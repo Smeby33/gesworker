@@ -1,0 +1,129 @@
+.tasks-container {
+    background: linear-gradient(15deg, #808080, #000000);
+    padding: 20px;
+    border-radius: 8px;
+  }
+  .tasks-container h3{
+    color: white;
+  }
+  
+  .tasks-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .task-item {
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    padding: 15px;
+    margin-bottom: 15px;
+    border-radius: 8px;
+  }
+  
+  .task-item h4 {
+    margin-bottom: 10px;
+  }
+  
+  .task-actions {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  
+  .task-actions button {
+    padding: 8px 12px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .task-actions button:hover {
+    opacity: 0.8;
+  }
+  
+  .status-icon {
+    margin-left: 10px;
+  }
+  
+  .pending {
+    color: orange;
+  }
+  
+  .in-progress {
+    color: blue;
+  }
+  
+  .completed {
+    color: green;
+  }
+  .task-item1:hover {
+    background: linear-gradient(45deg, #ffc107, transparent);
+    color: white;
+}
+.task-item1 {
+    display: flex;
+    justify-content: space-between;
+    padding: 0.8em;
+    margin-bottom: 10px;
+    flex-direction: column;
+    color: white;
+    /* background: #fff; */
+    background: linear-gradient(359deg, #151516, #0061f1);
+    border-radius: 8px;
+    transition: background 0.3s ease;
+    cursor: pointer;
+}
+.task-item1-date{
+    display: flex;
+    justify-content: space-between;
+}
+.filters {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2em;
+}
+.filters button , .filter-buttons button{
+   border-radius: 5px;
+   background:none;
+  }
+  
+.filters button:hover , .filter-buttons button:hover{
+    border-radius: 5px;
+    background: linear-gradient(359deg, #151516, #0061f1);
+}
+.filter-buttons button{
+  border-radius: 5px;
+  background:none;
+ }
+ .filter-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 2em;
+}
+.no-tasks-message span {
+  margin-bottom: 5px;
+  color: white; /* Couleur de base du texte */
+  animation: blink 0.5s infinite alternate;
+}
+
+@keyframes blink {
+  from {
+      color: rgb(225, 255, 0);
+  }
+  to {
+      color: #0061f1;
+  }
+}
+.userconected{
+  font-size: 14px;
+  color: #ffffff;
+}
+.userconected span{
+  font-size: 16px;
+  font-weight: bolder;
+  color: #ffffff;
+}
+
+
+  

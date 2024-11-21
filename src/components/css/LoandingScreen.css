@@ -1,0 +1,81 @@
+/* LoadingScreen.css */
+
+.loading-screen {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    background: linear-gradient(15deg, #06060a, #002d5a);
+    color: #333;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  /* Animation pour l'icône */
+  .app-icon {
+    width: 300px;
+    height: 300px;
+    margin-bottom: 20px;
+    border-radius: 150px;
+    animation: rotate 2s linear 3;
+  }
+  
+  /* Texte avec une animation de type machine à écrire */
+  .animationh3 {
+    font-size: 1.5rem;
+    color: #5b8c85;
+    margin-bottom: 15px;
+    overflow: hidden;
+    border-right: 2px solid #5b8c85;
+    white-space: nowrap;
+    width: 0;
+    animation: typing 3s steps(30, end) forwards, blink 0.7s infinite step-end alternate;
+  }
+  
+  /* Animation du texte "Chargement..." */
+  h1 {
+    font-size: 2rem;
+    color: #000000;
+    animation: fade-in 2s ease-in-out infinite alternate;
+  }
+  
+  /* Animation de rotation */
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  
+  /* Animation de type machine à écrire */
+  @keyframes typing {
+    from {
+      width: 0;
+    }
+    to {
+      width: 500px; /* Ajuste la largeur selon la longueur de ton texte */
+    }
+  }
+  
+  /* Animation du curseur clignotant */
+  @keyframes blink {
+    from, to {
+      border-color: transparent;
+    }
+    50% {
+      border-color: #000000;
+    }
+  }
+  
+  /* Animation de fondu pour le texte */
+  @keyframes fade-in {
+    from {
+      opacity: 0.5;
+    }
+    to {
+      opacity: 2;
+    }
+  }
+  

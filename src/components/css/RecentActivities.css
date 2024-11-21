@@ -1,0 +1,65 @@
+/* RecentActivities.css */
+
+.recent-activities {
+    background-color: #f1f1f1;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .recent-activities h3 {
+    color: #007bff;
+    margin-bottom: 15px;
+  }
+  
+  .activity-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .activity-item {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+  
+  .activity-item strong {
+    color: #333;
+  }
+  
+  .activity-item p {
+    margin: 5px 0;
+    color: #555;
+  }
+  
+  .activity-item span {
+    font-size: 0.8em;
+    color: #888;
+  }
+  .refresh-button {
+    background-color: #007bff00;
+    color: rgb(9, 0, 0);
+    border: none;
+    padding: 8px 12px;
+    border-radius: 5px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* Espace entre l'icône et le texte */
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .refresh-button:hover {
+    background: linear-gradient(15deg, #808080, #000000);
+    color: white;
+  }
+  
+  .refresh-button svg {
+    font-size: 18px; /* Taille de l'icône */
+  }
+  
+  

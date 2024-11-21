@@ -1,0 +1,95 @@
+/* Company.css */
+
+.company-container {
+    position: relative;
+    background: linear-gradient(15deg, #808080, #000000);
+    padding: 20px;
+    border-radius: 10px;
+  }
+  .company-container h3 {
+    color: white;
+  }
+  
+  .client-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .client-item {
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    position: relative;
+    background: linear-gradient(131deg, rgb(255 255 255 / 98%), #000);
+    border-radius: 5px;
+}
+  
+  .company-details {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    margin-left: 20px; /* Décalage pour qu'il ne soit pas trop collé à l'élément */
+    width: 250px; /* Réduit la largeur du détail */
+    background-color: #f9f9f9;
+    padding: 8px; /* Réduit l'espace autour du contenu */
+    border: 1px solid #ddd;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: none; /* Initialement caché */
+    font-size: 0.9rem; /* Réduit la taille de la police */
+    line-height: 1.4; /* Espacement plus compact des lignes */
+  }
+  
+  .client-item:hover .company-details {
+    display: block; /* Affiche le détail au survol */
+  }
+  
+  .company-details h4 {
+    font-size: 0.7rem; /* Réduit la taille du titre */
+    margin-bottom: 8px;
+  }
+  
+  .tasks {
+    margin-top: 10px;
+  }
+  
+  .tasks h5 {
+    font-size: 0.6rem;
+    margin-bottom: 8px;
+    color: #555;
+  }
+  
+  .task-item3 {
+    background: linear-gradient(131deg, rgb(255 255 255 / 98%), black);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    padding: 6px;
+    margin-bottom: 6px;
+    border-radius: 4px;
+    font-size: 0.6rem; /* Taille de la police réduite pour les tâches */
+  }
+  .task-item-ul:hover {
+    background: linear-gradient(131deg, rgba(71, 55, 55, 0.98), rgb(28, 26, 146));
+  }
+  
+  .task-item strong {
+    font-weight: normal;
+    font-size: 0.6rem; /* Taille du titre de la tâche réduite */
+  }
+  
+  .task-item ul {
+    margin-top: 4px;
+    padding-left: 15px;
+    list-style-type: circle;
+  }
+  
+  .task-item ul li {
+    font-size: 0.6rem; /* Réduit la taille des intervenants */
+    color: #555;
+  }
+  .task-item-ul{
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+  }
+  

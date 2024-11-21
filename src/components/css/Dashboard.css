@@ -1,0 +1,44 @@
+/* Dashboard.css */
+
+.Dashboard {
+    min-height: 100vh;
+    background: linear-gradient(15deg, #06060a, #002d5a);
+    box-shadow: 0px 2px 3px 5px #06060a;
+    border-radius: 10px;
+
+  }
+  
+  .nav-column {
+    background-color: #343a40;
+    color: #ffffff;
+    padding: 20px;
+  }
+  
+  .nav-buttons button {
+    color: #ffffff;
+    font-weight: bold;
+    margin-bottom: 10px;
+    transition: background-color 0.3s;
+  }
+  
+  .nav-buttons button:hover {
+    background-color: #495057;
+  }
+  
+  .contenu {
+    background-color: #ffffff;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  .nav-buttons button {
+    display: flex;
+    justify-content: space-evenly;
+  }
+  .nav-buttons {
+    display: flex;
+    justify-content: space-evenly;
+  }
+  #p-4{
+    background: linear-gradient(135deg, #000428, #004e92);
+  }
