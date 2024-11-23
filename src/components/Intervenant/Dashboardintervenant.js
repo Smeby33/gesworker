@@ -6,6 +6,7 @@ import Tasksinter from './Tasks-inter'; // Import du composant Tasks
 import '../css/Dashboard.css';
 import Companyinter from './Company-inter';
 import PerformanceDashboard from './PerformanceDashboard';
+
 function Dashboardintervenant() {
   const [selectedView, setSelectedView] = useState('clients');
 

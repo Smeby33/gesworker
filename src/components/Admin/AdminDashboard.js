@@ -4,6 +4,7 @@ import CreateCompany from './CreateCompany';
 import CreateIntervenant from './CreateIntervenant';
 import Dashboard from './Dashbord';
 import TaskCategories from '../Intervenant/TaskCategories';
+import CustomCalendar from './CustomCalendar';
 import '../css/AdminDashboard.css';
 
 function AdminDashboard() {
@@ -21,6 +22,9 @@ function AdminDashboard() {
       <div className="AD-cintenu1">
         <TaskCreation/>
         <TaskCategories />
+      </div>
+      <div className="AD-cintenu1">
+        <CustomCalendar/>
       </div>
      
     </div>

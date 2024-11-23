@@ -1,7 +1,7 @@
 import React   from 'react';
 import   { useEffect ,useState}  from 'react';
 import { useNavigate } from 'react-router-dom';
-import RecentActivities from '../Admin/RecentActivities'; // Import du nouveau composant
+import RecentActivities from '../Intervenant/RecentActivitiesinter'; // Import du nouveau composant
 import IntervenantDashboard from '../Intervenant/IntervenantDashboard';
 import Navbar from '../Intervenant/Navbar';
 import '../css/IntervenantPage.css';

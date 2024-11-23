@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
-import { FaTachometerAlt, FaTasks,FaUserShield, FaUserTie, FaSignInAlt ,FaDiagnoses ,FaStreetView,FaUserPlus,FaBuilding,FaFileMedical  } from 'react-icons/fa';
+import { FaTachometerAlt, FaTasks,FaUserShield, FaUserTie, FaSignInAlt ,FaDiagnoses ,FaStreetView,FaUserPlus,FaBuilding,FaFileMedical ,FaCalendarAlt  } from 'react-icons/fa';
 import Modal from 'react-modal';
 import Dashboard from '../Admin/Dashbord'; // Assurez-vous que le chemin est correct
 import TaskCategories from './TaskCategories'; // Assurez-vous que le chemin est correct
@@ -10,6 +10,7 @@ import '../css/Navbar.css'; // Assurez-vous que le chemin est correct
 Modal.setAppElement('#root'); // Nécessaire pour l'accessibilité
 
 function Navbar() {
+  const currentUser = JSON.parse(localStorage.getItem('currentUser'));
   const handleLogout = () => {
     // Suppression des données de l'utilisateur connecté dans le localStorage
     localStorage.removeItem('currentUser');
@@ -45,7 +46,7 @@ function Navbar() {
 
   };
   const handleAdminClick = () => {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
+    
 
     // Vérification si l'utilisateur est connecté
     if (!currentUser) {
@@ -83,10 +84,26 @@ function Navbar() {
         <FaDiagnoses />  Intervenantdash
       </button>
       <div>
-      <button  className="nav-button" onClick={handleLogout}>
-        <Link to="/Auth" className="nav-link"><FaSignInAlt />  Deconnexion</Link>
-      </button>
-      </div>
+  {currentUser ? (
+    <button
+      className="nav-button"
+      onClick={() => {
+        handleLogout();
+        navigate('/auth'); // Redirection après déconnexion
+      }}
+    >
+      <FaSignInAlt /> Déconnexion
+    </button>
+  ) : (
+    <button
+      className="nav-button"
+      onClick={() => navigate('/auth')} // Redirection vers Auth pour connexion
+    >
+      <FaSignInAlt /> Se connecter
+    </button>
+  )}
+</div>
+
           <a href="#tableau">
             <button  className="nav-button">
               <FaTachometerAlt />  Tableau de bord
@@ -113,6 +130,11 @@ function Navbar() {
             <button  className="nav-button">
               <a href="#from-tache" className="nav-link"> <FaFileMedical/>  Add Tâches</a>
             </button>
+            <div className="btnnav">
+            <button  className="nav-button">
+              <a href="#calendar" className="nav-link"> <FaCalendarAlt/>Calendrier</a>
+            </button>
+          </div>
           </div>
         </div>
           {/* onClick={openActions} onClick={openDashboard} */}

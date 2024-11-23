@@ -13,18 +13,6 @@ function RecentActivities() {
     // Fonction pour vérifier si un élément est récent
     const isRecent = (timestamp) => timestamp && now - timestamp < thirtyMinutes;
 
-    // Récupérer et traiter les entreprises
-    const storedCompanies = JSON.parse(localStorage.getItem('clients')) || [];
-    storedCompanies.forEach((company) => {
-      if (isRecent(company.timestamp)) {
-        activities.push({
-          type: 'Entreprise',
-          name: company.companyName,
-          description: `Description : ${company.description || 'Aucune'}`,
-          timestamp: company.timestamp,
-        });
-      }
-    });
 
     // Récupérer et traiter les tâches
     const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
@@ -35,19 +23,6 @@ function RecentActivities() {
           name: task.titre,
           description: `Entreprise : ${task.company || 'Non spécifiée'}`,
           timestamp: task.timestamp,
-        });
-      }
-    });
-
-    // Récupérer et traiter les intervenants
-    const storedIntervenants = JSON.parse(localStorage.getItem('intervenant')) || [];
-    storedIntervenants.forEach((intervenant) => {
-      if (isRecent(intervenant.timestamp)) {
-        activities.push({
-          type: 'Intervenant',
-          name: intervenant.name,
-          description: `Email : ${intervenant.email || 'Non spécifié'}`,
-          timestamp: intervenant.timestamp,
         });
       }
     });
