@@ -1,11 +1,14 @@
 /* RecentActivities.css */
 
 .recent-activities {
-    background-color: #f1f1f1;
+    background-color: #ffffff;
     padding: 20px;
     border-radius: 8px;
     margin-bottom: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 8px rgba(246, 80, 80, 0.1);
+  }
+  .recent-activities p {
+    color: black;
   }
   
   .recent-activities h3 {
@@ -41,7 +44,7 @@
   }
   .refresh-button {
     background-color: #007bff00;
-    color: rgb(9, 0, 0);
+    color: rgb(255, 255, 255);
     border: none;
     padding: 8px 12px;
     border-radius: 5px;
@@ -61,5 +64,8 @@
   .refresh-button svg {
     font-size: 18px; /* Taille de l'icône */
   }
-  
+  .prager{
+    color: black;
+
+  }
   

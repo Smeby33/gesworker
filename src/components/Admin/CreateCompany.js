@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import '../css/CreateCompany.css'; // Vérifiez que le chemin est correct
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function CreateCompany() {
   const [companyName, setCompanyName] = useState('');
@@ -34,11 +36,13 @@ function CreateCompany() {
     setEmail('');
     setAddress('');
     setDescription('');
-    alert('Entreprise créée avec succès');
+
+    toast.success('Entreprise créée avec succès');
   };
 
   return (
     <div className="max-w-md mx-auto p-6 mt-10" id='form'>
+      
       <h3 className="text-xl font-semibold mb-4" id='Form-company'>Créer une Entreprise</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>

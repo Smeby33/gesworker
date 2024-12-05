@@ -97,4 +97,43 @@
   .performance-table tr:hover {
     background-color: #f1f1f1;
   }
+
+
+  .all-performance-tables {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+  }
+  
+  .performance-table {
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+    padding: 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+  .performance-tablecontent{display: flex;
+  justify-content: space-between;
+}
+  
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  
+  table th,
+  table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+  }
+  
+  table th {
+    background-color: #f4f4f4;
+    font-weight: bold;
+  }
+  
+  .circular-progress {
+    margin: 0 auto;
+  }
+  
   

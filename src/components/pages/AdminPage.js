@@ -22,8 +22,9 @@ function AdminPage() {
         <Navbar />
       </div>
       <div className="AdminPagemain">
+        
         <h1 className='animationh3a'>
-          Bienvenue administrateur {adminName} dans votre tableau de bord 
+          Bienvenue administrateur {adminName}  dans votre tableau de bord 
         </h1>
         <div className="company">
           <RecentActivities /> {/* Inclusion du nouveau composant */}

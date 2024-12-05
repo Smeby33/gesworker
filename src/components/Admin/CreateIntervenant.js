@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import '../css/CreateIntervenant.css'; // Assurez-vous que le chemin est correct
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function CreateIntervenant() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
+  const [ profilePicture, setProfilePicture]= useState('')
   const [phone, setPhone] = useState('');
   const [role, setRole] = useState('');
 
@@ -24,6 +27,7 @@ function CreateIntervenant() {
       email,
       phone,
       role,
+      profilePicture,
       password: generatePassword(name),
       timestamp: new Date().getTime(),
     };
@@ -33,10 +37,11 @@ function CreateIntervenant() {
     localStorage.setItem('intervenant', JSON.stringify(updatedIntervenants));
 
     setName('');
+    setProfilePicture('');
     setEmail('');
     setPhone('');
     setRole('');
-    alert('Intervenant créé avec succès');
+    toast.success('Intervenant créé avec succès');
   };
 
   return (

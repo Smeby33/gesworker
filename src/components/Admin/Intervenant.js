@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from 'react';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import '../css/Intervenant.css'; // Assure-toi que le chemin est correct
 
 function Intervenant() {

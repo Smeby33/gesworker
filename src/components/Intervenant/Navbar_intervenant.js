@@ -5,9 +5,7 @@ import { FaTachometerAlt, FaTasks,FaUserShield, FaUserTie, FaSignInAlt ,FaDiagno
 import Modal from 'react-modal';
 import Dashboard from '../Admin/Dashbord'; // Assurez-vous que le chemin est correct
 import TaskCategories from './TaskCategories'; // Assurez-vous que le chemin est correct
-import ProfilePicture from '../Admin/ProfilePicture';
-import { toast, ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
+import ProfilePicture from '../Admin/ProfilePicture_intervenant';
 import '../css/Navbar.css'; // Assurez-vous que le chemin est correct
 
 Modal.setAppElement('#root'); // Nécessaire pour l'accessibilité
@@ -19,7 +17,7 @@ function Navbar() {
     localStorage.removeItem('currentUser');
     
     // Message de confirmation de déconnexion
-    toast.success("Vous êtes maintenant déconnecté.");
+    alert("Vous êtes maintenant déconnecté.");
 
     // Rediriger l'utilisateur vers la page d'authentification
     navigate('/auth');
@@ -32,15 +30,14 @@ function Navbar() {
   const openDashboard = () => setIsDashboardOpen(true);
   const closeDashboard = () => setIsDashboardOpen(false);
 
-  const openActions = () => setIsActionsOpen(true);
+  const openActions = () => setIsActionsOpen(true); 
   const closeActions = () => setIsActionsOpen(false);
   const handleIntervenantClick = () => {
     const currentUser = JSON.parse(localStorage.getItem('currentUser')); // Récupère l'utilisateur connecté
   
     if (!currentUser) {
       // Si personne n'est connecté, redirige vers la page d'authentification
-      toast.warn('Veuillez vous authentifier pour accéder à cette page.');
-      
+      alert('Veuillez vous authentifier pour accéder à cette page.');
       navigate('/auth'); // Redirection vers la page d'authentification
     } else {
       // Si un utilisateur est connecté, autorise l'accès à la page intervenant
@@ -54,12 +51,12 @@ function Navbar() {
 
     // Vérification si l'utilisateur est connecté
     if (!currentUser) {
-      toast.alert('Veuillez vous authentifier pour accéder à cette page.');
+        alert('Veuillez vous authentifier pour accéder à cette page.');
         navigate('/auth');  // Redirige vers la page de connexion
     } 
     // Si l'utilisateur est administrateur
     else if (currentUser.isAdmin) {
-        const shouldAccessIntervenant = toast.info('Voulez-vous accéder au tableau de bord de l\'intervenant ?');
+        const shouldAccessIntervenant = window.confirm('Voulez-vous accéder au tableau de bord de l\'intervenant ?');
         
         if (shouldAccessIntervenant) {
             navigate('/intervenant'); // L'administrateur choisit d'accéder à l'intervenant
@@ -69,7 +66,7 @@ function Navbar() {
     } 
     // Si l'utilisateur n'est pas un administrateur
     else {
-      toast.error("Vous n'avez pas les droits d'accès en tant qu'administrateur.");
+        alert("Vous n'avez pas les droits d'accès en tant qu'administrateur.");
     }
 };
 
@@ -79,7 +76,6 @@ function Navbar() {
   return (
     <nav>
       <div className="navbar-list">
-      <ToastContainer />
       <ProfilePicture/>
       <div className="btnnav"> 
       <button  className="nav-button" onClick={handleAdminClick}>
@@ -117,34 +113,6 @@ function Navbar() {
               <FaTachometerAlt />  Tableau de bord
             </button>
           </a>
-          <div className="btnnav">
-          <a href="#Action">
-          <button  className="nav-button">
-            <FaTasks />  Nos actions
-          </button>
-          </a>
-          <div className="btnnav">
-            <button  className="nav-button">
-              <a href="#form-intervenant" className="nav-link"> <FaUserPlus />  Add Intervenant</a>
-            </button>
-          </div>
-        
-          <div className="btnnav">
-            <button  className="nav-button">
-              <a href="#Form-company" className="nav-link"> <FaBuilding  />  Add Entreprise</a>
-            </button>
-          </div>
-          <div className="btnnav">
-            <button  className="nav-button">
-              <a href="#from-tache" className="nav-link"> <FaFileMedical/>  Add Tâches</a>
-            </button>
-            <div className="btnnav">
-            <button  className="nav-button">
-              <a href="#calendar" className="nav-link"> <FaCalendarAlt/>  Calendrier</a>
-            </button>
-          </div>
-          </div>
-        </div>
           {/* onClick={openActions} onClick={openDashboard} */}
       
       </div>

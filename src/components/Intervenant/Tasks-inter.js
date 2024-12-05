@@ -5,91 +5,75 @@ import '../css/Tasks.css';
 function Tasksinter() {
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
-  const [filterStatus, setFilterStatus] = useState(null); // État pour stocker le statut du filtre
-  const [noTasksMessage, setNoTasksMessage] = useState(""); // État pour le message d'alerte
-  const [comments, setComments] = useState({}); // Stockage des commentaires par tâche
-
-  // Récupérer l'utilisateur connecté depuis le localStorage
+  const [filterStatus, setFilterStatus] = useState('');
+  const [noTasksMessage, setNoTasksMessage] = useState('');
+  const [comments, setComments] = useState({});
   const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
 
-  // Récupérer les tâches depuis le localStorage
   useEffect(() => {
     const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
     setTasks(storedTasks);
+    setFilteredTasks(storedTasks);
 
-    // Charger les commentaires
     const storedComments = JSON.parse(localStorage.getItem('comments')) || {};
     setComments(storedComments);
   }, []);
 
-  // Filtrer les tâches assignées à l'utilisateur connecté
-  useEffect(() => {
-    if (tasks.length > 0 && currentUser?.username) {
-      const assignedTasks = tasks.filter(task =>
-        task.intervenants.some(intervenant => intervenant === currentUser.username)
-      );
-      setFilteredTasks(assignedTasks);
-    }
-  }, [tasks, currentUser]);
-
-  // Détermine si une tâche est en retard
   const isTaskLate = (task) => {
     const today = new Date();
     const dateFin = new Date(task.dateFin);
     return task.statut !== 'Terminé' && dateFin < today;
   };
 
-  // Filtrer les tâches en fonction du statut ou des critères (y compris les tâches en retard)
-  const filterTasks = (status) => {
-    setFilterStatus(status); // Mettre à jour le statut du filtre
-    let filtered;
+  const handleFilterChange = (status) => {
+    setFilterStatus(status);
+    filterTasks(tasks, status);
+  };
 
-    if (status === 'En retard') {
-      filtered = filteredTasks.filter(task => isTaskLate(task));
-    } else if (status) {
-      filtered = filteredTasks.filter(task => task.statut === status);
+  const filterTasks = (tasks, status) => {
+    const assignedTasks = tasks.filter((task) =>
+      task.intervenants.includes(currentUser.username)
+    );
+
+    let filtered;
+    if (status === 'overdue') {
+      filtered = assignedTasks.filter(isTaskLate);
+      setNoTasksMessage(filtered.length === 0 ? 'Aucune tâche en retard.' : '');
+    } else if (status === '') {
+      filtered = assignedTasks;
+      setNoTasksMessage('');
     } else {
-      filtered = tasks.filter(task =>
-        task.intervenants.some(intervenant => intervenant === currentUser.username)
+      filtered = assignedTasks.filter((task) => task.statut === status);
+      setNoTasksMessage(
+        filtered.length === 0 ? `Aucune tâche ${status.toLowerCase()}.` : ''
       );
     }
 
     setFilteredTasks(filtered);
-
-    // Gérer le message d'alerte
-    if (filtered.length === 0) {
-      const message = status === 'En retard'
-        ? "Vous n'avez aucune tâche en retard."
-        : `Vous n'avez aucune tâche ${status?.toLowerCase()}.`;
-      setNoTasksMessage(message);
-    } else {
-      setNoTasksMessage(""); // Réinitialiser le message si on a des tâches
-    }
   };
 
-  // Mise à jour du statut d'une tâche
-  const updateTaskStatus = (id, newStatus) => {
-    const updatedTasks = tasks.map(task =>
-      task.id === id ? { ...task, statut: newStatus } : task
-    );
+  const updateTaskStatus = (taskId, newStatus) => {
+    const updatedTasks = tasks.map((task) => {
+      if (task.id === taskId) {
+        return { ...task, statut: newStatus, timestamp: new Date().getTime() };
+      }
+      return task;
+    });
+
     setTasks(updatedTasks);
+    setFilteredTasks(updatedTasks.filter((task) => task.intervenants.includes(currentUser.username)));
     localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-
-    // Mettre à jour les tâches filtrées
-    setFilteredTasks(
-      updatedTasks.filter(task =>
-        task.intervenants.some(intervenant => intervenant === currentUser.username)
-      )
-    );
   };
 
-  // Ajouter un commentaire à une tâche
   const addComment = (taskId, comment) => {
-    if (!comment.trim()) return; // Empêcher l'ajout de commentaires vides
+    if (!comment.trim()) return;
 
     const updatedComments = {
       ...comments,
-      [taskId]: [...(comments[taskId] || []), { user: currentUser.username, text: comment, date: new Date() }]
+      [taskId]: [
+        ...(comments[taskId] || []),
+        { user: currentUser.username, text: comment, date: new Date() }
+      ]
     };
 
     setComments(updatedComments);
@@ -98,47 +82,69 @@ function Tasksinter() {
 
   return (
     <div className="tasks-container">
-      <h3>Liste des Tâches</h3>
-      <p className='userconected'>Utilisateur connecté : <span>{currentUser.username}</span></p>
+      <h3>Mes Tâches Assignées</h3>
+      <p className="userconected">
+        Utilisateur connecté : <span>{currentUser.username}</span>
+      </p>
 
-      {/* Section des filtres */}
       <div className="filters">
-      <button onClick={() => filterTasks(null)}>
+        <button
+          onClick={() => handleFilterChange('')}
+          className={filterStatus === '' ? 'active' : ''}
+        >
           <FaFilter /> Toutes
         </button>
-        <button onClick={() => filterTasks('En attente')}>
+        <button
+          onClick={() => handleFilterChange('En attente')}
+          className={filterStatus === 'En attente' ? 'active' : ''}
+        >
           <FaHourglassHalf /> En attente
         </button>
-        <button onClick={() => filterTasks('En cours')}>
+        <button
+          onClick={() => handleFilterChange('En cours')}
+          className={filterStatus === 'En cours' ? 'active' : ''}
+        >
           <FaHourglassHalf /> En cours
         </button>
-        <button onClick={() => filterTasks('Terminé')}>
+        <button
+          onClick={() => handleFilterChange('Terminé')}
+          className={filterStatus === 'Terminé' ? 'active' : ''}
+        >
           <FaCheckCircle /> Terminé
         </button>
-        <button onClick={() => filterTasks('Annulé')}>
+        <button
+          onClick={() => handleFilterChange('Annulé')}
+          className={filterStatus === 'Annulé' ? 'active' : ''}
+        >
           <FaTimesCircle /> Annulé
         </button>
-        <button onClick={() => filterTasks('En retard')}>
+        <button
+          onClick={() => handleFilterChange('overdue')}
+          className={filterStatus === 'overdue' ? 'active' : ''}
+        >
           <FaExclamationCircle /> En retard
         </button>
       </div>
 
-      {/* Alerte si aucune tâche ne correspond au filtre */}
-      {noTasksMessage && <p className="no-tasks-message"><span>{noTasksMessage}</span></p>}
+      {noTasksMessage && (
+        <p className="no-tasks-message">
+          <span>{noTasksMessage}</span>
+        </p>
+      )}
 
-      {/* Affichage des tâches filtrées */}
-      {filteredTasks.length === 0 && !noTasksMessage ? (
-        <p>Aucune tâche assignée trouvée pour : {currentUser.username}</p>
-      ) : (
+      {filteredTasks.length > 0 ? (
         <ul className="tasks-list">
-          {filteredTasks.map(task => (
+          {filteredTasks.map((task) => (
             <li
               key={task.id}
-              className="task-item1"
-              style={{ backgroundColor: isTaskLate(task) ? 'red' : 'white' }} // Affiche en rouge si en retard
+              className={`task-item1 ${
+                isTaskLate(task) ? 'overdue-task' : ''
+              }`}
             >
               <h4>{task.titre}</h4>
-              <p><strong>Entreprise :</strong> {task.company}</p>
+              <p>
+                <strong>Entreprise :</strong> {task.company}
+              </p>
               <p>
                 <strong>Catégories :</strong> {task.categories.join(', ')}
               </p>
@@ -146,31 +152,51 @@ function Tasksinter() {
                 <strong>Intervenants :</strong> {task.intervenants.join(', ')}
               </p>
               <div className="task-item1-date">
-                <p><strong>Date de début :</strong> {task.dateDebut}</p>
-                <p><strong>Statut :</strong> {task.statut}</p>
-                <p>{task.dateFin && <strong>Date de fin :</strong>} {task.dateFin}</p>
-              </div>
-              <div className="task-actions">
-                {task.statut !== 'Terminé' && task.statut !== 'Annulé' && (
-                  <>
-                    <button onClick={() => updateTaskStatus(task.id, 'En cours')}>En cours</button>
-                    <button onClick={() => updateTaskStatus(task.id, 'Terminé')}>Terminer</button>
-                    <button onClick={() => updateTaskStatus(task.id, 'Annulé')}>Annuler</button>
-                  </>
-                )}
+                <p>
+                  <strong>Date de début :</strong> {task.dateDebut}
+                </p>
+                <p>
+                  <strong>Date de fin :</strong> {task.dateFin || 'Non spécifiée'}
+                </p>
+                <p>
+                  <strong>Statut :</strong> {task.statut}
+                </p>
               </div>
 
-              {/* Section des commentaires */}
+              <div className="task-actions">
+                <button
+                  className="btn-start"
+                  onClick={() => updateTaskStatus(task.id, 'En cours')}
+                  disabled={task.statut === 'En cours'}
+                >
+                  En cours
+                </button>
+                <button
+                  className="btn-complete"
+                  onClick={() => updateTaskStatus(task.id, 'Terminé')}
+                  disabled={task.statut === 'Terminé'}
+                >
+                  Terminer
+                </button>
+                <button
+                  className="btn-cancel"
+                  onClick={() => updateTaskStatus(task.id, 'Annulé')}
+                  disabled={task.statut === 'Annulé'}
+                >
+                  Annuler
+                </button>
+              </div>
+
               <div className="task-comments">
                 <h5>Commentaires</h5>
                 {comments[task.id]?.length > 0 ? (
                   <ul>
                     {comments[task.id].map((comment, index) => (
                       <li key={index}>
-                        <p>
-                          <strong style={{ color: '#007bff' }}>{comment.user}</strong>: {comment.text}
+                        <p className='comment-one'>
+                          <strong>{comment.user} :</strong> {comment.text}
                         </p>
-                        <span style={{ fontSize: '0.8em', color: '#888' }}>
+                        <span>
                           {new Date(comment.date).toLocaleString()}
                         </span>
                       </li>
@@ -180,7 +206,7 @@ function Tasksinter() {
                   <p>Aucun commentaire.</p>
                 )}
               </div>
-              {/* Ajout d'un commentaire */}
+
               <div className="add-comment">
                 <input
                   type="text"
@@ -196,6 +222,8 @@ function Tasksinter() {
             </li>
           ))}
         </ul>
+      ) : (
+        !noTasksMessage && <p>Aucune tâche assignée trouvée.</p>
       )}
     </div>
   );

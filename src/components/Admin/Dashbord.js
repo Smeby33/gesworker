@@ -5,7 +5,7 @@ import Company from './Company';
 import Intervenant from './Intervenant';
 import Tasks from './Tasks'; // Import du composant Tasks
 import '../css/Dashboard.css';
-import AllPerformanceTables from './AllPerformanceTables';
+import AllPerformanceTables from './AllPerformanceTables'
 
 function Dashboard() {
   const [selectedView, setSelectedView] = useState('clients');

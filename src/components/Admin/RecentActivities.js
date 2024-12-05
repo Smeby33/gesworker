@@ -85,7 +85,7 @@ function RecentActivities() {
           ))}
         </ul>
       ) : (
-        <p>Aucune activité récente.</p>
+        <p style={{ color: 'black ', fontWeight: 'bold' }}>Aucune activité récente.</p>
       )}
     </div>
   );

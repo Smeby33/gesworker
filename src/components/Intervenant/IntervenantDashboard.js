@@ -4,7 +4,7 @@ import Dashboardintervenant from './Dashboardintervenant';
 function IntervenantDashboard() {
   return (
     <div>
-      <h2>Intervenant Dashboard</h2>
+      <h2  className='intervenantDashboardh2'>Intervenant Dashboard</h2>
       <Dashboardintervenant />
     </div>
   );

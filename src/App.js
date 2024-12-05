@@ -29,6 +29,19 @@ function App() {
 
     return () => clearTimeout(timeout);
   }, []);
+   // Polling : vérifier les mises à jour toutes les X secondes
+   useEffect(() => {
+    const interval = setInterval(() => {
+      const updatedUser = getUserFromLocalStorage();
+      if (JSON.stringify(updatedUser) !== JSON.stringify(currentUser)) {
+        setIsAuthenticated(!!updatedUser);
+        setCurrentUser(updatedUser);
+        console.log("Mise à jour détectée via polling !");
+      }
+    }, 2000); // Vérifie toutes les 5 secondes
+
+    return () => clearInterval(interval);
+  }, [currentUser]);
 
   // Écoute les modifications du localStorage
   useEffect(() => {
@@ -72,10 +85,10 @@ function App() {
     <Router>
       <Routes>
         {/* Routes pour les utilisateurs non connectés */}
+        <Route path="/" element={<Auth onLoginSuccess={handleLoginSuccess} />} />
+
         {!isAuthenticated ? (
           <>
-            <Route path="/" element={<Auth onLoginSuccess={handleLoginSuccess} />} />
-            
             <Route path="/register" element={<RegisterPage onRegisterSuccess={onRegisterSuccess} />} />
           </>
         ) : (

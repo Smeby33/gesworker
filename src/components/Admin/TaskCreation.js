@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import '../css/TaskCreation.css';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function TaskCreation() {
   const [tasks, setTasks] = useState([]);
@@ -69,6 +71,7 @@ function TaskCreation() {
     const updatedTasks = [...tasks, newTask];
     setTasks(updatedTasks);
     saveTasksToLocalStorage(updatedTasks);
+    toast.success('tâche créé avec succès');
 
     // Réinitialisation des champs
     setTitre('');
@@ -81,6 +84,7 @@ function TaskCreation() {
 
   return (
     <div className="task-creation-container" id='from-tache'>
+      <ToastContainer />
       <h3>Création de Tâche</h3>
 
       <form onSubmit={handleTaskCreation}>
