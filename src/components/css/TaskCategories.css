@@ -1,0 +1,104 @@
+/* TaskCategories.css */
+
+.task-categories-container {
+    font-family: 'Arial', sans-serif;
+    padding: 1em;
+    background: linear-gradient(15deg, #808080, #000000);
+    border-radius: 10px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    margin: 2em auto;
+    max-width: 600px;
+  }
+  
+  .task-categories-container h3 {
+    color: #ffffff;
+    font-weight: 600;
+    text-align: center;
+    margin-bottom: 1em;
+  }
+  
+  .task-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .task-item0 {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.8em;
+    margin-bottom: 10px;
+    background: #fff;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+    cursor: pointer;
+  }
+  ul li {
+    flex-direction: none ;
+  }
+
+  
+  .task-item0:hover {
+    background: linear-gradient(45deg, #f8f9fa, #0d6efd);
+    color: white;
+  }
+  
+  .task-icon {
+    font-size: 1.5em;
+    color: #0a74da;
+    margin-right: 10px;
+  }
+  
+  .task-name {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #333;
+  }
+  
+  .task-item:hover .task-icon {
+    color: white;
+  }
+  
+  .delete-btn {
+    background: transparent;
+    border: none;
+    color: #ff4d4d;
+    font-size: 1.2em;
+    cursor: pointer;
+    transition: color 0.3s ease;
+  }
+  
+  .delete-btn:hover {
+    color: #ff1a1a;
+  }
+  
+  /* Styles pour le formulaire d'ajout de catégorie */
+  .add-category {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 20px;
+  }
+  
+  .add-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #0a74da;
+    border-radius: 5px;
+  }
+  
+  .add-btn {
+    background: #0a74da;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+  }
+  
+  .add-btn:hover {
+    background: #1c1c1c;
+  }
+  

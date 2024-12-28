@@ -1,0 +1,20 @@
+.AdminDashboard{
+  width: 80%;
+  margin-top: 3em;
+}
+.AdminDashboard h2{
+  text-align: center;
+  font-weight: bolder;
+  color: rgb(56, 140, 242);
+  text-shadow: 2px 2px 2px #151111,
+  1px 1px 2px rgba(0,0,0,0.5);
+}
+.AD-cintenu{
+  display: flex;
+  justify-content: space-evenly;
+}
+.AD-cintenu1{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+}

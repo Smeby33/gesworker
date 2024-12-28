@@ -1,0 +1,155 @@
+.intervenant-container {
+    margin: 20px;
+    background: linear-gradient(15deg, #808080, #000000);
+    padding: 20px;
+    border-radius: 8px;
+  }
+  .intervenant-container h3{
+    color: white;
+  }
+  
+  .intervenant-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .intervenant-item {
+    padding: 15px;
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+        padding: 15px;
+        color: white;
+        margin-bottom: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        background: linear-gradient(45deg, #000205, #00274e);
+    }
+  
+  .intervenant-details {
+    margin-top: 10px;
+  }
+  
+  .task-item2 {
+    background-color: #f9f9f9;
+    padding: 10px;
+    color: #00274e;
+    border-radius: 4px;
+    margin-bottom: 8px;
+  }
+  
+  .task-item.red {
+    background-color: red;
+    color: white;
+  }
+  
+  .task-item.orange {
+    background-color: orange;
+    color: white;
+  }
+
+  /* Sélecteur de vue */
+.view-selector {
+  margin-bottom: 20px;
+}
+
+.view-selector button {
+  margin-right: 10px;
+  padding: 8px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  color: #000000;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+}
+
+.view-selector button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Liste et grille */
+.intervenant-view.list .intervenant-item {
+  display: block;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+
+.intervenant-view.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.intervenant-view.grid .intervenant-item {
+  width: calc(33.33% - 15px);
+  border: 1px solid #ddd;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+/* Boutons de navigation */
+.navclient {
+  display: flex;
+  justify-content: right;
+  margin-bottom: 10px;
+}
+
+.nav-button {
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border-radius: 3px;
+  font-size: 12px;
+}
+
+.nav-button .nav-link {
+  color: white;
+  text-decoration: none;
+}
+.view-toggle {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.toggle-btn {
+  padding: 10px;
+  cursor: pointer;
+  border: none;
+  color: #332d2d;
+  background: #f0f0f0;
+  display: flex;
+  border-radius: 5px;
+  align-items: center;
+  gap: 5px;
+}
+
+.toggle-btn.active {
+  background: #007bff;
+  color: white;
+  border-radius: 5px;
+}
+
+.intervenant-list {
+  list-style: none;
+  padding: 0;
+}
+
+.intervenant-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.grid-item {
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+
