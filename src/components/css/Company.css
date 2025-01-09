@@ -1,0 +1,334 @@
+/* Company.css */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+.company-container {
+    position: relative;
+    z-index: 0;
+    background: linear-gradient(15deg, #808080, #000000);
+    padding: 20px;
+    border-radius: 10px;
+  }
+  .company-container h3 {
+    color: white;
+  }
+  
+  .client-list {
+    list-style-type: none;
+    padding: 0;
+  }
+  
+  .client-item {
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    position: relative;
+    background: linear-gradient(131deg, rgb(255 255 255 / 98%), #000);
+    border-radius: 5px;
+}
+  
+  .company-details {
+    position: absolute;
+    top: 30%;
+    left: 45%;
+    margin-left: 20px; /* Décalage pour qu'il ne soit pas trop collé à l'élément */
+    width: 250px; /* Réduit la largeur du détail */
+    background-color: #f9f9f9;
+    padding: 8px; /* Réduit l'espace autour du contenu */
+    border: 1px solid #ddd;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    display: none; /* Initialement caché */
+    font-size: 0.9rem; /* Réduit la taille de la police */
+    line-height: 1.4; /* Espacement plus compact des lignes */
+    z-index: 1;
+  }
+  #from-tache {
+    position: absolute;
+    top: 20%;
+    left: 45%;
+    margin-left: 20px; /* Décalage pour qu'il ne soit pas trop collé à l'élément */
+    width: 450px; /* Réduit la largeur du détail */
+    z-index: 2000;
+  }
+  
+  .client-item:hover .company-details {
+    display: block; /* Affiche le détail au survol */
+  }
+  
+  .company-details h4 {
+    font-size: 0.7rem; /* Réduit la taille du titre */
+    margin-bottom: 8px;
+  }
+  
+  .tasks {
+    margin-top: 10px;
+  }
+  
+  .tasks h5 {
+    font-size: 0.6rem;
+    margin-bottom: 8px;
+    color: #555;
+  }
+  
+  .task-item3 {
+    background: linear-gradient(131deg, rgb(255 255 255 / 98%), rgb(241, 139, 6));
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    padding: 6px;
+    margin-bottom: 6px;
+    border-radius: 4px;
+    font-size: 0.6rem; /* Taille de la police réduite pour les tâches */
+  }
+  .task-item-ul:hover {
+    background: linear-gradient(131deg, rgba(71, 55, 55, 0.98), rgb(28, 26, 146));
+  }
+  
+  .task-item strong {
+    font-weight: normal;
+    font-size: 0.6rem; /* Taille du titre de la tâche réduite */
+  }
+  
+  .task-item ul {
+    margin-top: 4px;
+    padding-left: 15px;
+    list-style-type: circle;
+  }
+  
+  .task-item ul li {
+    font-size: 0.6rem; /* Réduit la taille des intervenants */
+    color: #555;
+  }
+  .task-item-ul{
+    display: flex;
+    justify-content: space-around;
+    flex-direction: column;
+  }
+  .navclient{
+    display: flex;
+    justify-content: right;
+    align-items: flex-end;
+  }
+  .companies-view.list .company-item {
+    margin-bottom: 15px;
+  }
+  
+  .companies-view.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 15px;
+  }
+  
+  .companies-view.grid .company-item {
+    border: 1px solid #ccc;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  /* Style pour le conteneur */
+.company-container {
+  padding: 20px;
+}
+
+/* Sélecteur de vue */
+.view-selector {
+  margin-bottom: 20px;
+}
+
+.view-selector button {
+  margin-right: 10px;
+  padding: 8px 15px;
+  font-size: 14px;
+  cursor: pointer;
+  border: none;
+  border-radius: 5px;
+  background-color: #f0f0f0;
+}
+
+.view-selector button.active {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Liste des clients */
+.client-view.list .client-item {
+  display: block;
+  margin-bottom: 15px;
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+
+.client-view.grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+.client-view.grid .client-item {
+  width: calc(33.33% - 15px);
+  border: 1px solid #ddd;
+  padding: 10px;
+  box-sizing: border-box;
+  border-color: rgb(211, 147, 27);
+}
+.client-view.grid .navclient a {
+  color: #000000;
+  font-size: 6px;
+}
+.client-view.grid .navclient .nav-button {
+  color: #000000;
+}
+
+.client-item .navclient {
+  display: flex;
+  justify-content: right;
+  margin-bottom: 10px;
+}
+
+.nav-button {
+  padding: 5px 10px;
+  border: none;
+  cursor: pointer;
+  background-color: #007bff;
+  color: white;
+  border-radius: 3px;
+  font-size: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.btnnavicon{
+  height: 1.5em;
+  width: 1.5em;
+}
+
+.nav-button .nav-link {
+  color: white;
+  text-decoration: none;
+}
+.view-toggle {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.toggle-btn {
+  padding: 10px;
+  cursor: pointer;
+  border: none;
+  background: #f0f0f0;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.toggle-btn.active {
+  background: #007bff;
+  color: white;
+}
+
+.client-list {
+  list-style: none;
+  padding: 0;
+}
+
+.client-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.grid-item {
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 5px;
+  background-color: #f9f9f9;
+}
+.company-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  background: #e8f4fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+.client-view.grid .company-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px;
+  background: #f9f9f9;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  flex-direction: column;
+}
+
+.company-row:hover {
+  background:#f7d7c6; /* Couleur de survol */
+}
+.company-col {
+  flex: 1;
+  text-align: left;
+  padding: 4px 8px;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.company-col:first-child {
+  font-weight: bold;
+  color: #0073e6; /* Couleur du nom */
+}
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px; /* Espace entre les éléments */
+}
+
+.checkbox-group div {
+  display: flex;
+  align-items: center;
+}
+
