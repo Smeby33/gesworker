@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import { FaTachometerAlt, FaTasks,FaUserShield, FaUserTie, FaSignInAlt ,FaDiagnoses ,FaStreetView,FaUserPlus,FaBuilding,FaFileMedical ,FaCalendarAlt  } from 'react-icons/fa';
 import Modal from 'react-modal';
+import { toast, ToastContainer } from 'react-toastify'; 
 import Dashboard from '../Admin/Dashbord'; // Assurez-vous que le chemin est correct
 import TaskCategories from './TaskCategories'; // Assurez-vous que le chemin est correct
 import ProfilePicture from '../Admin/ProfilePicture_intervenant';
@@ -17,7 +18,7 @@ function Navbar() {
     localStorage.removeItem('currentUser');
     
     // Message de confirmation de déconnexion
-    alert("Vous êtes maintenant déconnecté.");
+    toast.success("Vous êtes maintenant déconnecté.");
 
     // Rediriger l'utilisateur vers la page d'authentification
     navigate('/auth');
@@ -37,7 +38,7 @@ function Navbar() {
   
     if (!currentUser) {
       // Si personne n'est connecté, redirige vers la page d'authentification
-      alert('Veuillez vous authentifier pour accéder à cette page.');
+      toast.altert('Veuillez vous authentifier pour accéder à cette page.');
       navigate('/auth'); // Redirection vers la page d'authentification
     } else {
       // Si un utilisateur est connecté, autorise l'accès à la page intervenant

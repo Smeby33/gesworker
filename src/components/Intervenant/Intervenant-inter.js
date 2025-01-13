@@ -1,62 +1,63 @@
-import React, { useEffect, useState } from 'react'; 
-import '../css/Intervenant.css'; // Assure-toi que le chemin est correct
+import React, { useEffect, useState } from 'react';
+import '../css/Intervenant.css';
 import { FaList, FaTh } from 'react-icons/fa';
 
 function Intervenantinter() {
   const [intervenants, setIntervenants] = useState([]);
   const [tasks, setTasks] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null); // Utilisateur connecté
-  const [viewMode, setViewMode] = useState('list'); // 'list' ou 'grid'
+  const [currentUser, setCurrentUser] = useState(null);
+  const [viewMode, setViewMode] = useState('list');
 
   useEffect(() => {
-    // Charger l'utilisateur connecté depuis le localStorage
+    // Charger les données depuis le localStorage
     const storedUser = JSON.parse(localStorage.getItem('currentUser')) || {};
     setCurrentUser(storedUser);
 
-    // Charger les intervenants depuis le localStorage
     const storedIntervenants = JSON.parse(localStorage.getItem('intervenant')) || [];
     setIntervenants(storedIntervenants);
 
-    // Charger les tâches depuis le localStorage
     const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    setTasks(storedTasks);
+    const validatedTasks = storedTasks.filter((task) => Array.isArray(task.intervenants));
+    setTasks(validatedTasks);
   }, []);
 
-  // Fonction pour récupérer les tâches associées à un intervenant
+  // Fonction pour récupérer les tâches d'un intervenant
   const getTasksForIntervenant = (intervenantName) => {
-    return tasks.filter((task) => task.intervenants.includes(intervenantName));
+    return tasks.filter(
+      (task) =>
+        Array.isArray(task.intervenants) && task.intervenants.includes(intervenantName)
+    );
   };
 
-  // Filtrer les intervenants en fonction des tâches partagées ou de l'entreprise
+  // Filtrer les intervenants
   const filteredIntervenants = intervenants.filter((intervenant) => {
-    // Vérifie si l'intervenant est dans la même entreprise ou a une tâche en commun
-    const hasCommonTask = tasks.some((task) =>
-      task.intervenants.includes(intervenant.name) && 
-      (task.intervenants.includes(currentUser.name) || task.company === currentUser.company)
+    return tasks.some(
+      (task) =>
+        Array.isArray(task.intervenants) &&
+        task.intervenants.includes(intervenant.name) &&
+        (task.intervenants.includes(currentUser?.name) || task.company === currentUser?.company)
     );
-    return hasCommonTask;
   });
 
-  // Fonction pour déterminer le style de la tâche en fonction de la date limite
+  // Déterminer la couleur de fond de la tâche
   const getTaskBackgroundColor = (task) => {
     const today = new Date();
     const dateFin = new Date(task.dateFin);
-    const diffTime = dateFin - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convertir en jours
+    const diffDays = Math.ceil((dateFin - today) / (1000 * 60 * 60 * 24));
 
     if (task.statut !== 'Terminé' && diffDays < 0) {
-      return 'red'; // Si la date est dépassée et la tâche non terminée
+      return 'red';
     } else if (diffDays <= 3 && diffDays >= 0) {
-      return 'orange'; // Si la date limite est dans 3 jours ou moins
+      return 'orange';
     }
-    return 'white'; // Couleur par défaut
+    return 'white';
   };
 
   return (
     <div className="intervenant-container" id="Intervenant">
-      <h3>Liste des Intervenants</h3>
+      <h3>Liste des collègues</h3>
 
-      {/* Boutons pour changer de vue */}
+      {/* Boutons de changement de vue */}
       <div className="view-toggle">
         <button
           className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
@@ -80,13 +81,15 @@ function Intervenantinter() {
               key={index}
               className={`intervenant-item ${viewMode === 'grid' ? 'grid-item' : ''}`}
             >
-              <strong>{intervenant.name}</strong>
-              <p><span>Contact:</span> {intervenant.contact}</p>
-              <p><span>Email:</span> {intervenant.email}</p>
-              <p><span>Identifiant:</span> {intervenant.id}</p>
+              <div className="intervenant-row">
+                <strong className="intervenant-col">{intervenant.name}</strong>
+                <p className="intervenant-col">Contact: {intervenant.phone}</p>
+                <p className="intervenant-col">Email: {intervenant.email}</p>
+                <p className="intervenant-col">Identifiant: {intervenant.id}</p>
+              </div>
 
               <div className="intervenant-details">
-                <h4>Tâches assignées </h4>
+                <h4>Tâches assignées</h4>
                 <div className="tasks">
                   {getTasksForIntervenant(intervenant.name).length > 0 ? (
                     getTasksForIntervenant(intervenant.name).map((task, index) => (
@@ -95,7 +98,18 @@ function Intervenantinter() {
                         className="task-item2"
                         style={{ backgroundColor: getTaskBackgroundColor(task) }}
                       >
-                        <strong>Client: {task.company}</strong> - Catégorie: {task.categories.join(', ')}
+                        <strong>Client: {task.company}</strong>
+                        <p>
+                          <span>Catégorie:</span>{' '}
+                          {task.categories && task.categories.length > 0 ? (
+                            task.categories.map((cat, index) => (
+                            
+                              <span className='cate' key={index}>-{cat.name} </span>
+                            ))
+                          ) : (
+                            <span>Aucune catégorie</span>
+                          )}
+                        </p>
                         <p>Statut: {task.statut}</p>
                         <p>Date limite: {task.dateFin}</p>
                       </div>

@@ -25,7 +25,7 @@ const [selectedIntervenantState, setSelectedIntervenantState] = useState(''); //
 const [selectedIntervenant, setSelectedIntervenant] = useState(null); // Intervenant actuellement sélectionné
 
 const [tasks, setTasks] = useState([]);
-const [categories, setCategories] = useState([]);
+const [categories, setCategories] = useState([]);  
 const [intervenants, setIntervenants] = useState([]);
 const [companies, setCompanies] = useState([]);
 
@@ -136,12 +136,18 @@ useEffect(() => {
   const storedIntervenants = JSON.parse(localStorage.getItem('intervenant')) || [];
   const storedCompanies = JSON.parse(localStorage.getItem('clients')) || [];
   const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+  const validatedTasks = storedTasks.map((task) => ({
+    ...task,
+    intervenants: Array.isArray(task.intervenants) ? task.intervenants : [],
+  }));
+  setTasks(validatedTasks);
 
   setCategories(storedCategories);
   setIntervenants(storedIntervenants);
   setCompanies(storedCompanies);
   setTasks(storedTasks);
 }, []);
+
 
 
 
@@ -171,8 +177,15 @@ const handleIntervenantFormToggle = (intervenantIndex) => {
 
 // Récupérer les tâches d'un intervenant spécifique
 const getTasksForIntervenant = (intervenantName) => {
-  return tasks.filter((task) => task.intervenants.includes(intervenantName));
+  return tasks.filter((task) => {
+    if (!Array.isArray(task.intervenants)) {
+      toast.warning("Tâche avec intervenants non valide :", task);
+      return false;
+    }
+    return task.intervenants.includes(intervenantName);
+  });
 };
+
 
 // Déterminer la couleur de fond d'une tâche en fonction de la date limite
 const getTaskBackgroundColor = (task) => {
@@ -274,8 +287,17 @@ const handleCompanyCreation = () => {
                      <CreateCompany onCompanyCreated={setCompanies} />
                      )}
               {formState.selectedIntervenantForTask?.name === intervenant.name && (
-                <div className="task-creation-container" id="form">
+                <div className="task-creation-container" id="formz">
                 <ToastContainer />
+                <div className="buttoncompanytask">
+                  <button
+                    className="close-buttoncompanytask"
+                    onClick={() => toggleFormState('selectedIntervenantForTask', null)}
+                    aria-label="Fermer le formulaire"
+                  >
+                    <FaTimes />
+                  </button>
+              </div>
                 <h3>Création de Tâche</h3>
               
                 <form onSubmit={handleTaskCreation}>
@@ -364,7 +386,15 @@ const handleCompanyCreation = () => {
                           style={{ backgroundColor: getTaskBackgroundColor(task) }}
                         >
                           <strong>Client: {task.company}</strong> 
-                          <p>Catégorie: {task.categories.join(', ')}</p> 
+                          <p>Catégorie: {task.categories && task.categories.length > 0 ? task.categories.map((cat, index) => (
+                      
+                      
+                        
+                      <p > -{cat.name}  </p> 
+                  
+                
+                  
+                )) : <div  className="intervenant-col" >Aucune catégorie.</div >}</p> 
                           <p>Statut: {task.statut}</p>
                           <p>Date limite: {task.dateFin}</p>
                         </div>

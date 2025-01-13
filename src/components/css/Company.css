@@ -294,6 +294,15 @@
   border: 1px solid #ddd;
   border-radius: 4px;
 }
+.grid-item .company-row {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 8px;
+  background: #e8f4fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
 .client-view.grid .company-row {
   display: flex;
   justify-content: space-between;
@@ -330,5 +339,17 @@
 .checkbox-group div {
   display: flex;
   align-items: center;
+}
+.close-buttoncompanytask{
+  color: orange;
+  background-color: rgba(245, 245, 220, 0);
+    border: none;
+    font-size: 1.5em;
+    cursor: pointer;
+    float: right;
+}
+.buttoncompanytask{
+  display: flex;
+  justify-content: right;
 }
 

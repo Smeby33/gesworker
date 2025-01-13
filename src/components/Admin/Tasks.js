@@ -172,9 +172,6 @@ function Tasks() {
         <button onClick={() => handleFilterChange('')} className={filter === '' ? 'active' : ''}>
           <FaFilter /> Tous
         </button>
-        <button onClick={() => handleFilterChange('En attente')} className={filter === 'En attente' ? 'active' : ''}>
-          <FaHourglassHalf /> En attente
-        </button>
         <button onClick={() => handleFilterChange('En cours')} className={filter === 'En cours' ? 'active' : ''}>
           <FaHourglassHalf /> En cours
         </button>
@@ -202,23 +199,12 @@ function Tasks() {
           >
                 <div className="affichagelist">
                 
-                  <div className="intervenant-row">
-
-                    <div  className="intervenant-col" >{task.titre}</div>
-                    <div  className="intervenant-col" >{task.company}</div>
-                    <div  className="intervenant-col">{task.intervenants.join(', ')}</div>
-                    <div  className="intervenant-col"> {task.dateDebut}</div>
-                    <div  className="intervenant-col" > {task.dateFin || 'Non sdivécifiée'}</div>
-                    <div   className="intervenant-col"> {task.statut}</div>
-
-                  </div>
-
-                  <div className="category-itemparent">
+                <div className="intervenant-row">
+                  <div className="category-itemparent" id='cate'>
                   {task.categories && task.categories.length > 0 ? task.categories.map((cat, index) => (
                       
                       <div
                         key={index}
-                        className="category-item"
                         onClick={() => handleCategoryClick(task.id, index)} // Définit la catégorie sélectionnée
                       >
                         {isCategorySelected(task.id, index) ? (
@@ -227,59 +213,66 @@ function Tasks() {
                             onChange={(e) => updateCategorySubStatus(task.id, index, e.target.value)}
                             onBlur={() => setSelectedCategory((prevState) => ({ ...prevState, [task.id]: null }))} // Cache le <select>
                           >
-                            <option value="En attente">En attente</option>
                             <option value="En cours">En cours</option>
                             <option value="Terminé">Terminé</option>
                           </select>
                         ) : (
-                          <span >{cat.name}</span> // Affiche le nom de la catégorie si ce n'est pas sélectionné
+                          <p >{cat.name}</p> // Affiche le nom de la catégorie si ce n'est pas sélectionné
                         )}
                       </div>
                       
                     )) : <div  className="intervenant-col" >Aucune catégorie.</div >}
                   </div>
-                  
+                  <div className="intervenant-col" id='cate'><p>{Array.isArray(task.intervenants) ? task.intervenants.join(', ') : 'Non spécifié'} </p> </div>
+                  <div  className="intervenant-col" id='cate'> <p> {task.dateDebut} </p> <p> {task.dateFin || 'Non sdivécifiée'} </p>  </div>
+                  <div   className="intervenant-col"> <p> {task.statut} </p> </div>
+                  <div  className="intervenant-col" ><p>{task.company}</p></div>
 
-                  <div className="task-actions">
-                    <button onClick={() => updateTaskStatus(task.id, 'En cours')}>En cours</button>
-                    <button onClick={() => updateTaskStatus(task.id, 'Terminé')}>Terminer</button>
-                    <button onClick={() => updateTaskStatus(task.id, 'Annulé')}>Annuler</button>
-                  </div>
-
-                 {/* Afficher les commentaires uniquement si la tâche est sélectionnée */}
-                 {selectedTaskId === task.id && (
-                      <div className="lescoment">
-                        <div className="task-comments">
-                          <h5>Commentaires</h5>
-                          {comments[task.id]?.length > 0 ? (
-                            <ul>
-                              {comments[task.id].map((comment, index) => (
-                                <li key={index}>
-                                  <p><strong>{comment.user} :</strong> {comment.text}</p>
-                                  <span>{new Date(comment.date).toLocaleString()}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          ) : (
-                            <p>Aucun commentaire.</p>
-                          )}
-                        </div>
-                        <div className="add-comment">
-                          <input
-                            type="text"
-                            placeholder="Ajouter un commentaire..."
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') {
-                                addComment(task.id, e.target.value);
-                                e.target.value = '';
-                              }
-                            }}
-                          />
-                        </div>
-                      </div>
-                    )}
-                
                 </div>
+
+               
+                
+
+                <div className="task-actions">
+                  <button onClick={() => updateTaskStatus(task.id, 'En cours')}>En cours</button>
+                  <button onClick={() => updateTaskStatus(task.id, 'Terminé')}>Terminer</button>
+                  <button onClick={() => updateTaskStatus(task.id, 'Annulé')}>Annuler</button>
+                </div>
+
+               {/* Afficher les commentaires uniquement si la tâche est sélectionnée */}
+               {selectedTaskId === task.id && (
+                    <div className="lescoment">
+                      <div className="task-comments">
+                        <h5>Commentaires</h5>
+                        {comments[task.id]?.length > 0 ? (
+                          <ul>
+                            {comments[task.id].map((comment, index) => (
+                              <li key={index}>
+                                <p><strong>{comment.user} :</strong> {comment.text}</p>
+                                <span>{new Date(comment.date).toLocaleString()}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p>Aucun commentaire.</p>
+                        )}
+                      </div>
+                      <div className="add-comment">
+                        <input
+                          type="text"
+                          placeholder="Ajouter un commentaire..."
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter') {
+                              addComment(task.id, e.target.value);
+                              e.target.value = '';
+                            }
+                          }}
+                        />
+                      </div>
+                    </div>
+                  )}
+              
+              </div>
             </div>
             
           ))}

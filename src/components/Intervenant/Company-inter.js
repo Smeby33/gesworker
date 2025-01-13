@@ -83,11 +83,13 @@ function Companyinter() {
               onMouseEnter={() => setHoveredCompany(company)}
               onMouseLeave={() => setHoveredCompany(null)}
             >
-              <strong>{company.companyName}</strong>
-              <p><span>Contact:</span> {company.contact}</p>
-              <p><span>Email:</span> {company.email}</p>
-              <p><span>Adresse:</span> {company.address}</p>
-              <p><span>Description:</span> {company.description}</p>
+              <div className="company-row">
+                  <strong className="company-col" >{company.companyName}</strong>
+                  <p className="company-col" ><span>Contact:</span> {company.contact}</p>
+                  <p className="company-col" ><span>Email:</span> {company.email}</p>
+                  <p className="company-col" ><span>Adresse:</span> {company.address}</p>
+                  <p className="company-col" ><span>Description:</span> {company.description}</p>
+              </div>
 
               {hoveredCompany && hoveredCompany.companyName === company.companyName && (
                 <div className="company-details">
@@ -101,7 +103,15 @@ function Companyinter() {
                           className="task-item3"
                           style={{ backgroundColor: getTaskBackgroundColor(task) }}
                         >
-                          <strong>{task.categories.join(', ')}</strong> - Statut: {task.statut}
+                          <strong>{task.categories && task.categories.length > 0 ? task.categories.map((cat, index) => (
+                      
+                      
+                        
+                      <span >  -{cat.name}  </span> 
+                  
+                
+                  
+                )) : <div  className="intervenant-col" >Aucune catégorie.</div >}</strong> - Statut: {task.statut}
                           <p>Date limite: {task.dateFin}</p>
                           <div className="task-item-ul3">
                             {task.intervenants.map((intervenant, i) => (

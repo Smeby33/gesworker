@@ -270,6 +270,15 @@ useEffect(() => {
                 company.companyName && (
                   <div className="task-creation-container" id="form" >
       <ToastContainer />
+      <div className="buttoncompanytask">
+          <button
+            className="close-buttoncompanytask"
+            onClick={() => setSelectedCompanyForTask(null)} // Réinitialiser pour fermer le formulaire
+            aria-label="Fermer le formulaire"
+          >
+            <FaTimes />
+          </button>
+      </div>
       <h3>Création de Tâche</h3>
 
       <form onSubmit={handleTaskCreation}>
