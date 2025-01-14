@@ -110,19 +110,25 @@ function CustomCalendar() {
           {filteredTasks.length > 0 ? (
             filteredTasks.map((task) => (
               <div key={task.id} className="task-item">
+                <div className="affichagelist">
+
+                  <div className="intervenant-row">
+
                     <div className="intervenant-col">{task.categories && task.categories.length > 0 ? task.categories.map((cat, index) => (
                       
                      
                          
-                          <span >{cat.name},</span> 
+                          <span >{cat.name}</span> 
                         
                       
                     )) : <div  className="intervenant-col" >Aucune catégorie.</div >}</div>
-                <div  className="intervenant-col" >{task.company}</div>
-                <p>Début : {new Date(task.dateDebut).toLocaleDateString()}</p>
-                <p>Fin : {new Date(task.dateFin).toLocaleDateString()}</p>
-                <p>Statut : {task.statut}</p>
-                <button onClick={() => toggleTaskStatus(task.id)}>
+
+                  <div  className="intervenant-col" >{task.company}</div>
+                  <div className="intervenant-col"><p>Début : {new Date(task.dateDebut).toLocaleDateString()}</p>                <p>Fin : {new Date(task.dateFin).toLocaleDateString()}</p></div>
+                  <div className="intervenant-col"><p>Statut : {task.statut}</p></div>
+              </div>
+              </div>
+              <button onClick={() => toggleTaskStatus(task.id)}>
                   {task.statut === 'En attente' ? (
                     <FaCheckCircle />
                   ) : (

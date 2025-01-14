@@ -76,6 +76,7 @@
   align-items: center;
   gap: 10px;
   justify-content: center;
+  margin-bottom: 20px;
 }
 
 .add-input {
@@ -108,4 +109,29 @@
 
 .add-btn svg {
   font-size: 1.3em;
+}
+
+.edit-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.edit-input,
+.edit-select {
+  padding: 5px;
+}
+
+.save-btn,
+.cancel-btn,
+.edit-btn {
+  padding: 5px 10px;
+  margin-left: 5px;
+  cursor: pointer;
+}
+
+.catebtn{
+  width: 100%;
+  display: flex;
+  justify-content: space-around;
 }

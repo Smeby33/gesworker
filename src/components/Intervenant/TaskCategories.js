@@ -14,6 +14,10 @@ function TaskCategories() {
   const [categories, setCategories] = useState([]);
   const [newCategoryName, setNewCategoryName] = useState("");
   const [newCategoryIcon, setNewCategoryIcon] = useState("FaFileInvoice");
+  const [editingCategory, setEditingCategory] = useState(null);
+  const [editedCategoryName, setEditedCategoryName] = useState("");
+  const [editedCategoryIcon, setEditedCategoryIcon] = useState("");
+
 
   const defaultCategories = [
     { name: "Saisie prestataires contractuels", icon: "FaFileInvoice" },
@@ -66,36 +70,35 @@ function TaskCategories() {
     }
   };
 
-  const deleteCategory = (index) => {
-    const updatedCategories = categories.filter((_, i) => i !== index);
+  const deleteCategory = (categoryToDelete) => {
+    const updatedCategories = categories.filter(
+      (category) => category.name !== categoryToDelete.name
+    );
     setCategories(updatedCategories);
     localStorage.setItem("taskCategories", JSON.stringify(updatedCategories));
   };
 
+  const startEditing = (category) => {
+    setEditingCategory(category);
+    setEditedCategoryName(category.name);
+    setEditedCategoryIcon(category.icon);
+  };
+  
+  const saveCategory = () => {
+    const updatedCategories = categories.map((category) =>
+      category.name === editingCategory.name
+        ? { ...category, name: editedCategoryName, icon: editedCategoryIcon }
+        : category
+    );
+    setCategories(updatedCategories);
+    localStorage.setItem("taskCategories", JSON.stringify(updatedCategories));
+    setEditingCategory(null); // Quitte le mode d'édition
+  };
+  
+
   return (
     <div className="task-categories-container" id="Action">
       <h3>Nos Actions - Catégories de Tâches</h3>
-
-      <div className="task-columns">
-        {[0, 1].map((column) => (
-          <div key={column} className="task-column">
-            {categories
-              .filter((_, index) => index % 2 === column)
-              .map((category, index) => (
-                <div key={index} className="task-item">
-                  <span className="task-icon">{iconMapping[category.icon]}</span>
-                  <span className="task-name">{category.name}</span>
-                  <button
-                    className="delete-btn"
-                    onClick={() => deleteCategory(index)}
-                  >
-                    <FaTrashAlt />
-                  </button>
-                </div>
-              ))}
-          </div>
-        ))}
-      </div>
 
       <div className="add-category">
         <input
@@ -109,6 +112,69 @@ function TaskCategories() {
           <FaPlusCircle /> Ajouter
         </button>
       </div>
+
+      <div className="task-columns">
+        {[0, 1].map((column) => (
+          <div key={column} className="task-column">
+            {categories
+  .filter((_, index) => index % 2 === column)
+  .map((category, index) => (
+    <div key={index} className="task-item">
+      {editingCategory?.name === category.name ? (
+        // Formulaire d'édition
+        <div className="edit-form">
+          <input
+            type="text"
+            value={editedCategoryName}
+            onChange={(e) => setEditedCategoryName(e.target.value)}
+            className="edit-input"
+          />
+          <select
+            value={editedCategoryIcon}
+            onChange={(e) => setEditedCategoryIcon(e.target.value)}
+            className="edit-select"
+          >
+            {Object.keys(iconMapping).map((icon) => (
+              <option key={icon} value={icon}>
+                {icon}
+              </option>
+            ))}
+          </select>
+          <button onClick={saveCategory} className="save-btn">
+            Sauvegarder
+          </button>
+          <button onClick={() => setEditingCategory(null)} className="cancel-btn">
+            Annuler
+          </button>
+        </div>
+      ) : (
+        // Affichage normal
+        <>
+          <span className="task-icon">{iconMapping[category.icon]}</span>
+          <span className="task-name">{category.name}</span>
+            <div className="catebtn">
+              <button
+                className="edit-btn"
+                onClick={() => startEditing(category)}
+              >
+                Modifier
+              </button>
+              <button
+                className="delete-btn"
+                onClick={() => deleteCategory(category)}
+              >
+                <FaTrashAlt />
+              </button>
+            </div>
+        </>
+      )}
+    </div>
+  ))}
+          </div>
+        ))}
+      </div>
+
+      
     </div>
   );
 }
