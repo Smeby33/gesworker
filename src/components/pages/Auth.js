@@ -115,79 +115,100 @@ function Auth({ onLoginSuccess }) {
 
   return (
     <div className="divauth">
-      <div className="auth">
-        <h1>{isSignup ? 'Inscription' : 'Connexion'}</h1>
-        <form onSubmit={handleSubmit} className="form1">
-          <div className="utilisateur">
-            <label>Nom d'utilisateur:</label>
-            <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              required
-            />
-          </div>
-          <div className="utilisateur">
-            <label>Mot de passe:</label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
-          </div>
-          {isSignup && (
-            <>
-              <div className="utilisateur">
-                <label>Confirmer le mot de passe:</label>
-                <input
-                  type="password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  required
-                />
-              </div>
-              <div className="utilisateur">
-                <label>
+      <div className="auth1">
+        <div className="auth1part1">
+          <h1>GESWOKER</h1>
+          <h6 className='animationh3'>Organisez , maximisez et gérez votre équipe</h6>
+        </div>
+        <div className="auth1part2">
+          <p className='animationh4'>
+          Gesworker est une application simple et intuitive conçue pour optimiser  la gestion et le suivi<br /> 
+           des tâches en entreprise. Elle permet aux administrateurs de créer, assigner et suivre des tâches <br /> 
+           variées (TVA, rapprochement bancaire, reporting, etc.), tout en offrant aux
+            intervenants une <br /> interface dédiée pour mettre à jour les statuts, ajouter des 
+            commentaires et collaborer <br /> efficacement.
+          
+           Grâce à son design épuré, ses notifications intelligentes et sa sécurité <br /> 
+           renforcée, Gesworker centralise les informations et améliore la productivité. Une solution  <br />fiable pour coordonner vos équipes et simplifier vos processus internes.
+          </p>
+        </div>
+      </div>
+      <div className="auth2">
+      <img src="/logo513.png" alt="" height={400} width={500}/>
+        <div className="auth">
+          <h1>{isSignup ? 'Inscription' : 'Connexion'}</h1>
+          <form onSubmit={handleSubmit} className="form1">
+            <div className="utilisateur">
+              <label>Nom d'utilisateur:</label>
+              <input
+                type="text"
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                required
+              />
+            </div>
+            <div className="utilisateur">
+              <label>Mot de passe:</label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+            </div>
+            {isSignup && (
+              <>
+                <div className="utilisateur">
+                  <label>Confirmer le mot de passe:</label>
                   <input
-                    type="checkbox"
-                    checked={isAdmin}
-                    onChange={(e) => setIsAdmin(e.target.checked)}
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
                   />
-                  Inscription en tant qu'admin
-                </label>
-              </div>
-              {isAdmin && (
-                <>
-                  <div className="utilisateur">
-                    <label>Mot de passe administrateur:</label>
+                </div>
+                <div className="utilisateur">
+                  <label>
                     <input
-                      type="password"
-                      value={adminPassword}
-                      onChange={(e) => setAdminPassword(e.target.value)}
-                      required
+                      type="checkbox"
+                      checked={isAdmin}
+                      onChange={(e) => setIsAdmin(e.target.checked)}
                     />
-                  </div>
-                  <div className="utilisateur">
-                    <label>Nom de l'entreprise:</label>
-                    <input
-                      type="text"
-                      value={companyName}
-                      onChange={(e) => setCompanyName(e.target.value)}
-                      required
-                    />
-                  </div>
-                </>
-              )}
-            </>
-          )}
-          <button className="boutonauth1" type="submit">
-            {isSignup ? 'S\'inscrire' : 'Se connecter'}
+                    Inscription en tant qu'admin
+                  </label>
+                </div>
+                {isAdmin && (
+                  <>
+                    <div className="utilisateur">
+                      <label>Mot de passe administrateur:</label>
+                      <input
+                        type="password"
+                        value={adminPassword}
+                        onChange={(e) => setAdminPassword(e.target.value)}
+                        required
+                      />
+                    </div>
+                    <div className="utilisateur">
+                      <label>Nom de l'entreprise:</label>
+                      <input
+                        type="text"
+                        value={companyName}
+                        onChange={(e) => setCompanyName(e.target.value)}
+                        required
+                      />
+                    </div>
+                  </>
+                )}
+              </>
+            )}
+            <button className="boutonauth1" type="submit">
+              {isSignup ? 'S\'inscrire' : 'Se connecter'}
+            </button>
+          </form>
+          <button className="boutonauth2" onClick={() => setIsSignup(!isSignup)}>
+            {isSignup ? 'Déjà inscrit ? Connectez-vous' : 'Pas encore de compte ? Inscrivez-vous'}
           </button>
-        </form>
-        <button className="boutonauth2" onClick={() => setIsSignup(!isSignup)}>
-          {isSignup ? 'Déjà inscrit ? Connectez-vous' : 'Pas encore de compte ? Inscrivez-vous'}
-        </button>
+        </div>
       </div>
     </div>
   );

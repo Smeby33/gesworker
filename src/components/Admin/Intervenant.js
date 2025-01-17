@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import CreateCompany from  './CreateCompany';
 import CreateIntervenant from  './CreateIntervenant';
+import ProfilePicture from './ProfilePicture';
 import TaskCreation from './TaskCreation';
 import {
   FaUserPlus,
@@ -208,6 +209,25 @@ const handleCompanyCreation = () => {
   setCompanies(updatedCompanies);
   setActiveIntervenantIndex(null); // Fermer tous les formulaires
 };
+
+//function ProfilePicture() {
+
+
+  // Avatars prédéfinis
+  const avatars = [
+    '/avatar1.png',
+    '/avatar2.png',
+    '/avatar3.png',
+    '/avatar4.png',
+  ];
+
+
+  // Sauvegarder la photo de profil dans la table correspondante
+  
+  // Gestion de l'upload d'image
+ 
+
+ 
    
   return (
     <div className="intervenant-container" id='Intervenant'>
@@ -216,7 +236,7 @@ const handleCompanyCreation = () => {
       {/* Sélecteur de vue */}
       <div className="view-selector">
         <button
-          onClick={() => setViewMode('list')}
+          onClick={() => setViewMode('list')} 
           className={viewMode === 'list' ? 'active' : ''}
         >
           <FaList /> Liste
@@ -229,7 +249,7 @@ const handleCompanyCreation = () => {
         </button>
       </div>
 
-      {/* Conteneur des intervenants */}
+      {/* Conteneur des intervenants */}  
       <div className={`intervenant-view ${viewMode}`}>
         {intervenants.length > 0 ? (
           intervenants.map((intervenant, index) => (
@@ -278,7 +298,25 @@ const handleCompanyCreation = () => {
                 <div className="intervenant-col">{intervenant.id}</div>
                 <div className="intervenant-col">{intervenant.password}</div>
               </div>
-        
+              <div className="profile-picture-container">
+                <ToastContainer />
+                <h3> {intervenant.name}</h3> {/* Affichage du username */}
+
+                {/* Affichage de la photo actuelle */}
+                <div
+                  className="profile-picture-display"
+                >
+                  {intervenant.profilePicture ? (
+                    <img
+                      src= {intervenant.profilePicture}
+                      alt="Photo de profil"
+                      className="profile-picture-image"
+                    />
+                  ) : (
+                    <div className="placeholder">Aucune photo</div>
+                  )}
+                </div>
+              </div>
 
                {formState.showIntervenantForm === index && (     
                  <CreateIntervenant id='form'  onIntervenantAdded={setIntervenants} />

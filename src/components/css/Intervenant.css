@@ -368,6 +368,14 @@
   padding: 10px;
 }
 
+.intervenant-view.list .profile-picture-container{
+  display: none;
+}
+.intervenant-view.gridt .profile-picture-container{
+  display: block;
+}
+
+
 .intervenant-view.grid {
   display: flex;
   flex-wrap: wrap;

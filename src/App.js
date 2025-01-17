@@ -25,7 +25,7 @@ function App() {
         setIsAuthenticated(true);
         setCurrentUser(user);
       }
-    }, 2000); // Simule un écran de chargement pendant 2 secondes
+    }, 3000); // Simule un écran de chargement pendant 2 secondes
 
     return () => clearTimeout(timeout);
   }, []);

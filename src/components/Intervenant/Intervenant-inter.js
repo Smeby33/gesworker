@@ -6,12 +6,19 @@ function Intervenantinter() {
   const [intervenants, setIntervenants] = useState([]);
   const [tasks, setTasks] = useState([]);
   const [currentUser, setCurrentUser] = useState(null);
+  const [interProfil,setinterProfil] = useState(false)
   const [viewMode, setViewMode] = useState('list');
 
   useEffect(() => {
     // Charger les données depuis le localStorage
     const storedUser = JSON.parse(localStorage.getItem('currentUser')) || {};
     setCurrentUser(storedUser);
+
+    const storedProfil = JSON.parse(localStorage.getItem('profilePicture')) || {};
+    setinterProfil(storedProfil);
+
+    
+
 
     const storedIntervenants = JSON.parse(localStorage.getItem('intervenant')) || [];
     setIntervenants(storedIntervenants);

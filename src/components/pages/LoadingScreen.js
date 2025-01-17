@@ -5,7 +5,7 @@ const LoadingScreen = () => {
   return (
     <div className="loading-screen">
       <img src="/favicon.ico" alt="App Icon" className="app-icon" />
-      <h3 className='animationh3'>Organisez et maximisez votre travail avec moi  </h3>
+      <h3 className='animationh3'>Organisez , maximisez et gérez travailleur  </h3>
       <h1>Chargement...</h1>
     </div>
   );
