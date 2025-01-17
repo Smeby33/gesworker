@@ -1,0 +1,99 @@
+/* AdminPage.css */
+
+.company {
+  background:#F8F8EE; /* Fond clair pour la section des entreprises */
+  padding: 20px; /* Espace autour du contenu */
+  border-radius: 8px; /* Coins arrondis */
+  display: flex;
+  color: white;
+  flex-direction: column;
+  width: 80%;
+  box-shadow:0px 2px 3px 5px #06060a;
+}
+.list-unstyled{
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-top: 1em;
+}
+.divnav{
+  /* background: linear-gradient(15deg, #e3e3ee, #002d5a); */
+  margin-right: 1em;
+  position: relative;
+}
+
+.company-item {
+  border: 1px solid #0a74da; /* Bord bleu roi */
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px; /* Espacement entre les entreprises */
+  background: linear-gradient(15deg, #808080, #000000); /* Fond blanc pour les éléments d'entreprise */
+}
+.AdminPagemain{
+  margin-top: 2em;
+  width: 80%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items:center;
+}
+.AdminPage {
+    min-height: 100vh;
+    position: relative;
+    display: flex;
+    background: linear-gradient(135deg, #000428, #004e92);
+  }
+  
+  .adminpagepart1 {
+    background-color: #001f3f;
+    color: #ffffff;
+    padding: 20px;
+    min-height: 100vh;
+  }
+  
+  .adminpagepart2 {
+    background-color: #f8f9fa;
+    padding: 40px;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+  
+  /* Navbar styling */
+  .navbar {
+    color: #fff;
+  }
+  
+  .navbar a {
+    color: #ffffff;
+    text-decoration: none;
+    padding: 10px 15px;
+    display: block;
+    border-radius: 5px;
+    transition: background-color 0.3s;
+  }
+  
+  .navbar a:hover {
+    background-color: #003366;
+  }
+  .animationh3a {
+    font-size: 1.7rem;
+    margin-top:1em;
+    color: #ffffff;
+    margin-bottom: 2em;
+    overflow: hidden;
+    text-align: start;
+    border-right: 2px solid #5b8c85;
+    white-space: nowrap;
+    width: 32px;
+    animation: typing2 3s steps(30, end) forwards, blink 0.7s infinite step-end alternate;
+  }
+  @keyframes typing2 {
+    from {
+      width: 0;
+    }
+    to {
+      width: 900px; /* Ajuste la largeur selon la longueur de ton texte */
+    }
+  }
+
+  

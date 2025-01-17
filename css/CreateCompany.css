@@ -1,0 +1,61 @@
+/* CreateCompany.css */
+
+#form{
+  margin: 0;
+  margin-top: 2em;
+  font-family: 'Arial', sans-serif;
+  padding: 1em;
+  position: absolute;
+  top: 11%;
+  left: 45%;
+  margin-left: 20px; /* Décalage pour qu'il ne soit pas trop collé à l'élément */
+  width: 400px;
+  z-index: 2;
+  background: linear-gradient(15deg, #808080, #000000);
+}
+
+.max-w-md {
+  background: #fff; /* Fond blanc pour le formulaire */
+  border-radius: 10px; /* Coins arrondis */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Ombre légère */
+}
+
+#form h3 {
+  color:white ;/* Couleur bleu roi pour le titre */
+  font-weight: 600;
+}
+
+label {
+  color: #ffffff; /* Couleur de texte sombre pour les labels */
+  font-weight: bold;
+}
+
+input,
+textarea {
+  border: 1px solid #000428; /* Bord bleu roi */
+  border-radius: 5px; /* Coins arrondis */
+  padding: 10px; /* Espace interne */
+  width: 100%; /* Largeur complète */
+  transition: border-color 0.3s ease; /* Transition pour la couleur de la bordure */
+}
+
+input:focus,
+textarea:focus {
+  border-color: #000428; /* Bord bleu roi au focus */
+  outline: none; /* Retire le contour par défaut */
+}
+
+#button-company {
+  margin-top: 2em;
+  background: #000428; /* Couleur de fond bleu roi */
+  color: white; /* Texte blanc */
+  border: none; /* Pas de bordure */
+  border-radius: 5px; /* Coins arrondis */
+  padding: 10px; /* Espace interne */
+  cursor: pointer; /* Curseur de pointeur */
+  transition: background 0.3s ease; /* Transition pour le fond */
+}
+
+#button-company:hover {
+  background: #1c1c1c; /* Fond noir au survol */
+}

@@ -1,0 +1,55 @@
+nav {
+    padding: 2em;
+    background:#4B7DB8;
+    height: 100vh;
+    position: fixed;
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar-list {
+  list-style-type: none; /* Enlève les puces des listes */
+  padding: 0; /* Enlève le padding par défaut */
+}
+
+.navbar-list li {
+  display: inline-block; /* Affiche les éléments de la liste horizontalement */
+  margin-right: 20px; /* Espacement entre les éléments */
+}
+
+.nav-link, .nav-button {
+  color: #fff; /* Couleur du texte */
+  text-decoration: none; /* Enlève le soulignement */
+  padding: 10px; /* Espacement interne */
+  border: none; /* Enlève la bordure des boutons */
+  background: transparent; /* Fond transparent pour les boutons */
+  cursor: pointer; /* Curseur de pointeur */
+}
+
+.nav-button  {
+  border-radius: 5px; 
+  display: flex;/* Coins arrondis */
+}
+
+.nav-button:hover ,.nav-link:hover {
+    color: #1c1c1c; /* Couleur au survol */
+}
+
+.modal-content {
+  padding: 20px; /* Espacement interne du modal */
+  background-color: #fff; /* Fond blanc pour le contenu du modal */
+  border-radius: 10px; /* Coins arrondis du modal */
+}
+
+.modal-overlay {
+  background-color: rgba(0, 0, 0, 0.7); /* Fond semi-transparent pour l'overlay */
+}
+
+.close-button {
+  background: transparent; /* Fond transparent pour le bouton de fermeture */
+  border: none; /* Pas de bordure */
+  font-size: 1.5em; /* Taille du texte */
+  color: #000; /* Couleur du texte */
+  cursor: pointer; /* Curseur de pointeur */
+  float: right; /* Place le bouton de fermeture à droite */
+}
