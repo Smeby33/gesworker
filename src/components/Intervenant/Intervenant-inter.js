@@ -8,6 +8,7 @@ function Intervenantinter() {
   const [currentUser, setCurrentUser] = useState(null);
   const [interProfil,setinterProfil] = useState(false)
   const [viewMode, setViewMode] = useState('list');
+  const [ taskAssigned, setTaskAssigned ] = useState(null);
 
   useEffect(() => {
     // Charger les données depuis le localStorage
@@ -86,6 +87,8 @@ function Intervenantinter() {
           filteredIntervenants.map((intervenant, index) => (
             <div
               key={index}
+              onClick={() => setTaskAssigned(taskAssigned === intervenant.id ? null : intervenant.id)}
+
               className={`intervenant-item ${viewMode === 'grid' ? 'grid-item' : ''}`}
             >
               <div className="intervenant-row">
@@ -94,7 +97,7 @@ function Intervenantinter() {
                 <p className="intervenant-col">Email: {intervenant.email}</p>
                 <p className="intervenant-col">Identifiant: {intervenant.id}</p>
               </div>
-
+              {taskAssigned === intervenant.id && (
               <div className="intervenant-details">
                 <h4>Tâches assignées</h4>
                 <div className="tasks">
@@ -126,6 +129,7 @@ function Intervenantinter() {
                   )}
                 </div>
               </div>
+              )}
             </div>
           ))
         ) : (

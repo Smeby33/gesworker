@@ -6,7 +6,8 @@ import {
   FaFilter,
   FaExclamationCircle,
   FaList,
-  FaTh
+  FaTh,
+  FaMailBulk
 } from 'react-icons/fa';
 import '../css/Tasks.css';
 
@@ -20,6 +21,7 @@ function Tasksinter() {
   const [viewMode, setViewMode] = useState('list'); // 'list' or 'grid'
   const currentUser = JSON.parse(localStorage.getItem('currentUser')) || {};
   const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [selectedTaskIdbtn, setSelectedTaskIdbtn] = useState(null);
 
 
   // Load tasks and comments from localStorage
@@ -40,18 +42,19 @@ function Tasksinter() {
    // Ajouter un commentaire avec le nom de l'utilisateur
    const addComment = (taskId, comment) => {
     if (!comment.trim()) return;
-
+  
     const updatedComments = {
       ...comments,
       [taskId]: [
         ...(comments[taskId] || []),
-        { user: currentUser, text: comment, date: new Date() }
+        { user: { name: currentUser.name || currentUser.username }, text: comment, date: new Date() }
       ]
     };
-
+  
     setComments(updatedComments);
     localStorage.setItem('comments', JSON.stringify(updatedComments));
   };
+  
 
   // Helpers
   const isTaskLate = (task) => {
@@ -194,7 +197,6 @@ function Tasksinter() {
           filteredTasks.map((task) => (
             <div
               key={task.id}
-              onClick={() => setSelectedTaskId(selectedTaskId === task.id ? null : task.id)}
               className={`task-item ${isTaskLate(task) ? 'overdue-task' : ''}`}
             >
               <div className="affichagelist">
@@ -225,19 +227,23 @@ function Tasksinter() {
                   </div>
                   <div className="intervenant-col" id='cate'><p>{Array.isArray(task.intervenants) ? task.intervenants.join(', ') : 'Non spécifié'} </p> </div>
                   <div  className="intervenant-col" id='cate'> <p> {task.dateDebut} </p> <p> {task.dateFin || 'Non sdivécifiée'} </p>  </div>
-                  <div   className="intervenant-col"> <p> {task.statut} </p> </div>
+                  <div   className="intervenant-col"> <p onClick={() => setSelectedTaskIdbtn(selectedTaskIdbtn === task.id ? null : task.id)} > {task.statut} </p> </div>
                   <div  className="intervenant-col" ><p>{task.company}</p></div>
+                    <button
+                      onClick={() => setSelectedTaskId(selectedTaskId === task.id ? null : task.id)} >
+                      <FaMailBulk/>
+                    </button>
+                  </div>
 
-                </div>
 
-               
-                
 
-                <div className="task-actions">
-                  <button onClick={() => updateTaskStatus(task.id, 'En cours')}>En cours</button>
-                  <button onClick={() => updateTaskStatus(task.id, 'Terminé')}>Terminer</button>
-                  <button onClick={() => updateTaskStatus(task.id, 'Annulé')}>Annuler</button>
-                </div>
+                  {selectedTaskIdbtn === task.id && (
+                    <div className="task-actions">
+                      <button onClick={() => updateTaskStatus(task.id, 'En cours')}>En cours</button>
+                      <button onClick={() => updateTaskStatus(task.id, 'Terminé')}>Terminer</button>
+                      <button onClick={() => updateTaskStatus(task.id, 'Annulé')}>Annuler</button>
+                    </div>
+                  )}
 
                {/* Afficher les commentaires uniquement si la tâche est sélectionnée */}
                {selectedTaskId === task.id && (
@@ -245,17 +251,18 @@ function Tasksinter() {
                       <div className="task-comments">
                         <h5>Commentaires</h5>
                         {comments[task.id]?.length > 0 ? (
-                          <ul>
-                            {comments[task.id].map((comment, index) => (
-                              <li key={index}>
-                                <p><strong>{comment.user} :</strong> {comment.text}</p>
-                                <span>{new Date(comment.date).toLocaleString()}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p>Aucun commentaire.</p>
-                        )}
+                            <ul>
+                              {comments[task.id].map((comment, index) => (
+                                <li key={index}>
+                                  <p><strong>{comment.user.name || comment.user.username} :</strong> {comment.text}</p>
+                                  <span>{new Date(comment.date).toLocaleString()}</span>
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p>Aucun commentaire.</p>
+                          )}
+
                       </div>
                       <div className="add-comment">
                         <input

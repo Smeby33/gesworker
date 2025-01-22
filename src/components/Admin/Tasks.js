@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import TaskCreation from './TaskCreation';
-import { FaCheckCircle, FaHourglassHalf, FaTh, FaTimesCircle, FaFilter, FaList, FaExclamationTriangle } from 'react-icons/fa';
+import { FaCheckCircle, FaHourglassHalf, FaTh, FaTimesCircle, FaFilter, FaList,FaMailBulk, FaExclamationTriangle } from 'react-icons/fa';
 import '../css/Tasks.css';
 
 function Tasks() {
@@ -14,6 +14,7 @@ function Tasks() {
   const [viewMode, setViewMode] = useState('list');
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
+  const [selectedTaskIdbtn, setSelectedTaskIdbtn] = useState(null);
 
 
   // Récupérer les tâches et commentaires depuis le localStorage
@@ -187,7 +188,10 @@ function Tasks() {
       </div>
       {noTasksMessage && <p className="no-tasks-message"><span>{noTasksMessage}</span></p>}
       {filteredTasks.length === 0 && !noTasksMessage ? (
-        <p>Aucune tâche trouvée.</p>
+        <div>
+            <p>Aucune tâche trouvée.</p>
+            <TaskCreation/>
+        </div>
       ) : (
         <div className={`tasks-view ${viewMode}`}>
           {filteredTasks.map(task => (
@@ -195,7 +199,7 @@ function Tasks() {
             <div
             key={task.id}
             className={`task-item ${isTaskOverdue(task) ? 'overdue-task' : ''}`}
-            onClick={() => setSelectedTaskId(selectedTaskId === task.id ? null : task.id)} // Gérer la sélection
+
           >
                 <div className="affichagelist">
                 
@@ -225,19 +229,23 @@ function Tasks() {
                   </div>
                   <div className="intervenant-col" id='cate'><p>{Array.isArray(task.intervenants) ? task.intervenants.join(', ') : 'Non spécifié'} </p> </div>
                   <div  className="intervenant-col" id='cate'> <p> {task.dateDebut} </p> <p> {task.dateFin || 'Non sdivécifiée'} </p>  </div>
-                  <div   className="intervenant-col"> <p> {task.statut} </p> </div>
+                  <div   className="intervenant-col"> <p onClick={() => setSelectedTaskIdbtn(selectedTaskIdbtn === task.id ? null : task.id)} > {task.statut} </p> </div>
                   <div  className="intervenant-col" ><p>{task.company}</p></div>
-
+                  <button
+                    onClick={() => setSelectedTaskId(selectedTaskId === task.id ? null : task.id)} >
+                    <FaMailBulk/>
+                  </button>
                 </div>
 
                
                 
-
-                <div className="task-actions">
-                  <button onClick={() => updateTaskStatus(task.id, 'En cours')}>En cours</button>
-                  <button onClick={() => updateTaskStatus(task.id, 'Terminé')}>Terminer</button>
-                  <button onClick={() => updateTaskStatus(task.id, 'Annulé')}>Annuler</button>
-                </div>
+                {selectedTaskIdbtn === task.id && (
+                  <div className="task-actions">
+                    <button onClick={() => updateTaskStatus(task.id, 'En cours')}>En cours</button>
+                    <button onClick={() => updateTaskStatus(task.id, 'Terminé')}>Terminer</button>
+                    <button onClick={() => updateTaskStatus(task.id, 'Annulé')}>Annuler</button>
+                  </div>
+                )}
 
                {/* Afficher les commentaires uniquement si la tâche est sélectionnée */}
                {selectedTaskId === task.id && (
@@ -273,6 +281,8 @@ function Tasks() {
                   )}
               
               </div>
+
+              
             </div>
             
           ))}

@@ -447,7 +447,10 @@ const handleCompanyCreation = () => {
             </div>
           ))
         ) : (
+          <div>
           <p>Aucun intervenant trouvé.</p>
+          <CreateIntervenant id='form'  onIntervenantAdded={setIntervenants} />
+          </div>
         )}
       </div>
     </div>

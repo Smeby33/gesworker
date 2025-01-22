@@ -36,6 +36,8 @@ function Company() {
   const [dateDebut, setDateDebut] = useState(new Date().toISOString().slice(0, 16));
   const [dateFin, setDateFin] = useState('');
 
+  
+
   useEffect(() => {
     // Récupération des données depuis le localStorage
     const storedCategories = JSON.parse(localStorage.getItem('taskCategories')) || [];
@@ -100,9 +102,6 @@ function Company() {
     setDateDebut(new Date().toISOString().slice(0, 16));
     setDateFin('');
   };
-
-
-
 
   
   
@@ -388,11 +387,15 @@ useEffect(() => {
             </div>
           ))
         ) : (
-          <p>Aucun client trouvé.</p>
-        )}
+          <div>
+            <p> Aucun clients trouvé</p>
+          <CreateCompany  onCompanyCreated={handleCompanyCreation} />
+          </div>
+        ) }
       </div>
     </div>
   );
 }
 
 export default Company;
+ 

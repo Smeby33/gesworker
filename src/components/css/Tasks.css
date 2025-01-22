@@ -1,5 +1,5 @@
 .tasks-container {
-    background: linear-gradient(15deg, #808080, #000000);
+    background: linear-gradient(15deg, #e2950a, #f49a0f);
     padding: 20px;
     border-radius: 8px;
   }
@@ -305,6 +305,7 @@
 
 .task-item:hover {
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  border: none;
 }
 
 .task-row {
