@@ -1,119 +1,81 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useNavigate } from "react-router-dom";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
+import axios from "axios";
+import Auth from "./components/pages/Auth";
 import AdminPage from "./components/pages/AdminPage";
 import IntervenantPage from "./components/pages/IntervenantPage";
-import Auth from "./components/pages/Auth";
-import RegisterPage from "./components/pages/RegisterPage";
 import LoadingScreen from "./components/pages/LoadingScreen";
 
-function App() {
+const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(true); 
+  const [message,setErrorMessage]= useState(false)
 
-  // Fonction pour récupérer l'utilisateur connecté depuis le localStorage
-  const getUserFromLocalStorage = () => {
-    return JSON.parse(localStorage.getItem("currentUser")) || null;
-  };
-
-  // Fonction pour gérer le chargement initial
   useEffect(() => {
-    const timeout = setTimeout(() => {
-      setLoading(false);
-      const user = getUserFromLocalStorage();
+    const auth = getAuth();
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        setIsAuthenticated(true);
-        setCurrentUser(user);
+        try {
+          const response = await axios.get(`http://localhost:5000/users/getUser/${user.uid}`);
+          const userData = response.data;
+  
+          if (userData && userData.is_admin !== undefined) {
+            setCurrentUser(userData);
+            setIsAuthenticated(true);
+          } else {
+            setErrorMessage("Votre compte n'est pas encore enregistré. Veuillez contacter un administrateur.");
+            setIsAuthenticated(false);
+            setCurrentUser(null);
+          }
+        } catch (error) {
+          console.error("Erreur lors de la récupération de l'utilisateur:", error);
+          setIsAuthenticated(false);
+          setCurrentUser(null);
+        }
+      } else {
+        setIsAuthenticated(false);
+        setCurrentUser(null);
       }
-    }, 3000); // Simule un écran de chargement pendant 2 secondes
-
-    return () => clearTimeout(timeout);
-  }, []);
-   // Polling : vérifier les mises à jour toutes les X secondes
-   useEffect(() => {
-    const interval = setInterval(() => {
-      const updatedUser = getUserFromLocalStorage();
-      if (JSON.stringify(updatedUser) !== JSON.stringify(currentUser)) {
-        setIsAuthenticated(!!updatedUser);
-        setCurrentUser(updatedUser);
-        console.log("Mise à jour détectée via polling !");
-      }
-    }, 2000); // Vérifie toutes les 5 secondes
-
-    return () => clearInterval(interval);
-  }, [currentUser]);
-
-  // Écoute les modifications du localStorage
-  useEffect(() => {
-    const handleStorageChange = () => {
-      const updatedUser = getUserFromLocalStorage();
-      setIsAuthenticated(!!updatedUser);
-      setCurrentUser(updatedUser);
-    };
-
-    window.addEventListener("storage", handleStorageChange);
-    return () => window.removeEventListener("storage", handleStorageChange);
+      setLoading(false);
+    });
+  
+    return () => unsubscribe();
   }, []);
 
-  const handleLoginSuccess = (user) => {
-    setIsAuthenticated(true);
-    setCurrentUser(user);
-    localStorage.setItem("currentUser", JSON.stringify(user));
-  };
+  
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
-    setCurrentUser(null);
-    localStorage.removeItem("currentUser");
-  };
 
-  const onRegisterSuccess = (newUser) => {
-    const users = JSON.parse(localStorage.getItem("users")) || [];
-    users.push(newUser);
-    localStorage.setItem("users", JSON.stringify(users));
-    setCurrentUser(newUser);
-    setIsAuthenticated(true);
-    localStorage.setItem("currentUser", JSON.stringify(newUser));
-  };
-
-  // Affiche l'écran de chargement si nécessaire
-  if (loading) {
-    return <LoadingScreen />;
-  }
+  // if (loading) return <LoadingScreen />;
 
   return (
     <Router>
-      <Routes>
-        {/* Routes pour les utilisateurs non connectés */}
-        <Route path="/" element={<Auth onLoginSuccess={handleLoginSuccess} />} />
-
-        {!isAuthenticated ? (
-          <>
-            <Route path="/register" element={<RegisterPage onRegisterSuccess={onRegisterSuccess} />} />
-          </>
-        ) : (
-          <>
-            {/* Routes pour les administrateurs */}
-            {currentUser?.isAdmin ? (
-              <>
-                <Route path="/admin" element={<AdminPage onLogout={handleLogout} />} />
-                <Route path="/Auth" element={<Auth onLoginSuccess={handleLoginSuccess} />} />
-              </>
-            ) : (
-              <>
-                {/* Routes pour les intervenants */}
-                <Route path="/intervenant" element={<IntervenantPage onLogout={handleLogout} />} />
-              </>
-            )}
-            {/* Redirection par défaut pour les utilisateurs connectés */}
-            <Route path="*" element={<Navigate to={currentUser?.isAdmin ? "/admin" : "/intervenant"} replace />} />
-          </>
-        )}
-        {/* Redirection par défaut pour les utilisateurs non connectés */}
-        <Route path="*" element={<Navigate to="/" replace />} />
-      </Routes>
+      <AppRoutes isAuthenticated={isAuthenticated} currentUser={currentUser} setCurrentUser={setCurrentUser} />
     </Router>
   );
-}
+};
+
+const AppRoutes = ({ isAuthenticated, currentUser, setCurrentUser }) => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (isAuthenticated && currentUser) {
+      if (currentUser.is_admin) {
+        navigate("/admin");
+      } else {
+        navigate("/intervenant");
+      }
+    }
+  }, [isAuthenticated, currentUser, navigate]);
+
+  return (
+    <Routes>
+      <Route path="/" element={<Auth onLoginSuccess={setCurrentUser} />} />
+      <Route path="/admin" element={isAuthenticated && currentUser?.is_admin ? <AdminPage /> : <Navigate to="/" />} />
+      <Route path="/intervenant" element={isAuthenticated && !currentUser?.is_admin ? <IntervenantPage /> : <Navigate to="/" />} />
+    </Routes>
+  );
+};
 
 export default App;

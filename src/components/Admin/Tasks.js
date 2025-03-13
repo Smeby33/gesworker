@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import TaskCreation from './TaskCreation';
-import { FaCheckCircle, FaHourglassHalf, FaTh, FaTimesCircle, FaFilter, FaList,FaMailBulk, FaExclamationTriangle } from 'react-icons/fa';
+import { getAuth, } from "firebase/auth";
+import { FaCheckCircle,FaUserPlus, FaHourglassHalf, FaTh, FaTimesCircle, FaFilter, FaList,FaMailBulk, FaExclamationTriangle } from 'react-icons/fa';
 import '../css/Tasks.css';
 
 function Tasks() {
@@ -12,20 +13,75 @@ function Tasks() {
   const [currentUser, setCurrentUser] = useState('Admin'); // Simuler un utilisateur connecté
   const [taskStats, setTaskStats] = useState({});
   const [viewMode, setViewMode] = useState('list');
+  const [ajoutertache, setAjoutertache] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [selectedTaskIdbtn, setSelectedTaskIdbtn] = useState(null);
+  const [adminEmail, setAdminEmail] = useState('');
+  const auth = getAuth();
+    
+  
 
 
   // Récupérer les tâches et commentaires depuis le localStorage
   useEffect(() => {
-    const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    setTasks(storedTasks);
-    setFilteredTasks(storedTasks);
+    const fetchTasks = async () => {
+      if (auth.currentUser) {
+        setAdminEmail(auth.currentUser.email);
+        const adminUID = auth.currentUser.uid;
+        try {
+          const response = await fetch(`http://localhost:5000/taches/tasks-by-owner/${adminUID}`);
+          const data = await response.json();
+          console.log("Données reçues :", data);
 
+          const formattedData = data.map(task => ({
+            ...task,
+            date_debut: task.date_debut ? new Date(task.date_debut) : null,
+            date_fin: task.date_fin ? new Date(task.date_fin) : null,
+            categories: task.categories
+              ? task.categories.split(',').map(cat => ({ name: cat.trim(), sousStatut: 'En cours' }))
+              : [],
+            intervenants: task.intervenants ? task.intervenants.split(',') : []
+          }));
+          
+          console.log("Données après transformation :", formattedData);
+          
+  
+          // Convertir les champs 'categories' et 'intervenants' en tableaux
+          
+          
+          
+  
+          setTasks(Array.isArray(formattedData) ? formattedData : []);
+          setFilteredTasks(Array.isArray(formattedData) ? formattedData : []);
+        } catch (error) {
+          console.error("Erreur lors de la récupération des tâches :", error);
+          setTasks([]);
+          setFilteredTasks([]);
+        }
+      }
+    };
+  
+    fetchTasks();
+  
     const storedComments = JSON.parse(localStorage.getItem('comments')) || {};
     setComments(storedComments);
   }, []);
+  
+  const formatDate = (date) => {
+    if (!date || !(date instanceof Date) || isNaN(date.getTime())) return "Date invalide";
+    
+    return date.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    }) + " , " + date.toLocaleTimeString('fr-FR', {
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  };
+  
+  
 
   const handleCategoryClick = (taskId, index) => {
     setSelectedCategory((prevState) => ({
@@ -42,8 +98,8 @@ function Tasks() {
   // Fonction pour vérifier si une tâche est en retard
   const isTaskOverdue = (task) => {
     const today = new Date();
-    const dateFin = new Date(task.dateFin);
-    return task.statut !== 'Terminé' && dateFin < today;
+    const date_fin = new Date(task.date_fin);
+    return task.statut !== 'Terminé' && date_fin < today;
   };
 
   const saveTasksToLocalStorage = (updatedTasks) => {
@@ -83,14 +139,49 @@ function Tasks() {
   };
 
   // Mise à jour du statut d'une tâche
-  const updateTaskStatus = (id, newStatus) => {
-    const updatedTasks = tasks.map(task =>
-      task.id === id ? { ...task, statut: newStatus } : task
-    );
-    setTasks(updatedTasks);
-    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-    filterTasks(updatedTasks, filter);
+  const updateTaskStatus = async (id, newStatus) => {
+    try {
+      console.log(`Mise à jour du statut de la tâche ${id} vers : ${newStatus}`);
+  
+      const response = await fetch(`http://localhost:5000/taches/updatestatus/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ statut: newStatus }),
+      });
+  
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Erreur HTTP: ${response.status} - ${errorText}`);
+      }
+  
+      const updatedTask = await response.json();
+      console.log("ID envoyé :", id);
+      console.log("Statut envoyé :", newStatus);
+      console.log("Réponse de l'API :", updatedTask);
+
+  
+      // Vérifier que l'API renvoie bien la tâche mise à jour
+      if (!updatedTask || !updatedTask.id) {
+        throw new Error("Réponse invalide de l'API.");
+      }
+  
+      // Mettre à jour l'état local
+      setTasks(prevTasks =>
+        prevTasks.map(task =>
+          task.id === id ? { ...task, statut: newStatus } : task
+        )
+      );
+  
+      // Mettre à jour l'affichage des tâches filtrées
+      filterTasks(tasks, filter);
+  
+    } catch (error) {
+      console.error('Erreur lors de la mise à jour du statut:', error);
+    }
   };
+  
 
   // Fonction de filtrage
   const handleFilterChange = (status) => {
@@ -135,7 +226,7 @@ function Tasks() {
     return tasks.reduce(
       (acc, task) => {
         acc[task.statut] = (acc[task.statut] || 0) + 1;
-        if (task.statut !== 'Terminé' && new Date(task.dateFin) < new Date()) {
+        if (task.statut !== 'Terminé' && new Date(task.date_fin) < new Date()) {
           acc.overdue += 1;
         }
         return acc;
@@ -168,6 +259,10 @@ function Tasks() {
         <button onClick={() => setViewMode('grid')} className={viewMode === 'grid' ? 'active' : ''}>
           <FaTh /> Grille
         </button>
+        <button onClick={() => setAjoutertache((prev) => !prev)} >
+          <FaUserPlus/> Tâches
+        </button>
+        
       </div>
       <div className="filter-buttons">
         <button onClick={() => handleFilterChange('')} className={filter === '' ? 'active' : ''}>
@@ -194,7 +289,10 @@ function Tasks() {
         </div>
       ) : (
         <div className={`tasks-view ${viewMode}`}>
-          {filteredTasks.map(task => (
+          {filteredTasks.map(task =>{ 
+            console.log(task.date_debut);
+            
+            return(
             
             <div
             key={task.id}
@@ -205,30 +303,42 @@ function Tasks() {
                 
                 <div className="intervenant-row">
                   <div className="category-itemparent" id='cate'>
-                  {task.categories && task.categories.length > 0 ? task.categories.map((cat, index) => (
-                      
-                      <div
-                        key={index}
-                        onClick={() => handleCategoryClick(task.id, index)} // Définit la catégorie sélectionnée
-                      >
+                  {Array.isArray(task.categories) ? (
+                    task.categories.map((cat, index) => (
+                      <div key={index} onClick={() => handleCategoryClick(task.id, index)}>
                         {isCategorySelected(task.id, index) ? (
                           <select
-                            value={cat.sousStatut}
+                            value={cat.sousStatut} // Maintenant cat a bien un sousStatut
                             onChange={(e) => updateCategorySubStatus(task.id, index, e.target.value)}
-                            onBlur={() => setSelectedCategory((prevState) => ({ ...prevState, [task.id]: null }))} // Cache le <select>
+                            onBlur={() =>
+                              setSelectedCategory((prevState) => ({
+                                ...prevState,
+                                [task.id]: null,
+                              }))
+                            }
                           >
                             <option value="En cours">En cours</option>
                             <option value="Terminé">Terminé</option>
                           </select>
                         ) : (
-                          <p >{cat.name}</p> // Affiche le nom de la catégorie si ce n'est pas sélectionné
+                          <p>{cat.name}</p> // Affiche le nom correctement
                         )}
                       </div>
-                      
-                    )) : <div  className="intervenant-col" >Aucune catégorie.</div >}
-                  </div>
+                    ))
+                  ) : (
+                    <div className="intervenant-col">Aucune catégorie.</div>
+                  )}
+
+
+                </div>
+
                   <div className="intervenant-col" id='cate'><p>{Array.isArray(task.intervenants) ? task.intervenants.join(', ') : 'Non spécifié'} </p> </div>
-                  <div  className="intervenant-col" id='cate'> <p> {task.dateDebut} </p> <p> {task.dateFin || 'Non sdivécifiée'} </p>  </div>
+                  <div className="intervenant-col" id='cate'>
+                  <p>{formatDate(task.date_debut)}</p>
+                  <p>{formatDate(task.date_fin)}</p>
+
+                  </div>
+
                   <div   className="intervenant-col"> <p onClick={() => setSelectedTaskIdbtn(selectedTaskIdbtn === task.id ? null : task.id)} > {task.statut} </p> </div>
                   <div  className="intervenant-col" ><p>{task.company}</p></div>
                   <button
@@ -237,7 +347,10 @@ function Tasks() {
                   </button>
                 </div>
 
-               
+                {ajoutertache && (
+                  <TaskCreation/>
+                  
+                )}
                 
                 {selectedTaskIdbtn === task.id && (
                   <div className="task-actions">
@@ -285,7 +398,7 @@ function Tasks() {
               
             </div>
             
-          ))}
+          )})}
         </div>
       )}
     </div>

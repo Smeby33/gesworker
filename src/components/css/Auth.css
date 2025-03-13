@@ -6,17 +6,18 @@
     flex-direction: column;
     width: 100%;
     margin-top: 3.5%;
+    height:100%;
 
 }
 .divauth{
     display: flex;
         justify-content: space-between;
-        align-items: center;
-        background-color: black;
-        height: 100vh;
+        align-items: center; 
+        background-color: #f49a0f;
+        height:100%;
 }
 .auth{
-    background-color: rgb(255, 179, 0);
+    background-color: linear-gradient(15deg, #e2950a, #f49a0f);
     width: 90%;
     padding: 20px;
     /* box-shadow: 2px 2px 0px 2px rgb(228, 190, 67); */
@@ -51,7 +52,7 @@
   }
 
 .auth2{
-    background-color: rgb(255, 179, 0);
+    background-color:linear-gradient(15deg, #e2950a, #f49a0f);
     width: 40%;
     height: 100%;
     padding: 20px;
@@ -80,7 +81,8 @@
       width: 0;
     }
     to {
-      width: 800px; /* Ajuste la largeur selon la longueur de ton texte */
+      width: 810px;
+      text-decoration: none;                                            
     }
   }
 
@@ -103,7 +105,7 @@
     justify-content: center;
     align-items: center;
     flex-direction: column;
-    background-color: rgb(255, 179, 0);
+    background-color:linear-gradient(15deg, #e2950a, #f49a0f);
 
 }
 
@@ -142,7 +144,6 @@
     color: rgb(110, 68, 121);
 }
 .auth label {
-    background-color :rgb(255, 179, 0);
     width: 100%;
 }
 .boutonauth2 {

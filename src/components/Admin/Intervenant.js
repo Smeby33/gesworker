@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { toast, ToastContainer } from 'react-toastify';
 import CreateCompany from  './CreateCompany';
 import CreateIntervenant from  './CreateIntervenant';
+import {getAuth, } from "firebase/auth";
 import ProfilePicture from './ProfilePicture';
 import TaskCreation from './TaskCreation';
 import {
@@ -10,7 +11,8 @@ import {
   FaBuilding,
   FaTimes,
   FaList,
-  FaTh
+  FaTh,
+  FaPlusCircle
 } from 'react-icons/fa';
 import 'react-toastify/dist/ReactToastify.css';
 import '../css/Intervenant.css'; // Assure-toi que le chemin est correct
@@ -24,6 +26,11 @@ const [activeIntervenantIndex, setActiveIntervenantIndex] = useState(null); // I
 const [selectedIntervenantForTask, setSelectedIntervenantForTask] = useState(null); // Intervenant spécifique à une tâche
 const [selectedIntervenantState, setSelectedIntervenantState] = useState(''); // État sélectionné
 const [selectedIntervenant, setSelectedIntervenant] = useState(null); // Intervenant actuellement sélectionné
+const [showCompanyBtn , setshowCompanyBtn] = useState(null);
+const [showAjoutinter , setshowAjoutinter] = useState(null);
+const [adminEmail, setAdminEmail] = useState('');
+const auth = getAuth();
+
 
 const [tasks, setTasks] = useState([]);
 const [categories, setCategories] = useState([]);  
@@ -40,15 +47,65 @@ const [dateFin, setDateFin] = useState('');
 
 useEffect(() => {
   // Récupération des données depuis le localStorage
-  const storedCategories = JSON.parse(localStorage.getItem('taskCategories')) || [];
-  const storedIntervenants = JSON.parse(localStorage.getItem('intervenant')) || [];
-  const storedCompanies = JSON.parse(localStorage.getItem('clients')) || [];
-  const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+  const fetchTasks = async () => {
+    if (auth.currentUser) {
+      setAdminEmail(auth.currentUser.email);
+      const adminUID = auth.currentUser.uid;
+      try {
+        const response = await fetch(`http://localhost:5000/taches/tasks-by-owner/${adminUID}`);
+        const data = await response.json();
+        setTasks(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des intervenants :", error);
+      }
+    }
+  };
 
-  setCategories(storedCategories);
-  setIntervenants(storedIntervenants);
-  setCompanies(storedCompanies);
-  setTasks(storedTasks);
+  fetchTasks();
+  const fetchIntervenants = async () => {
+    if (auth.currentUser) {
+      setAdminEmail(auth.currentUser.email);
+      const adminUID = auth.currentUser.uid;
+      try {
+        const response = await fetch(`http://localhost:5000/intervenants/recuperertout/${adminUID}`);
+        const data = await response.json();
+        setIntervenants(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des intervenants :", error);
+      }
+    }
+  };
+
+  fetchIntervenants();
+  const fetchCompanies = async () => {
+    if (auth.currentUser) {
+      setAdminEmail(auth.currentUser.email);
+      const adminUID = auth.currentUser.uid;
+      try {
+        const response = await fetch(`http://localhost:5000/clients/client/${adminUID}`);
+        const data = await response.json();
+        setCompanies(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des intervenants :", error);
+      }
+    }
+  };
+
+  fetchCompanies();
+  const fetchCategories = async () => {
+    
+      try {
+        const response = await fetch(`http://localhost:5000/categories/toutescategories`);
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des intervenants :", error);
+      }
+    
+  };
+
+  fetchCategories();
+
 }, []);
 
 const saveTasksToLocalStorage = (tasks) => {
@@ -132,21 +189,61 @@ const [taskForm, setTaskForm] = useState({
 
 
 // ** Initialisation des données depuis le localStorage **
+
 useEffect(() => {
-  const storedCategories = JSON.parse(localStorage.getItem('taskCategories')) || [];
-  const storedIntervenants = JSON.parse(localStorage.getItem('intervenant')) || [];
-  const storedCompanies = JSON.parse(localStorage.getItem('clients')) || [];
-  const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+  const storedTasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
   const validatedTasks = storedTasks.map((task) => ({
     ...task,
     intervenants: Array.isArray(task.intervenants) ? task.intervenants : [],
   }));
+
   setTasks(validatedTasks);
 
-  setCategories(storedCategories);
-  setIntervenants(storedIntervenants);
-  setCompanies(storedCompanies);
-  setTasks(storedTasks);
+  // Récupération des intervenants depuis la base de données
+  const fetchIntervenants = async () => {
+    if (auth.currentUser) {
+      setAdminEmail(auth.currentUser.email);
+      const adminUID = auth.currentUser.uid;
+      try {
+        const response = await fetch(`http://localhost:5000/intervenants/recuperertout/${adminUID}`);
+        const data = await response.json();
+        setIntervenants(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des intervenants :", error);
+      }
+    }
+  };
+
+  fetchIntervenants();
+  const fetchCompanies = async () => {
+    if (auth.currentUser) {
+      setAdminEmail(auth.currentUser.email);
+      const adminUID = auth.currentUser.uid;
+      try {
+        const response = await fetch(`http://localhost:5000/clients/client/${adminUID}`);
+        const data = await response.json();
+        setCompanies(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des intervenants :", error);
+      }
+    }
+  };
+
+  fetchCompanies();
+  const fetchCategories = async () => {
+    
+      try {
+        const response = await fetch(`http://localhost:5000/categories/toutescategories`);
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des intervenants :", error);
+      }
+    
+  };
+
+  fetchCategories();
 }, []);
 
 
@@ -247,6 +344,11 @@ const handleCompanyCreation = () => {
         >
           <FaTh /> Grille
         </button>
+        <button
+          onClick={() => setshowAjoutinter(!showAjoutinter)}
+        >
+          <FaPlusCircle/> Intervenant
+        </button>
       </div>
 
       {/* Conteneur des intervenants */}  
@@ -258,18 +360,14 @@ const handleCompanyCreation = () => {
               className={`intervenant-item ${hoveredIntervenant === intervenant ? 'hovered' : ''}`}
               onMouseEnter={() => setHoveredIntervenant(intervenant)}
               onMouseLeave={() => setHoveredIntervenant(null)}
+              onClick={() =>
+                setshowCompanyBtn(showCompanyBtn === index ? null : index)
+              }
             >
+
+            {showCompanyBtn === index && (
               <div className="navclient">
-                <div className="btnnav">
-                <button className="nav-button"
-                 onClick={() => toggleFormState('showIntervenantForm', index)}
-                >
-                  <FaUserPlus className="btnnavicon"/>
-                    <a href="#form-intervenant" className="nav-link">
-                       Add Intervenant
-                    </a>
-                  </button>
-                </div>
+                
                 <div className="btnnav">
                   <button className="nav-button"onClick={() => toggleFormState('activeIntervenantIndex', index)}
                     >
@@ -289,6 +387,7 @@ const handleCompanyCreation = () => {
                   </button>
                 </div>
               </div>
+            )}
               <div className="affichagetable">
 
               <div className="intervenant-row">
@@ -453,23 +552,24 @@ const handleCompanyCreation = () => {
           </div>
         )}
       </div>
+      {showAjoutinter   && (
+      <CreateIntervenant
+  id="form"
+  onIntervenantAdded={(newIntervenant) => {
+    setIntervenants((prevIntervenants) => [...prevIntervenants, newIntervenant]);
+    localStorage.setItem('intervenant', JSON.stringify([...intervenants, newIntervenant]));
+  }}
+  onTaskAdded={(newTask) => {
+    const updatedTasks = [...tasks, newTask];
+    setTasks(updatedTasks);
+    saveTasksToLocalStorage(updatedTasks);
+    toast.success("Tâche créée avec succès !");
+  }}
+/>
+)}
+
     </div>
   );
 }
 
 export default Intervenant;
-
-
-
-
-
-  
-
-
-
-   
-
-   
-
-
- 

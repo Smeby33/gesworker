@@ -83,9 +83,11 @@ function Navbar() {
         <Link to="/admin" className="nav-link"> <FaUserShield />  Admin</Link>
       </button>
       </div>
+      <div className="btnnav">
       <button onClick={handleIntervenantClick} className="nav-button">
-        <FaDiagnoses />  Intervenantdash
+       <div  className="nav-link"><FaDiagnoses />  Intervenantdash </div> 
       </button>
+      </div>
       <div>
   {currentUser ? (
      <Link to="/">
@@ -96,7 +98,7 @@ function Navbar() {
         navigate('/auth'); // Redirection après déconnexion
       }}
     >
-      <FaSignInAlt /> Déconnexion
+     <div  className="nav-link"> <FaSignInAlt /> Déconnexion </div>
     </button>
     </Link>
   ) : (
@@ -111,7 +113,7 @@ function Navbar() {
 
           <a href="#tableau">
             <button  className="nav-button">
-              <FaTachometerAlt />  Tableau de bord
+            <div  className="nav-link">  <FaTachometerAlt />  Tableau de bord </div>
             </button>
           </a>
           {/* onClick={openActions} onClick={openDashboard} */}

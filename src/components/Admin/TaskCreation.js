@@ -1,47 +1,72 @@
 import React, { useEffect, useState } from 'react';
 import '../css/TaskCreation.css';
 import { toast, ToastContainer } from 'react-toastify';
+import { signOut, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+
 import 'react-toastify/dist/ReactToastify.css';
 
 function TaskCreation() {
   const [tasks, setTasks] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [intervenants, setIntervenants] = useState([]);
+  const [intervenants, setIntervenants] = useState([]);  
   const [companies, setCompanies] = useState([]);
+  const [priorités, setPriorités] = useState([]);
+  const [adminEmail, setAdminEmail] = useState('');
+  const auth = getAuth();
 
   // États pour les champs du formulaire
   const [titre, setTitre] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedIntervenants, setSelectedIntervenants] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState('');
+  const [selectedPriorités, setSelectedPriorités] = useState('');
   const [dateDebut, setDateDebut] = useState(new Date().toISOString().slice(0, 16));
   const [dateFin, setDateFin] = useState('');
 
   useEffect(() => {
-    // Récupération des données depuis le localStorage
-    const storedCategories = JSON.parse(localStorage.getItem('taskCategories')) || [];
-    const storedIntervenants = JSON.parse(localStorage.getItem('intervenant')) || [];
-    const storedCompanies = JSON.parse(localStorage.getItem('clients')) || [];
-    const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-
-    setCategories(storedCategories);
-    setIntervenants(storedIntervenants);
-    setCompanies(storedCompanies);
-    setTasks(storedTasks);
+    const fetchData = async () => {
+      if (auth.currentUser) {
+        setAdminEmail(auth.currentUser.email);
+        const adminUID = auth.currentUser.uid;
+  
+        try {
+          const [prioritesRes, intervenantsRes, tasksRes, companiesRes, categoriesRes] = await Promise.all([
+            fetch('http://localhost:5000/prioritys/toutesprioritys'),
+            fetch(`http://localhost:5000/intervenants/recuperertout/${adminUID}`),
+            fetch(`http://localhost:5000/taches/tasks-by-owner/${adminUID}`),
+            fetch(`http://localhost:5000/clients/client/${adminUID}`),
+            fetch('http://localhost:5000/categories/toutescategories'),
+          ]);
+  
+          setPriorités(await prioritesRes.json());
+          setIntervenants(await intervenantsRes.json());
+          setTasks(await tasksRes.json());
+          setCompanies(await companiesRes.json());
+          setCategories(await categoriesRes.json());
+        } catch (error) {
+          console.error("Erreur lors de la récupération des données :", error);
+        }
+      }
+    };
+  
+    fetchData();
   }, []);
-
-  const saveTasksToLocalStorage = (tasks) => {
-    localStorage.setItem('tasks', JSON.stringify(tasks));
-  };
+  
 
   const handleCategoryChange = (category) => {
-    const categoryExists = selectedCategories.find((cat) => cat.name === category.name);
-    if (categoryExists) {
-      setSelectedCategories(selectedCategories.filter((cat) => cat.name !== category.name));
-    } else {
-      setSelectedCategories([...selectedCategories, { name: category.name, sousStatut: 'En attente' }]);
-    }
+    setSelectedCategories((prevSelected) => {
+      const categoryExists = prevSelected.some((cat) => cat.name === category.name);
+  
+      if (categoryExists) {
+        // Retirer la catégorie si elle est déjà sélectionnée
+        return prevSelected.filter((cat) => cat.name !== category.name);
+      } else {
+        // Ajouter la nouvelle catégorie
+        return [...prevSelected, { name: category.name, sousStatut: 'En attente' }];
+      }
+    });
   };
+  
 
   const handleIntervenantChange = (intervenant) => {
     if (selectedIntervenants.includes(intervenant)) {
@@ -51,33 +76,53 @@ function TaskCreation() {
     }
   };
 
-  const handleTaskCreation = (e) => {
+  const handleTaskCreation = async (e) => {
     e.preventDefault();
 
     const newTask = {
-      id: tasks.length + 1,
-      titre,
+      title: titre,
       company: selectedCompany,
-      categories: selectedCategories,
-      intervenants: selectedIntervenants,
-      dateDebut,
-      dateFin: dateFin || dateDebut,
+      priorite: parseInt(selectedPriorités, 10), // Convertir en nombre si c'est un ID
+      categories: selectedCategories.map((cat) => cat.name), // Transformer en tableau de noms
+      intervenants: selectedIntervenants, // Déjà un tableau
+      date_debut: dateDebut,
+      date_fin: dateFin || dateDebut,
       statut: 'En attente',
     };
 
-    const updatedTasks = [...tasks, newTask];
-    setTasks(updatedTasks);
-    saveTasksToLocalStorage(updatedTasks);
-    toast.success('Tâche créée avec succès !');
+    // Console log pour voir les données envoyées
+    console.log("Données envoyées au backend:", JSON.stringify(newTask, null, 2));
 
-    // Réinitialisation des champs
-    setTitre('');
-    setSelectedCategories([]);
-    setSelectedIntervenants([]);
-    setSelectedCompany('');
-    setDateDebut(new Date().toISOString().slice(0, 16));
-    setDateFin('');
-  };
+    try {
+        const response = await fetch('http://localhost:5000/taches/add-task', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(newTask),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+            toast.success('Tâche créée avec succès !');
+
+            // Réinitialisation des champs
+            setTitre('');
+            setSelectedCategories([]);
+            setSelectedIntervenants([]);
+            setSelectedCompany('');
+            setDateDebut(new Date().toISOString().slice(0, 16));
+            setDateFin('');
+        } else {
+            toast.error(`Erreur: ${data.error}`);
+        }
+    } catch (error) {
+        console.error('Erreur lors de l\'envoi de la tâche:', error);
+        toast.error('Une erreur est survenue, veuillez réessayer.');
+    }
+};
+
 
   return (
     <div className="task-creation-container">
@@ -103,7 +148,7 @@ function TaskCreation() {
                 <input
                   type="checkbox"
                   id={`category-${index}`}
-                  value={category.name}
+                  value={category.id}
                   checked={selectedCategories.some((cat) => cat.name === category.name)}
                   onChange={() => handleCategoryChange(category)}
                 />
@@ -113,6 +158,7 @@ function TaskCreation() {
               </div>
             ))}
           </div>
+
         </div>
 
         <div>
@@ -134,7 +180,21 @@ function TaskCreation() {
             ))}
           </div>
         </div>
-
+        <div>
+          <label>priorité :</label>
+          <select
+            value={selectedPriorités}
+            onChange={(e) => setSelectedPriorités(e.target.value)}
+            required
+          >
+            <option value="">Sélectionnez une priorité</option>
+            {priorités.map((Priorité, index) => (
+              <option key={index} value={Priorité.id}>
+                {Priorité.Type}
+              </option>
+            ))}
+          </select>
+        </div>
         <div>
           <label>Entreprise :</label>
           <select
@@ -144,8 +204,8 @@ function TaskCreation() {
           >
             <option value="">Sélectionnez une entreprise</option>
             {companies.map((company, index) => (
-              <option key={index} value={company.companyName}>
-                {company.companyName}
+              <option key={index} value={company.company_name}>
+                {company.company_name}
               </option>
             ))}
           </select>

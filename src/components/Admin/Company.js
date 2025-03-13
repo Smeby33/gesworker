@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import CreateCompany from  './CreateCompany';
 import CreateIntervenant from  './CreateIntervenant';
+import { signOut, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import TaskCreation from './TaskCreation';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -10,18 +11,25 @@ import {
   FaFileMedical,
   FaBuilding,
   FaList,
+  FaPlusCircle,
   FaTimes,
   FaTh
 } from 'react-icons/fa';
 
 function Company() {
   const [companies, setCompanies] = useState([]);
-  const [hoveredCompany, setHoveredCompany] = useState(null);
+  const [hoveredCompany, setHoveredCompany] = useState(null); 
+  const [showTaskForm, setShowTaskForm] = useState(false);
+  const [ajouterCompany, setAjouterCompany] = useState(null);
   const [activeCompanyIndex, setActiveCompanyIndex] = useState(null); 
   const [selectedCompanyForTask, setSelectedCompanyForTask] = useState(null);// Devient spécifique
   const [viewMode, setViewMode] = useState('list'); // Vue par défaut : liste
   const [showIntervenantForm, setShowIntervenantForm] = useState(false);
   const [selectedCompanyForIntervenant, setSelectedCompanyForIntervenant] = useState(null);
+  const [showCompanyBtn , setshowCompanyBtn] = useState(null);
+  const [adminEmail, setAdminEmail] = useState('');
+  const auth = getAuth();
+  
 
 
   const [tasks, setTasks] = useState([]);
@@ -38,18 +46,57 @@ function Company() {
 
   
 
-  useEffect(() => {
-    // Récupération des données depuis le localStorage
-    const storedCategories = JSON.parse(localStorage.getItem('taskCategories')) || [];
-    const storedIntervenants = JSON.parse(localStorage.getItem('intervenant')) || [];
-    const storedCompanies = JSON.parse(localStorage.getItem('clients')) || [];
-    const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+  useEffect(() => { 
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/categories/toutescategories");
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des catégories :", error);
+      }
+    };
 
-    setCategories(storedCategories);
-    setIntervenants(storedIntervenants);
-    setCompanies(storedCompanies);
-    setTasks(storedTasks);
+    fetchCategories();
   }, []);
+
+  useEffect(() => {
+    const fetchIntervenants = async () => {
+      if (auth.currentUser) {
+        setAdminEmail(auth.currentUser.email);
+        const adminUID = auth.currentUser.uid;
+        try {
+          const response = await fetch(`http://localhost:5000/intervenats/recuperertout/${adminUID}`);
+          const data = await response.json();
+          setIntervenants(data);
+        } catch (error) {
+          console.error("Erreur lors de la récupération des intervenants :", error);
+        }
+      }
+    };
+  
+    fetchIntervenants();
+  }, [auth.currentUser]); // Assure-toi que auth est défini
+  
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      if (auth.currentUser) {
+        setAdminEmail(auth.currentUser.email);
+        const adminUID = auth.currentUser.uid;
+      try {
+        const response = await fetch(`http://localhost:5000/clients/client/${adminUID}`);
+        const data = await response.json();
+        setCompanies(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des entreprises :", error);
+      }
+    }
+    };
+
+    fetchCompanies();
+  }, [auth.currentUser]);
+
 
   const saveTasksToLocalStorage = (tasks) => {
     localStorage.setItem('tasks', JSON.stringify(tasks));
@@ -138,11 +185,16 @@ function Company() {
     setActiveCompanyIndex(null); // Fermer tous les formulaires
   };
 // Fonction pour afficher TaskCreation pour une entreprise
-const handleAddTaskClick = (companyIndex) => {
-  setSelectedCompanyForTask(
-    selectedCompanyForTask === companyIndex ? null : companyIndex
-  ); // Permet de basculer entre afficher/masquer
+const handleAddTaskClick = (company) => {
+  if (selectedCompanyForTask?.company_name === company.company_name) {
+    // Si on reclique sur le même client, on ferme le formulaire
+    setSelectedCompanyForTask(null);
+  } else {
+    // Sinon, on affiche le formulaire uniquement pour ce client
+    setSelectedCompanyForTask(company);
+  }
 };
+
 
 
 
@@ -190,6 +242,12 @@ useEffect(() => {
         >
           <FaTh /> Grille
         </button>
+        <button
+          onClick={() => setAjouterCompany(!ajouterCompany)}
+        >
+          <FaPlusCircle/> Client
+        </button>
+        
       </div>
 
       {/* Conteneur des clients */}
@@ -199,9 +257,18 @@ useEffect(() => {
             <div
               key={index}
               className={`client-item ${hoveredCompany === company ? 'hovered' : ''}`}
-              onMouseEnter={() => setHoveredCompany(company)}
-              onMouseLeave={() => setHoveredCompany(null)}
+              onClick={() =>
+                setshowCompanyBtn(showCompanyBtn === index ? null : index)
+              }
+              
+              
             >
+              
+              {ajouterCompany   && (
+                <CreateCompany/>
+              )}
+              {showCompanyBtn === index && (
+
               <div className="navclient">
                 <div className="btnnav">
                 <button className="nav-button"
@@ -213,26 +280,11 @@ useEffect(() => {
                     </a>
                   </button>
                 </div>
-                <div className="btnnav">
-                  <button className="nav-button" onClick={() => 
-                      setActiveCompanyIndex(activeCompanyIndex === index ? null : index)
-                    }>
-                      <FaBuilding className="btnnavicon" />
-                    <a  className="nav-link">
-                       Add Entreprise
-                    </a>
-                  </button>
-                </div>
+
                 <div className="btnnav">
                 <button
                   className="nav-button"
-                  onClick={() =>
-                    setSelectedCompanyForTask(
-                      selectedCompanyForTask?.companyName === company.companyName
-                        ? null
-                        : company
-                    )
-                  }
+                  onClick={() => handleAddTaskClick(company)}
                 >
                     <FaFileMedical className="btnnavicon" />
                     <a className="nav-link">
@@ -241,10 +293,16 @@ useEffect(() => {
                   </button>
                 </div>
               </div>
-              <div className="affichagetable">
+               )
+              }
+              <div className="affichagetable" >
 
               <div className="company-row">
-                <div className="company-col">{company.companyName}</div>
+                <div className="company-col"
+                onMouseEnter={() => setHoveredCompany(company)}
+                onMouseLeave={() => setHoveredCompany(null)}>
+                  {company.company_name}
+                </div>
                 <div className="company-col">{company.contact}</div>
                 <div className="company-col">{company.email}</div>
                 <div className="company-col">{company.address}</div>
@@ -265,15 +323,19 @@ useEffect(() => {
                 <CreateCompany onCompanyCreated={handleCompanyCreation} className="company-details1" />
               )}
                {/* Afficher le composant TaskCreation si une entreprise est sélectionnée */}
-               {selectedCompanyForTask?.companyName ===
-                company.companyName && (
+               {selectedCompanyForTask?.company_name === company.company_name && (
+
                   <div className="task-creation-container" id="form" >
       <ToastContainer />
+      
       <div className="buttoncompanytask">
           <button
             className="close-buttoncompanytask"
-            onClick={() => setSelectedCompanyForTask(null)} // Réinitialiser pour fermer le formulaire
-            aria-label="Fermer le formulaire"
+            onClick={() => {
+              setShowTaskForm(false);
+              setSelectedCompanyForTask(null);
+            }}
+                     aria-label="Fermer le formulaire"
           >
             <FaTimes />
           </button>
@@ -366,7 +428,15 @@ useEffect(() => {
                           className="task-item3"
                           style={{ backgroundColor: getTaskBackgroundColor(task) }}
                         >
-                          <strong>{task.categories.join(', ')}</strong> - Statut: {task.statut}
+                          <strong><p>Catégorie: {task.categories && task.categories.length > 0 ? task.categories.map((cat, index) => (
+                      
+                      
+                        
+                      <p > -{cat.name}  </p> 
+                  
+                
+                  
+                )) : <div  className="intervenant-col" >Aucune catégorie.</div >}</p> </strong> - Statut: {task.statut}
                           <p>Date limite: {task.dateFin}</p>
                           <div className="task-item-ul3">
                             {task.intervenants.map((intervenant, i) => (

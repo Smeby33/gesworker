@@ -126,16 +126,17 @@ function CustomCalendar() {
                   <div  className="intervenant-col" >{task.company}</div>
                   <div className="intervenant-col"><p>Début : {new Date(task.dateDebut).toLocaleDateString()}</p>                <p>Fin : {new Date(task.dateFin).toLocaleDateString()}</p></div>
                   <div className="intervenant-col"><p>Statut : {task.statut}</p></div>
-              </div>
-              </div>
-              <button onClick={() => toggleTaskStatus(task.id)}>
+                  <button onClick={() => toggleTaskStatus(task.id)}>
                   {task.statut === 'En attente' ? (
                     <FaCheckCircle />
                   ) : (
                     <FaHourglassHalf />
                   )}{' '}
                   {task.statut === 'En attente' ? 'Marquer Terminé' : 'En attente'}
-                </button>
+              </button>
+              </div>
+              </div>
+              
               </div>
             ))
           ) : (

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Row } from 'react-bootstrap';
 import { FaUsers, FaUserTie, FaTasks, FaUserGraduate, FaCalendarAlt, FaExclamationTriangle } from 'react-icons/fa'; // ajout des icônes nécessaires
 import Company from './Company';
+import { signOut, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import Intervenant from './Intervenant';
 import TaskCategories from '../Intervenant/TaskCategories'; // Assurez-vous que le chemin est correct
 import Tasks from './Tasks'; // Import du composant Tasks
@@ -12,12 +13,64 @@ import CustomCalendar from './CustomCalendar';
 function Dashboard() {
   const [selectedView, setSelectedView] = useState('clients');
   const [taskStats, setTaskStats] = useState({});
+  const [adminEmail, setAdminEmail] = useState('');
+  const auth = getAuth();
+  const [countClients, setCountClients] = useState(0);
+  const [countIntervenants, setCountIntervenants] = useState(0);
+  const [countTasks, setCountTasks] = useState(0);
+
+
+  
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        fetchcountClients();
+        fetchcountIntervenants();
+      }
+    });
+  
+    return () => unsubscribe();
+  }, [auth]);
   
   // Fonction pour compter les clients
-  const countClients = () => {
-    const clientsData = JSON.parse(localStorage.getItem('clients')) || [];
-    return clientsData.length;
+  const fetchcountClients = async () => {
+    if (auth.currentUser) {
+      setAdminEmail(auth.currentUser.email);
+      const adminUID = auth.currentUser.uid;
+      try {
+        const response = await fetch(`http://localhost:5000/clients/client/${adminUID}`);
+        const data = await response.json();
+        setCountClients(data.length); // Met à jour l'état avec le nombre de clients
+      } catch (error) {
+        console.error("Erreur lors de la récupération des intervenants :", error);
+      }
+    }
   };
+  
+  
+  useEffect(() => {
+    fetchcountClients();
+  }, []);
+
+  const fetchcountIntervenants = async () => {
+    if (auth.currentUser) {
+      setAdminEmail(auth.currentUser.email);
+      const adminUID = auth.currentUser.uid;
+      try {
+        const response = await fetch(`http://localhost:5000/intervenants/recuperertout/${adminUID}`);
+        const data = await response.json();
+        setCountIntervenants(data.length); // Met à jour l'état avec le nombre de clients
+      } catch (error) {
+        console.error("Erreur lors de la récupération des intervenants :", error);
+      }
+    }
+  };
+  
+  
+  useEffect(() => {
+    fetchcountIntervenants();
+  }, []);
+
   // Fonction pour compter les taskCategories
   const countTaskCategories = () => {
     const taskCategoriesData = JSON.parse(localStorage.getItem('taskCategories')) || [];
@@ -30,14 +83,28 @@ function Dashboard() {
     return performancesData.length;
   };
   // Fonction pour compter les intervenants
-  const countIntervenants = () => {
-    const intervenantData = JSON.parse(localStorage.getItem('intervenant')) || [];
-    return intervenantData.length;
-  };
-  const counttask = () => {
-    const taskData = JSON.parse(localStorage.getItem('tasks')) || [];
-    return taskData.length;
-  };
+  
+  useEffect(() => {
+    const fetchTaskCount = async () => {
+      if (auth.currentUser) {
+        setAdminEmail(auth.currentUser.email);
+        const adminUID = auth.currentUser.uid;
+        try {
+          const response = await fetch(`http://localhost:5000/taches/count-tasks/${adminUID}`);
+          const data = await response.json();
+          setCountTasks(data.total);  // Met à jour l'état avec le nombre de tâches
+        } catch (error) {
+          console.error("Erreur lors du comptage des tâches :", error);
+          setCountTasks(0);  // Définit 0 en cas d'erreur pour éviter un état vide
+        }
+      }
+    };
+  
+    fetchTaskCount();
+  }, [auth.currentUser]); // Ajout d'une dépendance pour exécuter l'effet quand l'utilisateur change
+  
+
+
 
   // Fonction pour compter les tâches par statut
   const countTasksByStatus = (tasks) => {
@@ -95,7 +162,7 @@ function Dashboard() {
               <a href="#intervenants">
                 <FaUserTie className="me-2" /> Intervenants
               </a>
-              <p>total : {countIntervenants()}</p>
+              <p>total : {countIntervenants}</p>
             </div>
             <div
               id="companyadm"
@@ -105,7 +172,7 @@ function Dashboard() {
               <a href="#clients">
                 <FaUsers className="me-2" />Clients
               </a>
-              <p>total: {countClients()}</p>
+              <p>total: {countClients}</p>
             </div>
             <div
               id="companyadm"
@@ -115,7 +182,7 @@ function Dashboard() {
               <a href="#taches">
                 <FaTasks className="me-2" /> Liste des Tâches
               </a>
-              <p>total: {counttask()}</p>
+              <p>total: {countTasks}</p>
             </div>
             <div
               id="companyadm"
