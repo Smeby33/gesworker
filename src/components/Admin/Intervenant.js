@@ -29,6 +29,7 @@ const [selectedIntervenant, setSelectedIntervenant] = useState(null); // Interve
 const [showCompanyBtn , setshowCompanyBtn] = useState(null);
 const [showAjoutinter , setshowAjoutinter] = useState(null);
 const [adminEmail, setAdminEmail] = useState('');
+const [selectedPriorités, setSelectedPriorités] = useState('');
 const auth = getAuth();
 
 
@@ -129,7 +130,69 @@ const handleIntervenantChange = (intervenant) => {
   }
 };
 
-const handleTaskCreation = (e) => {
+// const handleTaskCreation = async (e) => {
+//   e.preventDefault();
+
+//   if (!formState.selectedIntervenantForTask) {
+//     toast.error('Veuillez sélectionner un intervenant.');
+//     return;
+//   }
+
+//   const newTask = {
+//     title: titre,
+//     company: selectedCompany,
+//     priorite: parseInt(selectedPriorités, 10),
+//     categories: selectedCategories.map((cat) => cat.name),
+//     intervenants: [formState.selectedIntervenantForTask.name], // Assigner l'intervenant sélectionné
+//     dateDebut,
+//     dateFin: dateFin || dateDebut,
+//     statut: 'En attente',
+//   };
+//   console.log("Données envoyées au backend:", JSON.stringify(newTask, null, 2));
+
+//     try {
+//         const response = await fetch('http://localhost:5000/taches/add-task', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//             },
+//             body: JSON.stringify(newTask),
+//         });
+
+//         const data = await response.json();
+
+//         if (response.ok) {
+//             toast.success('Tâche créée avec succès !');
+
+//             // Réinitialisation des champs
+//             setTitre('');
+//             setSelectedCategories([]);
+//             setSelectedIntervenants([]);
+//             setSelectedCompany('');
+//             setDateDebut(new Date().toISOString().slice(0, 16));
+//             setDateFin('');
+//         } else {
+//             toast.error(`Erreur: ${data.error}`);
+//         }
+//     } catch (error) {
+//         console.error('Erreur lors de l\'envoi de la tâche:', error);
+//         toast.error('Une erreur est survenue, veuillez réessayer.');
+//     }
+
+//   const updatedTasks = [...tasks, newTask];
+//   setTasks(updatedTasks);
+//   saveTasksToLocalStorage(updatedTasks);
+//   toast.success('Tâche créée avec succès !');
+
+//   // Réinitialisation des champs
+//   setTitre('');
+//   setSelectedCategories([]);
+//   setSelectedCompany('');
+//   setDateDebut(new Date().toISOString().slice(0, 16));
+//   setDateFin('');
+// };
+
+const handleTaskCreation = async (e) => {
   e.preventDefault();
 
   if (!formState.selectedIntervenantForTask) {
@@ -138,29 +201,57 @@ const handleTaskCreation = (e) => {
   }
 
   const newTask = {
-    id: tasks.length + 1,
-    titre,
+    title: titre,
     company: selectedCompany,
-    categories: selectedCategories,
+    priorite: parseInt(selectedPriorités, 10),
+    categories: selectedCategories.map((cat) => cat.name),
     intervenants: [formState.selectedIntervenantForTask.name], // Assigner l'intervenant sélectionné
     dateDebut,
     dateFin: dateFin || dateDebut,
     statut: 'En attente',
   };
 
-  const updatedTasks = [...tasks, newTask];
-  setTasks(updatedTasks);
-  saveTasksToLocalStorage(updatedTasks);
-  toast.success('Tâche créée avec succès !');
+  console.log("Données envoyées au backend:", JSON.stringify(newTask, null, 2));
 
-  // Réinitialisation des champs
-  setTitre('');
-  setSelectedCategories([]);
-  setSelectedCompany('');
-  setDateDebut(new Date().toISOString().slice(0, 16));
-  setDateFin('');
+  try {
+    const response = await fetch('http://localhost:5000/taches/add-task', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(newTask),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Erreur inconnue");
+    }
+
+    const data = await response.json();
+    console.log("Réponse du serveur:", data);
+
+    // Ajouter la tâche au state après la réponse du backend
+    setTasks((prevTasks) => {
+      const updatedTasks = [...prevTasks, data]; // Utilisation des données retournées par le serveur
+      saveTasksToLocalStorage(updatedTasks);
+      return updatedTasks;
+    });
+
+    toast.success('Tâche créée avec succès !');
+
+    // Réinitialisation des champs
+    setTitre('');
+    setSelectedCategories([]);
+    setSelectedIntervenants([]);
+    setSelectedCompany('');
+    setDateDebut(new Date().toISOString().slice(0, 16));
+    setDateFin('');
+
+  } catch (error) {
+    console.error('Erreur lors de l\'envoi de la tâche:', error);
+    toast.error(`Une erreur est survenue : ${error.message}`);
+  }
 };
-
 
 
 

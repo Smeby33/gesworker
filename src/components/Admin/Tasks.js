@@ -114,73 +114,68 @@ function Tasks() {
 
   // Mettre à jour le sous-statut d'une catégorie
   const updateCategorySubStatus = (taskId, categoryIndex, newSubStatus) => {
-    const updatedTasks = tasks.map((task) => {
-      if (task.id === taskId) {
-        const updatedCategories = task.categories.map((cat, index) => {
-          if (index === categoryIndex) {
-            return { ...cat, sousStatut: newSubStatus };
-          }
-          return cat;
+    console.log("Mise à jour sous-statut :", { taskId, categoryIndex, newSubStatus });
+
+    setTasks(prevTasks => {
+        return prevTasks.map(task => {
+            if (task.id === taskId) {
+                const updatedCategories = task.categories.map((cat, idx) =>
+                    idx === categoryIndex ? { ...cat, sousStatut: newSubStatus } : cat
+                );
+
+                const allCompleted = updatedCategories.every(cat => cat.sousStatut === "Terminé");
+
+                // Mettre à jour le statut global en même temps
+                const newStatus = allCompleted ? "Terminé" : task.statut;
+
+                // Envoyer la mise à jour à l'API avec les catégories actualisées
+                updateTaskStatus(taskId, newStatus, updatedCategories);
+
+                return { ...task, categories: updatedCategories, statut: newStatus };
+            }
+            return task;
         });
-
-        // Si toutes les catégories sont terminées, mettre la tâche à "Terminé"
-        const allCategoriesCompleted = areAllCategoriesCompleted(updatedCategories);
-
-        return {
-          ...task,
-          categories: updatedCategories,
-          statut: allCategoriesCompleted ? 'Terminé' : task.statut,
-        };
-      }
-      return task;
     });
+};
 
-    saveTasksToLocalStorage(updatedTasks);
-  };
+
 
   // Mise à jour du statut d'une tâche
-  const updateTaskStatus = async (id, newStatus) => {
+  const updateTaskStatus = async (id, newStatus, categories = []) => {
     try {
-      console.log(`Mise à jour du statut de la tâche ${id} vers : ${newStatus}`);
-  
-      const response = await fetch(`http://localhost:5000/taches/updatestatus/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ statut: newStatus }),
-      });
-  
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Erreur HTTP: ${response.status} - ${errorText}`);
-      }
-  
-      const updatedTask = await response.json();
-      console.log("ID envoyé :", id);
-      console.log("Statut envoyé :", newStatus);
-      console.log("Réponse de l'API :", updatedTask);
+        console.log(`Mise à jour du statut de la tâche ${id} vers : ${newStatus}`);
+        console.log("Données envoyées :", { statut: 'Terminé', categories });
+        console.log(categories)
+        
+        const response = await fetch(`http://localhost:5000/taches/updatestatus/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ statut: newStatus, categories }), // Ajout des catégories
+        });
 
-  
-      // Vérifier que l'API renvoie bien la tâche mise à jour
-      if (!updatedTask || !updatedTask.id) {
-        throw new Error("Réponse invalide de l'API.");
-      }
-  
-      // Mettre à jour l'état local
-      setTasks(prevTasks =>
-        prevTasks.map(task =>
-          task.id === id ? { ...task, statut: newStatus } : task
-        )
-      );
-  
-      // Mettre à jour l'affichage des tâches filtrées
-      filterTasks(tasks, filter);
-  
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Erreur HTTP: ${response.status} - ${errorText}`);
+        }
+
+        const updatedTask = await response.json();
+        console.log("Réponse de l'API :", updatedTask);
+        
+        setTasks(prevTasks =>
+            prevTasks.map(task =>
+                task.id === id ? { ...task, statut: newStatus } : task
+            )
+        );
+
+        filterTasks(tasks, filter);
+
     } catch (error) {
-      console.error('Erreur lors de la mise à jour du statut:', error);
+        console.error('Erreur lors de la mise à jour du statut:', error);
     }
-  };
+};
+
   
 
   // Fonction de filtrage
@@ -308,18 +303,31 @@ function Tasks() {
                       <div key={index} onClick={() => handleCategoryClick(task.id, index)}>
                         {isCategorySelected(task.id, index) ? (
                           <select
-                            value={cat.sousStatut} // Maintenant cat a bien un sousStatut
-                            onChange={(e) => updateCategorySubStatus(task.id, index, e.target.value)}
-                            onBlur={() =>
-                              setSelectedCategory((prevState) => ({
-                                ...prevState,
-                                [task.id]: null,
-                              }))
+                          value={cat.sousStatut}
+                          onChange={(e) => {
+                            const newSubStatus = e.target.value;
+                            updateCategorySubStatus(task.id, index, newSubStatus);
+                        
+                            // Vérifie si toutes les sous-catégories sont à "Terminé"
+                            const allCompleted = task.categories.every((c, idx) => 
+                              idx === index ? newSubStatus === "Terminé" : c.sousStatut === "Terminé"
+                            );
+                        
+                            if (allCompleted) {
+                              updateTaskStatus(task.id, "Terminé");
                             }
-                          >
-                            <option value="En cours">En cours</option>
-                            <option value="Terminé">Terminé</option>
-                          </select>
+                          }}
+                          onBlur={() =>
+                            setSelectedCategory((prevState) => ({
+                              ...prevState,
+                              [task.id]: null,
+                            }))
+                          }
+                        >
+                          <option value="En cours">En cours</option>
+                          <option value="Terminé">Terminé</option>
+                        </select>
+                        
                         ) : (
                           <p>{cat.name}</p> // Affiche le nom correctement
                         )}
