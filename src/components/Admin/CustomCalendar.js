@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import Calendar from 'react-calendar';
-import { FaTh, FaList, FaPlusCircle, FaFilter, FaCheckCircle, FaHourglassHalf } from 'react-icons/fa';
-import '../css/CustomCalendar.css'; // Assurez-vous de mettre à jour les styles
+import { getAuth } from "firebase/auth";
+import { FaTh, FaList, FaCheckCircle, FaHourglassHalf } from 'react-icons/fa';
+import '../css/CustomCalendar.css';
 
 function CustomCalendar() {
   const [tasks, setTasks] = useState([]);
@@ -9,13 +10,40 @@ function CustomCalendar() {
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [filterPeriod, setFilterPeriod] = useState('month');
   const [filterStatus, setFilterStatus] = useState('all');
+  const [adminEmail, setAdminEmail] = useState('');
+  const auth = getAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
 
   useEffect(() => {
-    const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    setTasks(storedTasks);
-    setFilteredTasks(storedTasks);
-  }, []);
+    const fetchTasks = async () => {
+      if (auth.currentUser) {
+        setAdminEmail(auth.currentUser.email);
+        const adminUID = auth.currentUser.uid;
+        try {
+          const response = await fetch(`http://localhost:5000/taches/tasks-by-owner/${adminUID}`);
+          const data = await response.json();
+          const formattedData = data.map(task => ({
+            
+            ...task,
+            date_debut: task.date_debut ? new Date(task.date_debut) : null,
+            date_fin: task.date_fin ? new Date(task.date_fin) : null,
+            categories: task.categories ? task.categories.split(',').map(cat => ({ name: cat.trim(), sousStatut: 'En cours' })) : [],
+            intervenants: task.intervenants ? task.intervenants.split(',') : [],
+            
+            
+          }
+        ));
+          
+          
+          setTasks(formattedData);
+          setFilteredTasks(formattedData);
+        } catch (error) {
+          console.error("Erreur lors de la récupération des tâches :", error);
+        }
+      }
+    };
+    fetchTasks();
+  }, [auth.currentUser]);
 
   const saveTasksToLocalStorage = (updatedTasks) => {
     localStorage.setItem('tasks', JSON.stringify(updatedTasks));
@@ -25,32 +53,29 @@ function CustomCalendar() {
   const handleFilterChange = () => {
     const now = new Date();
     const filtered = tasks.filter((task) => {
-      const taskDate = new Date(task.dateDebut);
+      const taskDate = new Date(task.date_debut);
       // Filtrage par période
       if (filterPeriod === 'month') {
-        return (
-          taskDate.getMonth() === now.getMonth() &&
-          taskDate.getFullYear() === now.getFullYear()
-        );
+        return taskDate.getMonth() === now.getMonth() && taskDate.getFullYear() === now.getFullYear();
       }
       return true;
     });
 
     // Filtrage par statut
     if (filterStatus !== 'all') {
-      setFilteredTasks(
-        filtered.filter((task) => task.statut === filterStatus)
-      );
+      setFilteredTasks(filtered.filter((task) => task.statut === filterStatus));
     } else {
       setFilteredTasks(filtered);
     }
   };
 
   useEffect(() => {
-    handleFilterChange();
+    if (tasks.length > 0) {
+      handleFilterChange();
+    }
   }, [tasks, filterPeriod, filterStatus]);
+  console.log("Tasks filtrées :", filteredTasks);
 
-  
 
   const toggleTaskStatus = (taskId) => {
     const updatedTasks = tasks.map((task) =>
@@ -61,47 +86,43 @@ function CustomCalendar() {
     saveTasksToLocalStorage(updatedTasks);
   };
 
+  // Fonction pour récupérer les tâches d'un jour spécifique
+  const getTasksForDay = (date) => {
+    return tasks.filter((task) => {
+      if (!task.date_debut) return false;
+      return (
+        task.date_debut.getFullYear() === date.getFullYear() &&
+        task.date_debut.getMonth() === date.getMonth() &&
+        task.date_debut.getDate() === date.getDate()
+      );
+    });
+  };
+  
+
   return (
     <div className="custom-calendar-container">
       {/* En-tête avec filtres et basculement de vue */}
       <div className="header">
         <div className="filters">
-          <select
-            value={filterPeriod}
-            onChange={(e) => setFilterPeriod(e.target.value)}
-          >
+          <select value={filterPeriod} onChange={(e) => setFilterPeriod(e.target.value)}>
             <option value="month">Mois</option>
             <option value="week">Semaine</option>
             <option value="day">Jour</option>
           </select>
-
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-          >
+          <select value={filterStatus} onChange={(e) => setFilterStatus(e.target.value)}>
             <option value="all">Tous</option>
             <option value="En attente">En attente</option>
             <option value="Terminé">Terminé</option>
           </select>
         </div>
-
         <div className="view-toggle">
-          <button
-            className={viewMode === 'list' ? 'active' : ''}
-            onClick={() => setViewMode('list')}
-          >
+          <button className={viewMode === 'list' ? 'active' : ''} onClick={() => setViewMode('list')}>
             <FaList /> Liste
           </button>
-          <button
-            className={viewMode === 'calendar' ? 'active' : ''}
-            onClick={() => setViewMode('calendar')}
-          >
+          <button className={viewMode === 'calendar' ? 'active' : ''} onClick={() => setViewMode('calendar')}>
             <FaTh /> Calendrier
           </button>
         </div>
-        {/* <button onClick={addTask}>
-          <FaPlusCircle /> Ajouter Tâche
-        </button> */}
       </div>
 
       {/* Vue Liste */}
@@ -111,32 +132,24 @@ function CustomCalendar() {
             filteredTasks.map((task) => (
               <div key={task.id} className="task-item">
                 <div className="affichagelist">
-
                   <div className="intervenant-row">
-
-                    <div className="intervenant-col">{task.categories && task.categories.length > 0 ? task.categories.map((cat, index) => (
-                      
-                     
-                         
-                          <span >{cat.name}</span> 
-                        
-                      
-                    )) : <div  className="intervenant-col" >Aucune catégorie.</div >}</div>
-
-                  <div  className="intervenant-col" >{task.company}</div>
-                  <div className="intervenant-col"><p>Début : {new Date(task.dateDebut).toLocaleDateString()}</p>                <p>Fin : {new Date(task.dateFin).toLocaleDateString()}</p></div>
-                  <div className="intervenant-col"><p>Statut : {task.statut}</p></div>
-                  <button onClick={() => toggleTaskStatus(task.id)}>
-                  {task.statut === 'En attente' ? (
-                    <FaCheckCircle />
-                  ) : (
-                    <FaHourglassHalf />
-                  )}{' '}
-                  {task.statut === 'En attente' ? 'Marquer Terminé' : 'En attente'}
-              </button>
-              </div>
-              </div>
-              
+                    <div className="intervenant-col">
+                      {task.categories && task.categories.length > 0
+                        ? task.categories.map((cat, index) => <span key={index}>{cat.name}</span>)
+                        : <div>Aucune catégorie.</div>}
+                    </div>
+                    <div className="intervenant-col">{task.company}</div>
+                    <div className="intervenant-col">
+                      <p>Début : {task.date_debut ? new Date(task.date_debut).toLocaleDateString() : "Non défini"}</p>
+                      <p>Fin : {task.date_fin ? new Date(task.date_fin).toLocaleDateString() : "Non défini"}</p>
+                    </div>
+                    <div className="intervenant-col"><p>Statut : {task.statut}</p></div>
+                    <button onClick={() => toggleTaskStatus(task.id)}>
+                      {task.statut === 'En attente' ? <FaCheckCircle /> : <FaHourglassHalf />}
+                      {task.statut === 'En attente' ? 'Marquer Terminé' : 'En attente'}
+                    </button>
+                  </div>
+                </div>
               </div>
             ))
           ) : (
@@ -152,23 +165,16 @@ function CustomCalendar() {
           onChange={setCurrentDate}
           tileContent={({ date, view }) => {
             if (view === 'month') {
-              const dayTasks = tasks.filter(
-                (task) => new Date(task.dateDebut).toDateString() === date.toDateString()
-              );
-              return (
-                <div>
+              const dayTasks = getTasksForDay(date);
+              return dayTasks.length > 0 ? (
+                <div className="calendar-tasks">
                   {dayTasks.map((task) => (
-                    <span
-                      key={task.id}
-                      className={`calendar-task ${
-                        task.statut === 'Terminé' ? 'completed' : 'pending'
-                      }`}
-                    >
+                    <span key={task.id} className={task.statut === 'Terminé' ? 'completed' : 'pending'}>
                       {task.titre}
                     </span>
                   ))}
                 </div>
-              );
+              ) : null;
             }
           }}
         />

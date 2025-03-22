@@ -20,9 +20,6 @@ function Tasks() {
   const [adminEmail, setAdminEmail] = useState('');
   const auth = getAuth();
     
-  
-
-
   // Récupérer les tâches et commentaires depuis le localStorage
   useEffect(() => {
     const fetchTasks = async () => {
@@ -46,11 +43,7 @@ function Tasks() {
           
           console.log("Données après transformation :", formattedData);
           
-  
-          // Convertir les champs 'categories' et 'intervenants' en tableaux
-          
-          
-          
+          // Convertir les champs 'categories' et 'intervenants' en tableaux  
   
           setTasks(Array.isArray(formattedData) ? formattedData : []);
           setFilteredTasks(Array.isArray(formattedData) ? formattedData : []);
@@ -138,8 +131,6 @@ function Tasks() {
     });
 };
 
-
-
   // Mise à jour du statut d'une tâche
   const updateTaskStatus = async (id, newStatus, categories = []) => {
     try {
@@ -174,9 +165,7 @@ function Tasks() {
     } catch (error) {
         console.error('Erreur lors de la mise à jour du statut:', error);
     }
-};
-
-  
+};  
 
   // Fonction de filtrage
   const handleFilterChange = (status) => {
