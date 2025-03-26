@@ -104,31 +104,61 @@ function Auth({ onLoginSuccess }) {
   };
 
   const handleLogin = async () => {
-    const userCredential = await signInWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+    try {
+      await auth.signOut();  // 🔴 Déconnexion pour éviter les conflits
   
-    const response = await fetch(`http://localhost:5000/users/getUser/${user.uid}`);
-    const userData = await response.json();
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
   
-    if (response.status === 404) {
-      setErrorMessage("Utilisateur non trouvé dans la base de données.");
-      return;
-    }
+      console.log("Nouvelle connexion - Firebase UID:", user.uid);
   
-    if (response.status !== 200) {
-      setErrorMessage("Erreur lors de la récupération des données utilisateur.");
-      return;
-    }
+      // 1️⃣ Vérifier si l'utilisateur est enregistré dans `users`
+      const response = await fetch(`http://localhost:5000/users/getUser/${user.uid}`);
+      const userData = response.ok ? await response.json() : null;
   
-    setIsAuthenticated(true);
-    setCurrentUser(userData);
-
-    if (userData.is_admin === 1) {
-      onLoginSuccess(userData);
-    } else if (userData.is_admin === 0) {
-      setErrorMessage("Votre compte n'est pas encore enregistré. Veuillez contacter un administrateur.");
+      // 2️⃣ Si pas dans `users`, chercher dans `intervenants`
+      if (!userData) {
+        console.warn("Utilisateur non trouvé, recherche en tant qu'intervenant...");
+  
+        const intervenantResponse = await fetch(`http://localhost:5000/intervenants/recupererun/${user.uid}`);
+        const intervenantData = intervenantResponse.ok ? await intervenantResponse.json() : null;
+  
+        if (intervenantData) {
+          console.log("Intervenant trouvé:", intervenantData);
+          setIsAuthenticated(true);
+          setCurrentUser(intervenantData);
+          navigate("/intervenant");
+          return;
+        } else {
+          setErrorMessage("Votre compte n'est pas encore enregistré. Veuillez contacter un administrateur.");
+          return;
+        }
+      }
+  
+      // ✅ Mettre à jour les états avec les nouvelles infos utilisateur
+      setIsAuthenticated(true);
+      setCurrentUser(userData);
+  
+      // ✅ Rediriger tout utilisateur NON ADMIN vers la page intervenant
+      if (userData.is_admin !== 1) {  
+        console.warn("Utilisateur non admin, redirection vers intervenant...");
+        console.log(userData)
+        navigate("/intervenant");
+      } else {
+        console.log("Admin détecté, redirection vers admin...");
+        onLoginSuccess(userData);
+        console.log(userData)
+        navigate("/admin");
+      }
+    } catch (error) {
+      
+      console.error("Erreur lors de la connexion du nouveau connecté:", error);
+      setErrorMessage(error.message || "Une erreur est survenue lors de la connexion.");
     }
   };
+  
+  
+  
 
   return (
     <div className="divauth">

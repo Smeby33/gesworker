@@ -17,6 +17,7 @@ function Tasks() {
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [selectedTaskId, setSelectedTaskId] = useState(null);
   const [selectedTaskIdbtn, setSelectedTaskIdbtn] = useState(null);
+  const [countTasks, setCountTasks] = useState(0);
   const [adminEmail, setAdminEmail] = useState('');
   const auth = getAuth();
     
@@ -30,6 +31,11 @@ function Tasks() {
           const response = await fetch(`http://localhost:5000/taches/tasks-by-owner/${adminUID}`);
           const data = await response.json();
           console.log("Données reçues :", data);
+          if (Array.isArray(data)) {
+            setTasks(data);
+            setCountTasks(data.length);
+            setTaskStats(countTasksByStatus(data));
+          }
 
           const formattedData = data.map(task => ({
             ...task,

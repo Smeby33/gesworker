@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row } from 'react-bootstrap';
-import { FaUsers, FaUserTie, FaTasks, FaUserGraduate, FaCalendarAlt, FaExclamationTriangle } from 'react-icons/fa'; // ajout des icônes nécessaires
+import { FaUsers, FaUserTie, FaCalendarAlt,FaTasks, FaUserGraduate, FaCheckCircle, FaHourglassHalf, FaExclamationTriangle } from 'react-icons/fa';
 import Company from './Company';
 import { signOut, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import Intervenant from './Intervenant';
@@ -17,7 +17,9 @@ function Dashboard() {
   const auth = getAuth();
   const [countClients, setCountClients] = useState(0);
   const [countIntervenants, setCountIntervenants] = useState(0);
+  const [showTaskStats, setShowTaskStats] = useState(false);
   const [countTasks, setCountTasks] = useState(0);
+  const [tasks, setTasks] = useState([]);
 
 
   
@@ -90,9 +92,15 @@ function Dashboard() {
         setAdminEmail(auth.currentUser.email);
         const adminUID = auth.currentUser.uid;
         try {
-          const response = await fetch(`http://localhost:5000/taches/count-tasks/${adminUID}`);
+          const response = await fetch(`http://localhost:5000/taches/tasks-by-owner/${adminUID}`);
           const data = await response.json();
-          setCountTasks(data.total);  // Met à jour l'état avec le nombre de tâches
+          console.log("nous voulons les taches pour tout le monde ",data)
+          setCountTasks(data.total);
+          if (Array.isArray(data)) {
+            setTasks(data);
+            setCountTasks(data.length);
+            setTaskStats(countTasksByStatus(data));
+          }  // Met à jour l'état avec le nombre de tâches
         } catch (error) {
           console.error("Erreur lors du comptage des tâches :", error);
           setCountTasks(0);  // Définit 0 en cas d'erreur pour éviter un état vide
@@ -178,11 +186,26 @@ function Dashboard() {
               id="companyadm"
               className="w-24% d-flex align-items-center"
               onClick={() => setSelectedView('taches')}
+              onMouseEnter={() => setShowTaskStats(true)}
+              onMouseLeave={() => setShowTaskStats(false)}
             >
               <a href="#taches">
                 <FaTasks className="me-2" /> Liste des Tâches
               </a>
               <p>total: {countTasks}</p>
+                            {showTaskStats && (
+                              <div className="task-stats">
+                                <span className="stat-completed">
+                                  {taskStats['Terminé']} <FaCheckCircle /> 
+                                </span>
+                                <span className="stat-in-progress">
+                                  {taskStats['En cours']} <FaHourglassHalf />
+                                </span>
+                                <span className="stat-overdue">
+                                  {taskStats.overdue} <FaExclamationTriangle />
+                                </span>
+                              </div>
+                            )}
             </div>
             <div
               id="companyadm"
