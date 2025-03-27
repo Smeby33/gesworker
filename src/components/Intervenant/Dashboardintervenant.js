@@ -24,22 +24,28 @@ function Dashboardintervenant() {
     overdue: 0
   });
   const [showTaskStats, setShowTaskStats] = useState(false);
+  const [showPerformanceStats, setShowPerformanceStats] = useState(false);
 
   // Fonction pour compter les tâches par statut
   const countTasksByStatus = (tasks) => {
+    // Réinitialise toujours les compteurs à zéro avant de compter
     return tasks.reduce(
       (acc, task) => {
         acc[task.statut] = (acc[task.statut] || 0) + 1;
         if (task.statut !== 'Terminé' && new Date(task.date_fin) < new Date()) {
-          acc.overdue += 1;
+          acc.overdue = (acc.overdue || 0) + 1;
         }
         return acc;
       },
-      { ...taskStats }
+      { 
+        'En attente': 0, 
+        'En cours': 0, 
+        'Terminé': 0, 
+        'Annulé': 0, 
+        overdue: 0 
+      } // Initialisation propre à chaque appel
     );
   };
-
-
 
   useEffect(() => {
     const fetchData = async () => {
@@ -53,21 +59,27 @@ function Dashboardintervenant() {
           const tasksData = await tasksResponse.json();
           
           if (Array.isArray(tasksData)) {
+            // Calcul des stats AVANT de mettre à jour les states
+            const stats = countTasksByStatus(tasksData);
+            
+            // Mise à jour atomique des states
             setTasks(tasksData);
             setCountTasks(tasksData.length);
-            setTaskStats(countTasksByStatus(tasksData));
+            setTaskStats(stats);
+            
+            console.log("Données et stats mises à jour:", { tasksData, stats });
           }
 
           // Compter les clients
           const clientsResponse = await fetch(`http://localhost:5000/intervenantinters/entreprises/intervenant/${userId}`);
           const clientsCount = await clientsResponse.json();
-          console.log( clientsCount) 
+          console.log("Clients:", clientsCount);
           setCountClients(clientsCount.length);
 
           // Compter les intervenants
           const intervenantsResponse = await fetch(`http://localhost:5000/intervenantinters/mesintervenants/${userId}`);
           const intervenantsCount = await intervenantsResponse.json();
-          console.log("nous avoins trouve",intervenantsCount)
+          console.log("Intervenants:", intervenantsCount);
           setCountIntervenants(intervenantsCount.count);
 
         } catch (error) {
@@ -77,7 +89,7 @@ function Dashboardintervenant() {
     };
 
     fetchData();
-  }, [auth.currentUser]);
+  }, [auth.currentUser, selectedView]); // Ajout de selectedView comme dépendance
 
   const renderContent = () => {
     switch (selectedView) {
@@ -149,14 +161,14 @@ function Dashboardintervenant() {
               id="companyadm"
               className="w-24% d-flex align-items-center"
               onClick={() => setSelectedView('Performance')}
-              onMouseEnter={() => setShowTaskStats(true)}
-              onMouseLeave={() => setShowTaskStats(false)}
+              onMouseEnter={() => setShowPerformanceStats(true)}
+              onMouseLeave={() => setShowPerformanceStats(false)}
             >
               <a href="#Performances">
                 <FaUserGraduate className="me-2" />Mes performances
               </a>
               <p>total: {countTasks}</p>
-              {showTaskStats && (
+              {showPerformanceStats && (
                 <div className="task-stats">
                   <span className="stat-completed">
                     {taskStats['Terminé']} <FaCheckCircle /> 
@@ -182,4 +194,4 @@ function Dashboardintervenant() {
   );
 }
 
-export default Dashboardintervenant;
+export default Dashboardintervenant;  

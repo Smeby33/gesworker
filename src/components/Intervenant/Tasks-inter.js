@@ -1,8 +1,8 @@
-
 import React, { useEffect, useState } from 'react';
 import TaskCreation from '../Admin/TaskCreation';
-import { getAuth, } from "firebase/auth";
-import { FaCheckCircle,FaUserPlus, FaHourglassHalf, FaTh, FaTimesCircle, FaFilter, FaList,FaMailBulk, FaExclamationTriangle } from 'react-icons/fa';
+import TaskComments from './TaskComments';
+import { getAuth } from "firebase/auth";
+import { FaCheckCircle, FaUserPlus, FaHourglassHalf, FaTh, FaTimesCircle, FaFilter, FaList, FaMailBulk, FaExclamationTriangle } from 'react-icons/fa';
 import '../css/Tasks.css';
 
 function Tasksinter() {
@@ -10,8 +10,7 @@ function Tasksinter() {
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [filter, setFilter] = useState('');
   const [noTasksMessage, setNoTasksMessage] = useState('');
-  const [comments, setComments] = useState({});
-  const [currentUser, setCurrentUser] = useState('Admin'); // Simuler un utilisateur connecté
+  const [currentUser] = useState('Admin');
   const [taskStats, setTaskStats] = useState({});
   const [viewMode, setViewMode] = useState('list');
   const [ajoutertache, setAjoutertache] = useState(null);
@@ -21,8 +20,7 @@ function Tasksinter() {
   const [countTasks, setCountTasks] = useState(0);
   const [adminEmail, setAdminEmail] = useState('');
   const auth = getAuth();
-    
-  // Récupérer les tâches et commentaires depuis le localStorage
+
   useEffect(() => {
     const fetchTasks = async () => {
       if (auth.currentUser) {
@@ -31,48 +29,21 @@ function Tasksinter() {
         try {
           const response = await fetch(`http://localhost:5000/taches/intervenant/${adminUID}`);
           const data = await response.json();
-          console.log("Données reçues :", data);
 
           if (Array.isArray(data)) {
-            setTasks(data);
-            setCountTasks(data.length);
-            setTaskStats(countTasksByStatus(data));
-          }
-    
-          const formattedData = data.map(task => {
-            // Gestion des catégories
-            let categories = [];
-            if (Array.isArray(task.categories)) {
-              categories = task.categories.map(cat => ({
-                name: typeof cat === 'string' ? cat.trim() : cat.name || '',
-                sousStatut: cat.sousStatut || 'En cours'
-              }));
-            } else if (typeof task.categories === 'string') {
-              categories = task.categories.split(',').map(cat => ({
-                name: cat.trim(),
-                sousStatut: 'En cours'
-              }));
-            }
-    
-            // Gestion des intervenants
-            let intervenants = [];
-            if (Array.isArray(task.intervenants)) {
-              intervenants = task.intervenants;
-            } else if (typeof task.intervenants === 'string') {
-              intervenants = task.intervenants.split(',');
-            }
-    
-            return {
+            const formattedData = data.map(task => ({
               ...task,
               date_debut: task.date_debut ? new Date(task.date_debut) : null,
               date_fin: task.date_fin ? new Date(task.date_fin) : null,
-              categories,
-              intervenants
-            };
-          });
-    
-          setTasks(formattedData);
-          setFilteredTasks(formattedData);
+              categories: formatCategories(task.categories),
+              intervenants: formatIntervenants(task.intervenants)
+            }));
+
+            setTasks(formattedData);
+            setFilteredTasks(formattedData);
+            setCountTasks(data.length);
+            setTaskStats(countTasksByStatus(data));
+          }
         } catch (error) {
           console.error("Erreur lors de la récupération des tâches :", error);
           setTasks([]);
@@ -80,16 +51,34 @@ function Tasksinter() {
         }
       }
     };
-  
+
     fetchTasks();
-  
-    const storedComments = JSON.parse(localStorage.getItem('comments')) || {};
-    setComments(storedComments);
-  }, []);
-  
+  }, [auth.currentUser]);
+
+  const formatCategories = (categories) => {
+    if (Array.isArray(categories)) {
+      return categories.map(cat => ({
+        name: typeof cat === 'string' ? cat.trim() : cat.name || '',
+        sousStatut: cat.sousStatut || 'En cours'
+      }));
+    }
+    if (typeof categories === 'string') {
+      return categories.split(',').map(cat => ({
+        name: cat.trim(),
+        sousStatut: 'En cours'
+      }));
+    }
+    return [];
+  };
+
+  const formatIntervenants = (intervenants) => {
+    if (Array.isArray(intervenants)) return intervenants;
+    if (typeof intervenants === 'string') return intervenants.split(',');
+    return [];
+  };
+
   const formatDate = (date) => {
     if (!date || !(date instanceof Date) || isNaN(date.getTime())) return "Date invalide";
-    
     return date.toLocaleDateString('fr-FR', {
       day: '2-digit',
       month: '2-digit',
@@ -99,107 +88,60 @@ function Tasksinter() {
       minute: '2-digit'
     });
   };
-  
-  
 
   const handleCategoryClick = (taskId, index) => {
-    setSelectedCategory((prevState) => ({
-      ...prevState,
-      [taskId]: index // Stocke l'index de la catégorie sélectionnée pour chaque tâche
-    }));
+    setSelectedCategory(prev => ({ ...prev, [taskId]: index }));
   };
 
   const isCategorySelected = (taskId, index) => {
-    if (!selectedCategory || !taskId) return false; // Vérifie que "selectedCategory" et "taskId" existent
-    return selectedCategory[taskId] === index; // Compare si l'index correspond
+    return selectedCategory?.[taskId] === index;
   };
 
-  // Fonction pour vérifier si une tâche est en retard
   const isTaskOverdue = (task) => {
-    const today = new Date();
-    const date_fin = new Date(task.date_fin);
-    return task.statut !== 'Terminé' && date_fin < today;
+    return task.statut !== 'Terminé' && new Date(task.date_fin) < new Date();
   };
 
-  const saveTasksToLocalStorage = (updatedTasks) => {
-    localStorage.setItem('tasks', JSON.stringify(updatedTasks));
-    setTasks(updatedTasks);
-    filterTasks(updatedTasks, filter);
-  };
-
-  // Vérification si toutes les catégories sont terminées
-  const areAllCategoriesCompleted = (categories) =>
-    categories.every((cat) => cat.sousStatut === 'Terminé');
-
-  // Mettre à jour le sous-statut d'une catégorie
   const updateCategorySubStatus = (taskId, categoryIndex, newSubStatus) => {
-    console.log("Mise à jour sous-statut :", { taskId, categoryIndex, newSubStatus });
+    setTasks(prevTasks => prevTasks.map(task => {
+      if (task.id === taskId) {
+        const updatedCategories = task.categories.map((cat, idx) =>
+          idx === categoryIndex ? { ...cat, sousStatut: newSubStatus } : cat
+        );
+        
+        const allCompleted = updatedCategories.every(cat => cat.sousStatut === "Terminé");
+        const newStatus = allCompleted ? "Terminé" : task.statut;
+        
+        updateTaskStatus(taskId, newStatus, updatedCategories);
+        return { ...task, categories: updatedCategories, statut: newStatus };
+      }
+      return task;
+    }));
+  };
 
-    setTasks(prevTasks => {
-        return prevTasks.map(task => {
-            if (task.id === taskId) {
-                const updatedCategories = task.categories.map((cat, idx) =>
-                    idx === categoryIndex ? { ...cat, sousStatut: newSubStatus } : cat
-                );
-
-                const allCompleted = updatedCategories.every(cat => cat.sousStatut === "Terminé");
-
-                // Mettre à jour le statut global en même temps
-                const newStatus = allCompleted ? "Terminé" : task.statut;
-
-                // Envoyer la mise à jour à l'API avec les catégories actualisées
-                updateTaskStatus(taskId, newStatus, updatedCategories);
-
-                return { ...task, categories: updatedCategories, statut: newStatus };
-            }
-            return task;
-        });
-    });
-};
-
-  // Mise à jour du statut d'une tâche
   const updateTaskStatus = async (id, newStatus, categories = []) => {
     try {
-        console.log(`Mise à jour du statut de la tâche ${id} vers : ${newStatus}`);
-        console.log("Données envoyées :", { statut: 'Terminé', categories });
-        console.log(categories)
-        
-        const response = await fetch(`http://localhost:5000/taches/updatestatus/${id}`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ statut: newStatus, categories }), // Ajout des catégories
-        });
+      const response = await fetch(`http://localhost:5000/taches/updatestatus/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ statut: newStatus, categories }),
+      });
 
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Erreur HTTP: ${response.status} - ${errorText}`);
-        }
-
-        const updatedTask = await response.json();
-        console.log("Réponse de l'API :", updatedTask);
-        
-        setTasks(prevTasks =>
-            prevTasks.map(task =>
-                task.id === id ? { ...task, statut: newStatus } : task
-            )
-        );
-
+      if (response.ok) {
+        setTasks(prev => prev.map(task => 
+          task.id === id ? { ...task, statut: newStatus } : task
+        ));
         filterTasks(tasks, filter);
-
+      }
     } catch (error) {
-        console.error('Erreur lors de la mise à jour du statut:', error);
+      console.error('Erreur lors de la mise à jour du statut:', error);
     }
-}; 
+  };
 
-  // Fonction de filtrage
   const handleFilterChange = (status) => {
     setFilter(status);
     filterTasks(tasks, status);
   };
 
-  // Filtrer les tâches en fonction du statut
   const filterTasks = (tasks, status) => {
     let filtered;
     if (status === 'overdue') {
@@ -215,53 +157,27 @@ function Tasksinter() {
     setFilteredTasks(filtered);
   };
 
-  // Ajouter un commentaire avec le nom de l'utilisateur
-  const addComment = (taskId, comment) => {
-    if (!comment.trim()) return;
-
-    const updatedComments = {
-      ...comments,
-      [taskId]: [
-        ...(comments[taskId] || []),
-        { user: currentUser, text: comment, date: new Date() }
-      ]
-    };
-
-    setComments(updatedComments);
-    localStorage.setItem('comments', JSON.stringify(updatedComments));
-  };
-
-  // Fonction pour compter les tâches par statut
   const countTasksByStatus = (tasks) => {
-    return tasks.reduce(
-      (acc, task) => {
-        acc[task.statut] = (acc[task.statut] || 0) + 1;
-        if (task.statut !== 'Terminé' && new Date(task.date_fin) < new Date()) {
-          acc.overdue += 1;
-        }
-        return acc;
-      },
-      { 'En attente': 0, 'En cours': 0, 'Terminé': 0, 'Annulé': 0, overdue: 0 }
-    );
+    return tasks.reduce((acc, task) => {
+      acc[task.statut] = (acc[task.statut] || 0) + 1;
+      if (task.statut !== 'Terminé' && new Date(task.date_fin) < new Date()) {
+        acc.overdue += 1;
+      }
+      return acc;
+    }, { 'En attente': 0, 'En cours': 0, 'Terminé': 0, 'Annulé': 0, overdue: 0 });
   };
-
-  // Mettre à jour les statistiques des tâches
-  useEffect(() => {
-    const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    const stats = countTasksByStatus(storedTasks);
-    setTaskStats(stats);
-  }, []);
 
   return (
     <div className="tasks-container">
       <h3 id="taches">Liste des Tâches</h3>
       <div className="countertask">
-        <p className="ptachestyle">Tâches terminées : {taskStats['Terminé'] || 0}</p>
-        <p className="ptachestyle">Tâches En cours : {taskStats['En cours'] || 0}</p>
-        <p className="ptachestyle">Tâches En attente : {taskStats['En attente'] || 0}</p>
-        <p className="ptachestyle">Tâches Annulé : {taskStats['Annulé'] || 0}</p>
-        <p className="ptachestyle">Tâches en retard : {taskStats.overdue || 0}</p>
+        {Object.entries(taskStats).map(([statut, count]) => (
+          <p key={statut} className="ptachestyle">
+            {statut === 'overdue' ? 'Tâches en retard' : `Tâches ${statut.toLowerCase()}`} : {count || 0}
+          </p>
+        ))}
       </div>
+
       <div className="view-selector">
         <button onClick={() => setViewMode('list')} className={viewMode === 'list' ? 'active' : ''}>
           <FaList /> Liste
@@ -269,111 +185,88 @@ function Tasksinter() {
         <button onClick={() => setViewMode('grid')} className={viewMode === 'grid' ? 'active' : ''}>
           <FaTh /> Grille
         </button>
-        <button onClick={() => setAjoutertache((prev) => !prev)} >
+        <button onClick={() => setAjoutertache(prev => !prev)}>
           <FaUserPlus/> Tâches
         </button>
-        
       </div>
+
       <div className="filter-buttons">
-        <button onClick={() => handleFilterChange('')} className={filter === '' ? 'active' : ''}>
-          <FaFilter /> Tous
-        </button>
-        <button onClick={() => handleFilterChange('En cours')} className={filter === 'En cours' ? 'active' : ''}>
-          <FaHourglassHalf /> En cours
-        </button>
-        <button onClick={() => handleFilterChange('Terminé')} className={filter === 'Terminé' ? 'active' : ''}>
-          <FaCheckCircle /> Terminé
-        </button>
-        <button onClick={() => handleFilterChange('Annulé')} className={filter === 'Annulé' ? 'active' : ''}>
-          <FaTimesCircle /> Annulé
-        </button>
-        <button onClick={() => handleFilterChange('overdue')} className={filter === 'overdue' ? 'active overdue' : ''}>
-          <FaExclamationTriangle /> En retard
-        </button>
+        {['', 'En cours', 'Terminé', 'Annulé', 'overdue'].map(status => (
+          <button
+            key={status || 'all'}
+            onClick={() => handleFilterChange(status)}
+            className={`${filter === status ? 'active' : ''} ${status === 'overdue' ? 'overdue' : ''}`}
+          >
+            {getFilterIcon(status)} {getFilterLabel(status)}
+          </button>
+        ))}
       </div>
+
       {noTasksMessage && <p className="no-tasks-message"><span>{noTasksMessage}</span></p>}
+
       {filteredTasks.length === 0 && !noTasksMessage ? (
         <div>
-            <p>Aucune tâche trouvée.</p>
-            <TaskCreation/>
+          <p>Aucune tâche trouvée.</p>
+          <TaskCreation/>
         </div>
       ) : (
         <div className={`tasks-view ${viewMode}`}>
-          {filteredTasks.map(task =>{ 
-            console.log(task.date_debut);
-            
-            return(
-            
-            <div
-            key={task.id}
-            className={`task-item ${isTaskOverdue(task) ? 'overdue-task' : ''}`}
-
-          >
-                <div className="affichagelist">
-                
+          {filteredTasks.map(task => (
+            <div key={task.id} className={`task-item ${isTaskOverdue(task) ? 'overdue-task' : ''}`}>
+              <div className="affichagelist">
                 <div className="intervenant-row">
                   <div className="category-itemparent" id='cate'>
-                  {Array.isArray(task.categories) ? (
-                    task.categories.map((cat, index) => (
-                      <div key={index} onClick={() => handleCategoryClick(task.id, index)}>
-                        {isCategorySelected(task.id, index) ? (
-                          <select
-                          value={cat.sousStatut}
-                          onChange={(e) => {
-                            const newSubStatus = e.target.value;
-                            updateCategorySubStatus(task.id, index, newSubStatus);
-                        
-                            // Vérifie si toutes les sous-catégories sont à "Terminé"
-                            const allCompleted = task.categories.every((c, idx) => 
-                              idx === index ? newSubStatus === "Terminé" : c.sousStatut === "Terminé"
-                            );
-                        
-                            if (allCompleted) {
-                              updateTaskStatus(task.id, "Terminé");
-                            }
-                          }}
-                          onBlur={() =>
-                            setSelectedCategory((prevState) => ({
-                              ...prevState,
-                              [task.id]: null,
-                            }))
-                          }
-                        >
-                          <option value="En cours">En cours</option>
-                          <option value="Terminé">Terminé</option>
-                        </select>
-                        
-                        ) : (
-                          <p>{cat.name}</p> // Affiche le nom correctement
-                        )}
-                      </div>
-                    ))
-                  ) : (
-                    <div className="intervenant-col">Aucune catégorie.</div>
-                  )}
-
-
-                </div>
-
-                  <div className="intervenant-col" id='cate'><p>{Array.isArray(task.intervenants) ? task.intervenants.join(', ') : 'Non spécifié'} </p> </div>
-                  <div className="intervenant-col" id='cate'>
-                  <p>{formatDate(task.date_debut)}</p>
-                  <p>{formatDate(task.date_fin)}</p>
-
+                    {task.categories.length > 0 ? (
+                      task.categories.map((cat, index) => (
+                        <div key={index} onClick={() => handleCategoryClick(task.id, index)}>
+                          {isCategorySelected(task.id, index) ? (
+                            <select
+                              value={cat.sousStatut}
+                              onChange={(e) => {
+                                const newSubStatus = e.target.value;
+                                updateCategorySubStatus(task.id, index, newSubStatus);
+                                if (task.categories.every((c, idx) => 
+                                  idx === index ? newSubStatus === "Terminé" : c.sousStatut === "Terminé"
+                                )) {
+                                  updateTaskStatus(task.id, "Terminé");
+                                }
+                              }}
+                              onBlur={() => setSelectedCategory(prev => ({ ...prev, [task.id]: null }))}
+                            >
+                              <option value="En cours">En cours</option>
+                              <option value="Terminé">Terminé</option>
+                            </select>
+                          ) : (
+                            <p>{cat.name}</p>
+                          )}
+                        </div>
+                      ))
+                    ) : (
+                      <div className="intervenant-col">Aucune catégorie.</div>
+                    )}
                   </div>
 
-                  <div   className="intervenant-col"> <p onClick={() => setSelectedTaskIdbtn(selectedTaskIdbtn === task.id ? null : task.id)} > {task.statut} </p> </div>
-                  <div  className="intervenant-col" ><p>{task.company}</p></div>
-                  <button
-                    onClick={() => setSelectedTaskId(selectedTaskId === task.id ? null : task.id)} >
+                  <div className="intervenant-col" id='cate'>
+                    <p>{task.intervenants.join(', ') || 'Non spécifié'}</p>
+                  </div>
+                  <div className="intervenant-col" id='cate'>
+                    <p>{formatDate(task.date_debut)}</p>
+                    <p>{formatDate(task.date_fin)}</p>
+                  </div>
+                  <div className="intervenant-col">
+                    <p onClick={() => setSelectedTaskIdbtn(prev => prev === task.id ? null : task.id)}>
+                      {task.statut}
+                    </p>
+                  </div>
+                  <div className="intervenant-col">
+                    <p>{task.company}</p>
+                  </div>
+                  <button onClick={() => setSelectedTaskId(prev => prev === task.id ? null : task.id)}>
                     <FaMailBulk/>
                   </button>
                 </div>
 
-                {ajoutertache && (
-                  <TaskCreation/>
-                  
-                )}
+                {ajoutertache && <TaskCreation/>}
                 
                 {selectedTaskIdbtn === task.id && (
                   <div className="task-actions">
@@ -383,49 +276,36 @@ function Tasksinter() {
                   </div>
                 )}
 
-               {/* Afficher les commentaires uniquement si la tâche est sélectionnée */}
-               {selectedTaskId === task.id && (
-                    <div className="lescoment">
-                      <div className="task-comments">
-                        <h5>Commentaires</h5>
-                        {comments[task.id]?.length > 0 ? (
-                          <ul>
-                            {comments[task.id].map((comment, index) => (
-                              <li key={index}>
-                                <p><strong>{comment.user} :</strong> {comment.text}</p>
-                                <span>{new Date(comment.date).toLocaleString()}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p>Aucun commentaire.</p>
-                        )}
-                      </div>
-                      <div className="add-comment">
-                        <input
-                          type="text"
-                          placeholder="Ajouter un commentaire..."
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              addComment(task.id, e.target.value);
-                              e.target.value = '';
-                            }
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
-              
+                {selectedTaskId === task.id && (
+                  <TaskComments taskId={task.id} currentUser={auth.currentUser} />
+                )}
               </div>
-
-              
             </div>
-            
-          )})}
+          ))}
         </div>
       )}
     </div>
   );
 }
+
+// Fonctions utilitaires pour les filtres
+const getFilterIcon = (status) => {
+  switch(status) {
+    case '': return <FaFilter />;
+    case 'En cours': return <FaHourglassHalf />;
+    case 'Terminé': return <FaCheckCircle />;
+    case 'Annulé': return <FaTimesCircle />;
+    case 'overdue': return <FaExclamationTriangle />;
+    default: return null;
+  }
+};
+
+const getFilterLabel = (status) => {
+  switch(status) {
+    case '': return 'Tous';
+    case 'overdue': return 'En retard';
+    default: return status;
+  }
+};
 
 export default Tasksinter;

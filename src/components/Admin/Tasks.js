@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import TaskCreation from './TaskCreation';
 import { getAuth, } from "firebase/auth";
-import { FaCheckCircle,FaUserPlus, FaHourglassHalf, FaTh, FaTimesCircle, FaFilter, FaList,FaMailBulk, FaExclamationTriangle } from 'react-icons/fa';
+import TaskComments from '../Intervenant/TaskComments';
+ import { FaCheckCircle,FaUserPlus, FaHourglassHalf, FaTh, FaTimesCircle, FaFilter, FaList,FaMailBulk, FaExclamationTriangle } from 'react-icons/fa';
 import '../css/Tasks.css';
 
 function Tasks() {
@@ -63,8 +64,6 @@ function Tasks() {
   
     fetchTasks();
   
-    const storedComments = JSON.parse(localStorage.getItem('comments')) || {};
-    setComments(storedComments);
   }, []);
   
   const formatDate = (date) => {
@@ -365,36 +364,8 @@ function Tasks() {
 
                {/* Afficher les commentaires uniquement si la tâche est sélectionnée */}
                {selectedTaskId === task.id && (
-                    <div className="lescoment">
-                      <div className="task-comments">
-                        <h5>Commentaires</h5>
-                        {comments[task.id]?.length > 0 ? (
-                          <ul>
-                            {comments[task.id].map((comment, index) => (
-                              <li key={index}>
-                                <p><strong>{comment.user} :</strong> {comment.text}</p>
-                                <span>{new Date(comment.date).toLocaleString()}</span>
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p>Aucun commentaire.</p>
-                        )}
-                      </div>
-                      <div className="add-comment">
-                        <input
-                          type="text"
-                          placeholder="Ajouter un commentaire..."
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              addComment(task.id, e.target.value);
-                              e.target.value = '';
-                            }
-                          }}
-                        />
-                      </div>
-                    </div>
-                  )}
+                  <TaskComments taskId={task.id} currentUser={auth.currentUser} />
+                )}
               
               </div>
 
