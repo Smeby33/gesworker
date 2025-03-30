@@ -8,20 +8,25 @@ import TaskCategories from '../Intervenant/TaskCategories'; // Assurez-vous que 
 import Tasks from './Tasks'; // Import du composant Tasks
 import '../css/Dashboard.css';
 import AllPerformanceTables from './AllPerformanceTables';
+import axios from "axios";
 import CustomCalendar from './CustomCalendar';
+import { Await } from 'react-router-dom';
 
 function Dashboard() {
   const [selectedView, setSelectedView] = useState('clients');
   const [taskStats, setTaskStats] = useState({});
   const [adminEmail, setAdminEmail] = useState('');
   const auth = getAuth();
+  const [performances, setPerformances] = useState([]);
   const [countClients, setCountClients] = useState(0);
   const [countIntervenants, setCountIntervenants] = useState(0);
   const [showTaskStats, setShowTaskStats] = useState(false);
   const [countTasks, setCountTasks] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [tasks, setTasks] = useState([]);
-
-
+  const [countTaskCategories, setCountTaskCategories] = useState(0);
+  // ^ minuscule ici
   
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged((user) => {
@@ -74,11 +79,51 @@ function Dashboard() {
   }, []);
 
   // Fonction pour compter les taskCategories
-  const countTaskCategories = () => {
-    const taskCategoriesData = JSON.parse(localStorage.getItem('taskCategories')) || [];
-    return taskCategoriesData.length;
+// 2. Modifiez légèrement la fonction fetch
+const fetchcountTaskCategories = async () => {
+  try {
+    const response = await axios.get("http://localhost:5000/categories/toutescategories");
+    setCountTaskCategories(response.data?.length || 0); // Ajout de la sécurité ?
+  } catch (error) {
+    console.error("Erreur:", error);
+    setCountTaskCategories(0);
+  }
+};
+
+// 3. useEffect corrigé
+useEffect(() => {
+  const fetchData = async () => {
+    if (auth.currentUser) {
+      await fetchcountTaskCategories();
+    }
   };
-  
+  fetchData();
+}, [auth.currentUser]);
+
+    const fetchPerformances = async () => {
+      if (auth.currentUser) {
+        setAdminEmail(auth.currentUser.email);
+        const adminUID = auth.currentUser.uid;
+        try {
+      
+        const response = await fetch(`http://localhost:5000/performances/all/${adminUID}`);
+        if (!response.ok) {
+          throw new Error("Erreur lors de la récupération des performances");
+        }
+        const data = await response.json();
+        setPerformances(data.length);
+        console.log(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    };
+
+    useEffect(() => {
+    fetchPerformances();
+  }, [auth.currentUser]);
   // Fonction pour compter les performances
   const countPerformances = () => {
     const performancesData = JSON.parse(localStorage.getItem('performance')) || [];
@@ -224,7 +269,7 @@ function Dashboard() {
               <a href="#Performances">
                 <FaUserGraduate className="me-2" /> Performances
               </a>
-              <p>total: {countPerformances()}</p>
+               { <p>total: {performances}</p>}
 
             </div>
             <div
@@ -235,7 +280,7 @@ function Dashboard() {
               <a href="#Action">
                 <FaTasks className="me-2" /> Nos actions
               </a>
-              <p>total: {countTaskCategories()}</p>
+              <p>total: {countTaskCategories}</p>
 
               
             </div>

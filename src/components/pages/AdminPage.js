@@ -3,51 +3,111 @@ import { Container } from 'react-bootstrap';
 import AdminDashboard from '../Admin/AdminDashboard';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
 import Navbar from '../Intervenant/Navbar';
-import RecentActivities from '../Admin/RecentActivities'; // Import du composant
+import RecentActivities from '../Admin/RecentActivities';
+import { getAuth } from "firebase/auth";
 import '../css/AdminPage.css';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function AdminPage() {
-  const [adminName, setAdminName] = useState('');
-  const [showRecentActivities, setShowRecentActivities] = useState(false); // État pour gérer la visibilité
+  const [adminData, setAdminData] = useState({
+    name: '',
+    email: '',
+    company_name: '',
+    profile_picture: ''
+  });
+  const [showRecentActivities, setShowRecentActivities] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const auth = getAuth();
 
-  // Récupérer le nom de l'administrateur depuis le localStorage
   useEffect(() => {
-    const currentUser = JSON.parse(localStorage.getItem('currentUser'));
-    if (currentUser && currentUser.isAdmin) {
-      setAdminName(currentUser.username); // Utilise 'username' si c'est le champ utilisé dans le handleLogin
-    }
-  }, []);
+    const fetchAdminData = async () => {
+      if (auth.currentUser) {
+        try {
+          const adminUID = auth.currentUser.uid;
+          const response = await axios.get(`http://localhost:5000/users/getUser/${adminUID}`);
+          
+          if (response.data) {
+            setAdminData({
+              name: response.data.name || 'Administrateur',
+              email: response.data.email,
+              company_name: response.data.company_name || 'Votre entreprise',
+              profile_picture: response.data.profile_picture
+            });
+          }
+        } catch (err) {
+          console.error("Erreur lors de la récupération des données:", err);
+          toast.error(err.response?.data?.error || "Erreur lors du chargement des données");
+        } finally {
+          setLoading(false);
+        }
+      }
+    };
 
-  // Fonction pour basculer la visibilité du composant RecentActivities
+    fetchAdminData();
+  }, [auth.currentUser]);
+
   const toggleRecentActivities = () => {
-    setShowRecentActivities((prev) => !prev);
+    setShowRecentActivities(prev => !prev);
   };
+
+  if (loading) {
+    return (
+      <div className="AdminPage">
+        <div className="divnav">
+          <Navbar />
+        </div>
+        <div className="loading-container">
+          <div className="spinner-border text-primary" role="status">
+            <span className="visually-hidden">Chargement...</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="AdminPage">
       <div className="divnav">
-        <Navbar />
+        <Navbar profilePicture={adminData.profile_picture} />
       </div>
       <div className="AdminPagemain">
-        <h1 className="animationh3a">
-          Bienvenue administrateur {adminName} dans votre tableau de bord
-        </h1>
+        <header className="admin-header">
+          <h1 className="welcome-title">
+            Bienvenue {adminData.name} dans votre tableau de bord
+          </h1>
+          <p className="company-name">{adminData.company_name}</p>
+        </header>
+
         <div className="btnshow">
           <button
             id="toggle-buttonrecent"
             className="nav-button"
             onClick={toggleRecentActivities}
+            aria-expanded={showRecentActivities}
           >
-            {showRecentActivities ? <FaEyeSlash className="btnnavicon"  /> : <FaEye className="btnnavicon"  />}
-            <a  className="nav-link"> Historiques</a>
+            {showRecentActivities ? (
+              <>
+                <FaEyeSlash className="btnnavicon" />
+                <span className="nav-link">Masquer l'historique</span>
+              </>
+            ) : (
+              <>
+                <FaEye className="btnnavicon" />
+                <span className="nav-link">Afficher l'historique</span>
+              </>
+            )}
           </button>
         </div>
+
         {showRecentActivities && (
           <div className="company">
-            <RecentActivities /> {/* Inclusion conditionnelle */}
+            <RecentActivities adminId={auth.currentUser?.uid} />
           </div>
         )}
-        <AdminDashboard />
+
+        <AdminDashboard adminEmail={adminData.email} />
       </div>
     </div>
   );

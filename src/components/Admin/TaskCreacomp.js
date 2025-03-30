@@ -129,7 +129,7 @@ function TaskCreation() {
       <ToastContainer />
       <h3>Création de Tâche</h3>
 
-      <form onSubmit={handleTaskCreation} className=''>
+      <form onSubmit={handleTaskCreation} className='formi'>
         <div>
           <label>Titre de la tâche :</label>
           <input

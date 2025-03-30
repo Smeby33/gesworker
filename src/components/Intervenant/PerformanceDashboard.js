@@ -17,6 +17,7 @@ import "../css/PerformanceDashboard.css";
 function PerformanceDashboard() {
   const [userTasks, setUserTasks] = useState([]);
   const [adminEmail, setAdminEmail] = useState('');
+  const [nom, setNom] = useState(''); 
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [statistics, setStatistics] = useState({
@@ -30,11 +31,15 @@ function PerformanceDashboard() {
       medium: 0,
       high: 0
     },
-    average_duration: null
+    average_duration: null,
   });
+
+
 
   const auth = getAuth();
   const currentUser = auth.currentUser;
+
+
 
   const fetchPerformanceData = async (userId) => {
     try {
@@ -46,6 +51,8 @@ function PerformanceDashboard() {
       throw error;
     }
   };
+
+
 
   const fetchUserTasks = async (userId) => {
     try {
@@ -109,13 +116,24 @@ function PerformanceDashboard() {
 
   const updatePerformanceInDatabase = async (userId, performance) => {
     try {
+
+      const userResponse = await fetch(`http://localhost:5000/intervenants/recupererun/${userId}`);
+      const userData = await userResponse.json();
+      setNom(userData.name); // Stockez le nom dans le state
+      console.log("le nom",userData.name)
+      console.log("le proprietaire",userData.proprietaire)
+      console.log("les infos sont",userData)
+
+
+
       const payload = {
-        username: userId,
+        username: userData.name,
         total: performance.total,
         completed: performance.completed,
         in_progress: performance.in_progress,
         cancelled: performance.cancelled,
-        progress: performance.progress
+        progress: performance.progress,
+        proprietaire:userData.proprietaire
       };
   
       console.log("📤 Données envoyées à la route POST /performance/add :", payload);
@@ -133,6 +151,7 @@ function PerformanceDashboard() {
       if (!response.ok) {
         throw new Error(responseData.error || "Échec de la mise à jour");
       }
+      
   
       return responseData;
     } catch (error) {
@@ -140,7 +159,7 @@ function PerformanceDashboard() {
       throw error;
     }
   };
-  
+ 
 
   useEffect(() => {
     if (!currentUser) {
@@ -207,7 +226,7 @@ function PerformanceDashboard() {
           Tableau de bord de performance
         </h2>
         <p className="dashboard-subtitle">
-          Bonjour, {currentUser.displayName || adminEmail}
+          Bonjour, { nom || adminEmail}
         </p>
       </header>
       

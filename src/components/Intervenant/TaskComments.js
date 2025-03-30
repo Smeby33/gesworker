@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { FaPaperclip, FaTrash, FaEdit, FaReply, FaThumbtack, FaTimes } from 'react-icons/fa';
+import { FaPaperclip, FaTrash, FaEdit, FaReply, FaThumbtack, FaTimes,FaDownload ,FaCheck,FaPaperPlane} from 'react-icons/fa';
 import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../css/TaskComments.css';
@@ -27,7 +27,7 @@ const TaskComments = ({ taskId, currentUser }) => {
         throw new Error(await response.text());
       }
       const data = await response.json();
-      console.log("les taches",data)
+      console.log("les tcommentaires",data)
       setComments(data);
     } catch (error) {
       console.error("Error fetching comments:", error);
@@ -37,6 +37,8 @@ const TaskComments = ({ taskId, currentUser }) => {
       setIsLoading(false);
     }
   };
+  console.log("Current user:", currentUser);
+console.log("First comment author:", comments[0]?.authorId);
 
   useEffect(() => {
     fetchComments();
@@ -45,35 +47,33 @@ const TaskComments = ({ taskId, currentUser }) => {
   // Ajouter un commentaire
   const addComment = async (text, files = [], parentId = null) => {
     if (!text.trim()) return;
-
+  
     setIsLoading(true);
     setError(null);
     
     try {
-        const payload = {
-          text,
-          taskId,
-          authorId: currentUser.uid,
-          authorType: currentUser.type || 'intervenant',
-          ...(parentId && { parentId }), // Inclus parentId seulement si défini
-        };
-    
-        const response = await fetch(`${API_BASE_URL}/ajouteruncomment`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(payload),
-        });
-      console.log(response)
-
-      if (!response.ok) {
-        throw new Error(await response.text());
-      }
+      const formData = new FormData();
+      formData.append('text', text);
+      formData.append('taskId', taskId);
+      formData.append('authorId', currentUser.uid);
+      formData.append('authorType', currentUser.type || 'intervenant');
+      if (parentId) formData.append('parentId', parentId);
       
-
+      // Ajouter chaque fichier au FormData
+      files.forEach(file => {
+        formData.append('attachments', file);
+      });
+  
+      const response = await fetch(`${API_BASE_URL}/ajouteruncomment`, {
+        method: 'POST',
+        body: formData, // Pas besoin de Content-Type, le navigateur le fera automatiquement
+      });
+  
+      if (!response.ok) throw new Error(await response.text());
+  
       const newComment = await response.json();
-      await fetchComments();
-      console.log(newComment)
       setComments([...comments, newComment]);
+      setPreviewFiles([]);
       setFileInputKey(Date.now());
       setReplyToCommentId(null);
       toast.success("Commentaire ajouté avec succès");
@@ -84,7 +84,6 @@ const TaskComments = ({ taskId, currentUser }) => {
     } finally {
       setIsLoading(false);
     }
-    
   };
   useEffect(() => {
     fetchComments();
@@ -148,6 +147,23 @@ const TaskComments = ({ taskId, currentUser }) => {
       setIsLoading(false);
     }
   };
+  const downloadFile = async (fileId, fileName) => {
+    try {
+      setIsLoading(true);
+      
+      // Ouvrir le téléchargement dans un nouvel onglet
+      window.open(`${API_BASE_URL}/attachments/${fileId}`, '_blank');
+      
+      toast.success(`Téléchargement de ${fileName} démarré`);
+    } catch (error) {
+      console.error("Erreur:", error);
+      toast.error(`Échec du téléchargement: ${error.message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+  
+ 
 
   // Épingler/désépingler un commentaire
   const togglePinComment = async (commentId) => {
@@ -208,7 +224,7 @@ const handleSubmit = (e) => {
   }, [replyToCommentId, editingCommentId]);
 
   return (
-    <div className="comment-section-container"  onDoubleClick={fetchComments} >
+    <div className="whatsapp-comment-section" onDoubleClick={fetchComments}>
       <div className="comment-section-header">
         <h3 className="comment-section-title">
           <span className="comment-count-badge">{comments.length}</span>
@@ -242,7 +258,7 @@ const handleSubmit = (e) => {
         </div>
       )}
 
-      <div className="comment-thread">
+      <div className="whatsapp-comment-thread">
         {comments.length > 0 ? (
            comments
            .sort((a, b) => {
@@ -253,109 +269,121 @@ const handleSubmit = (e) => {
            .map((comment) => (
               <div 
                 key={comment.id} 
-                className={`comment-card ${comment.authorId === currentUser.id ? 'current-user-comment' : ''} ${comment.is_pinned ? 'pinned-comment' : ''}`}
+                className={`whatsapp-comment-container ${comment.author_id === currentUser.uid? 'current-user' : 'other-user'}`}
               >
-                {comment.is_pinned && (
-                  <div className="pinned-indicator">
-                    <FaThumbtack /> Épinglé
-                  </div>
-                )}
+                <div className="comment-avatar">
+                  {comment.author_name?.charAt(0) || comment.authorId?.charAt(0) || 'A'}
+                </div>
                 
-                <div className="comment-header">
-                  <div className="comment-author">
-                    <div className="author-avatar">
-                      {comment.author_name?.charAt(0) || comment.authorId?.charAt(0) || 'A'}
+                <div className={`whatsapp-comment-card ${comment.is_pinned ? 'pinned-comment' : ''}`}>
+                  {comment.is_pinned && (
+                    <div className="pinned-indicator">
+                      <FaThumbtack /> Épinglé
                     </div>
+                  )}
+                  
+                  <div className="comment-header">
                     <div className="author-info">
-                      <span className="author-name">{comment.author_name || comment.authorId}</span>
+                      <span className="author-name">{comment.author_name || comment.authorid}</span>
                       <span className="comment-date">
-                        {formatDate(comment.created_at)}
+                        
                         {comment.updated_at !== comment.created_at && (
                           <span className="edited-badge">modifié</span>
                         )}
                       </span>
+
+                    </div>
+                    
+                    <div className="comment-actions">
+                      {comment.authorId === currentUser.id && (
+                        <>
+                          <button 
+                            className="icon-btn edit-btn"
+                            onClick={() => {
+                              setEditingCommentId(comment.id);
+                              commentInputRef.current.value = comment.text;
+                            }}
+                            disabled={isLoading}
+                            title="Modifier"
+                          >
+                            <FaEdit />
+                          </button>
+                          <button 
+                            className="icon-btn delete-btn"
+                            onClick={() => deleteComment(comment.id)}
+                            disabled={isLoading}
+                            title="Supprimer"
+                          >
+                            <FaTrash />
+                          </button>
+                        </>
+                      )}
+                      <button 
+                        className="icon-btn reply-btn"
+                        onClick={() => {
+                          setReplyToCommentId(comment.id);
+                          setEditingCommentId(null);
+                        }}
+                        disabled={isLoading}
+                        title="Répondre"
+                      >
+                        <FaReply />
+                      </button>
+                      {currentUser.isAdmin && (
+                        <button 
+                          className="icon-btn pin-btn"
+                          onClick={() => togglePinComment(comment.id)}
+                          disabled={isLoading}
+                          title={comment.is_pinned ? 'Désépingler' : 'Épingler'}
+                        >
+                          <FaThumbtack />
+                        </button>
+                      )}
                     </div>
                   </div>
                   
-                  <div className="comment-actions">
-                    {comment.authorId === currentUser.id && (
-                      <>
-                        <button 
-                          className="icon-btn edit-btn"
-                          onClick={() => {
-                            setEditingCommentId(comment.id);
-                            commentInputRef.current.value = comment.text;
-                          }}
-                          disabled={isLoading}
-                          title="Modifier"
-                        >
-                          <FaEdit />
-                        </button>
-                        <button 
-                          className="icon-btn delete-btn"
-                          onClick={() => deleteComment(comment.id)}
-                          disabled={isLoading}
-                          title="Supprimer"
-                        >
-                          <FaTrash />
-                        </button>
-                      </>
+                  <div className="comment-content">
+                    <p>{comment.text}</p>
+                    
+                    {comment.attachments?.length > 0 && (
+                      <div className="attachments-grid">
+                        {comment.attachments.map((file) => (
+                          <a 
+                            key={file.id}
+                            href={`${API_BASE_URL}/attachments/${file.id}`}
+                            className="attachment-item"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <div className="attachment-icon">
+                              <FaPaperclip />
+                            </div>
+                            <div className="attachment-info">
+                              <span className="attachment-name">{file.file_name}</span>
+                              <span className="attachment-type">{file.file_type}</span>
+                            </div>
+                            <button 
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                downloadFile(file.id, file.file_name);
+                              }}
+                              className="download-btn"
+                            >
+                              <FaDownload />
+                            </button>
+                          </a>
+                        ))}
+                      </div>
                     )}
-                    <button 
-                      className="icon-btn reply-btn"
-                      onClick={() => {
-                        setReplyToCommentId(comment.id);
-                        setEditingCommentId(null);
-                      }}
-                      disabled={isLoading}
-                      title="Répondre"
-                    >
-                      <FaReply />
-                    </button>
-                    {currentUser.isAdmin && (
-                      <button 
-                        className="icon-btn pin-btn"
-                        onClick={() => togglePinComment(comment.id)}
-                        disabled={isLoading}
-                        title={comment.is_pinned ? 'Désépingler' : 'Épingler'}
-                      >
-                        <FaThumbtack />
-                      </button>
-                    )}
+                    {formatDate(comment.created_at)}
                   </div>
-                </div>
-                
-                <div className="comment-content">
-                  <p>{comment.text}</p>
                   
-                  {comment.attachments?.length > 0 && (
-                    <div className="attachments-grid">
-                      {comment.attachments.map((file) => (
-                        <a 
-                          key={file.id} 
-                          href={`${API_BASE_URL}/attachments/${file.id}`} 
-                          target="_blank" 
-                          rel="noopener noreferrer"
-                          className="attachment-item"
-                        >
-                          <div className="attachment-icon">
-                            <FaPaperclip />
-                          </div>
-                          <div className="attachment-info">
-                            <span className="attachment-name">{file.file_name}</span>
-                            <span className="attachment-type">{file.file_type}</span>
-                          </div>
-                        </a>
-                      ))}
+                  {replyToCommentId === comment.id && (
+                    <div className="replying-indicator">
+                      <span>↳ Réponse à {comment.author_name || comment.authorId}</span>
                     </div>
                   )}
                 </div>
-                
-                {replyToCommentId === comment.id && (
-                  <div className="replying-indicator">
-                    <span>↳ Réponse à {comment.author_name || comment.authorId}</span>
-                  </div>
-                )}
               </div>
             ))
         ) : (
@@ -394,7 +422,7 @@ const handleSubmit = (e) => {
           )}
         </div>
         
-        <div className="form-group">
+        <div id="form-group">
           <input
             type="text"
             name="comment"
@@ -417,49 +445,45 @@ const handleSubmit = (e) => {
                 type="file"
                 name="attachments"
                 multiple
-                onChange={handleFileChange}  // Ajoutez cette ligne
+                onChange={handleFileChange}
                 disabled={isLoading}
-                />
-
+              />
             </label>
             
             <button 
               type="submit" 
               className="submit-btn"
-              
               disabled={isLoading}
-              
             >
-              {editingCommentId ? "Mettre à jour" : "Publier"}
+              {editingCommentId ? "Mettre à jour" : "Envoyer"}
             </button>
           </div>
         </div>
-        {/* Aperçu des fichiers sélectionnés */}
-            {previewFiles.length > 0 && (
-            <div className="file-previews">
-                {previewFiles.map((file, index) => (
-                <div key={index} className="file-preview">
-                    <FaPaperclip />
-                    <span>{file.name}</span>
-                    <button 
-                    type="button"
-                    onClick={() => {
-                        const newFiles = [...previewFiles];
-                        newFiles.splice(index, 1);
-                        setPreviewFiles(newFiles);
-                        // Réinitialiser l'input file si tous les fichiers sont supprimés
-                        if (newFiles.length === 0) {
-                        setFileInputKey(Date.now());
-                        }
-                    }}
-                    className="remove-file-btn"
-                    >
-                    <FaTimes />
-                    </button>
-                </div>
-                ))}
-            </div>
-            )}
+        
+        {previewFiles.length > 0 && (
+          <div className="file-previews">
+            {previewFiles.map((file, index) => (
+              <div key={index} className="file-preview">
+                <FaPaperclip />
+                <span>{file.name}</span>
+                <button 
+                  type="button"
+                  onClick={() => {
+                    const newFiles = [...previewFiles];
+                    newFiles.splice(index, 1);
+                    setPreviewFiles(newFiles);
+                    if (newFiles.length === 0) {
+                      setFileInputKey(Date.now());
+                    }
+                  }}
+                  className="remove-file-btn"
+                >
+                  <FaTimes />
+                </button>
+              </div>
+            ))}
+          </div>
+        )}
       </form>
     </div>
   );

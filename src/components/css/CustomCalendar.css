@@ -343,3 +343,26 @@ button.react-calendar__navigation__label:hover,
 button.react-calendar__navigation__arrow:hover {
   color: #0056b3;
 }
+
+
+
+
+
+.calendar-task.dragging {
+  opacity: 0.5;
+}
+
+.updating-spinner {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-radius: 50%;
+  border-top-color: #fff;
+  animation: spin 1s ease-in-out infinite;
+  margin-left: 5px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

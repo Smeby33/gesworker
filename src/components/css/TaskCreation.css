@@ -29,7 +29,7 @@ form {
   gap: 20px;
 }
 
-form div {
+.formi div {
   display: flex;
   flex-direction: column;
 }
@@ -120,4 +120,7 @@ ul {
 ul li span {
   font-size: 14px;
   color: #666;
+}
+.submit-btn{
+  margin: 0px;
 }

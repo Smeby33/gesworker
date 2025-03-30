@@ -8,7 +8,7 @@ import {
 import Modal from 'react-modal';
 import Dashboard from '../Admin/Dashbord'; 
 import TaskCategories from './TaskCategories'; 
-import ProfilePicture from '../Admin/ProfilePicture';
+import ProfilePicture from '../Admin/ProfilePicture_intervenant';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../css/Navbar.css';
@@ -87,16 +87,17 @@ function Navbar() {
   };
 
   return (
-    <nav>
+    <nav className='navb'>
       <ToastContainer />
 
       <div className="navbar-list">
+        <div className="separation">
         {/* Photo de profil */}
         <ProfilePicture />
 
         {/* Bouton Admin */}
         <div className="btnnav">
-          <button className="nav-button" onClick={handleAdminClick}>
+          <button className="navb-button"  onClick={onLogout}>
             <Link to="/admin" className="nav-link">
               <FaUserShield /> Admin
             </Link>
@@ -104,22 +105,23 @@ function Navbar() {
         </div>
 
         {/* Bouton Intervenant */}
-        <button onClick={handleIntervenantClick} className="nav-button">
+        <button  className="navb-button" onClick={onLogout}>
           <div className="nav-link">
             <FaDiagnoses /> Intervenant
           </div>
         </button>
+        </div>
 
         {/* Bouton Connexion/Déconnexion */}
         <div>
           {auth.currentUser ? (
-            <button className="nav-button" onClick={onLogout}>
+            <button className="navb-button" onClick={onLogout}>
               <div className="nav-link">
                 <FaSignInAlt /> Déconnexion
               </div>
             </button>
           ) : (
-            <button className="nav-button" onClick={() => navigate('/')}>
+            <button className="navb-button" onClick={() => navigate('/')}>
               <div className="nav-link">
                 <FaSignInAlt /> Se connecter
               </div>

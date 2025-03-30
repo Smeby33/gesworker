@@ -287,13 +287,14 @@
   background: #f0f0f0;
 }
 
-.form-group {
+form #form-group {
   display: flex;
   gap: 12px;
 }
 
 .comment-input {
   flex: 1;
+  width: 70%;
   padding: 12px 16px;
   border: 1px solid #eaeaea;
   border-radius: 8px;
@@ -492,4 +493,57 @@
 
 .remove-file-btn:hover {
   color: #ff0000;
+}
+
+.attachment-item {
+  cursor: pointer;
+  transition: background-color 0.2s;
+  padding: 8px;
+  border-radius: 4px;
+}
+
+.attachment-item:hover {
+  background-color: #f0f0f0;
+}
+
+.attachment-icon {
+  margin-right: 8px;
+  color: #666;
+}
+
+.attachment-name {
+  font-weight: 500;
+  display: block;
+}
+
+.attachment-type {
+  font-size: 0.8em;
+  color: #888;
+}
+.download-btn {
+  background: none;
+  border: none;
+  color: #666;
+  cursor: pointer;
+  margin-left: auto;
+}
+
+.download-btn:hover {
+  color: #1890ff;
+}
+
+.whatsapp-style-comments {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  position: relative;
+}
+
+.comments-header {
+  padding: 10px;
+  background: #f0f2f5;
+  border-bottom: 1px solid #e9edef;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
