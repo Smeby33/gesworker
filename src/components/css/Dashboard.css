@@ -66,14 +66,13 @@
     text-decoration: none;
     color: white;
     display: flex;
-    flex-direction: column;
     align-items: center;
   }
-  #companyadm {
-    background:#024d86; /* Fond clair pour la section des entreprises */
-    ; /* Fond clair pour la section des entreprises */
-    padding-top: 15px; /* Espace autour du contenu */
-    border-radius: 8px; /* Coins arrondis */
+  /* #companyadm {
+    background:#024d86;
+
+    padding-top: 15px; 
+    border-radius: 8px; 
     border: #3ca1efe6 solid;
     display: flex;
     color: white;
@@ -82,7 +81,35 @@
     height: 106px;
     box-shadow: 0px 1px 4px 1px #9a96ac;
     margin: 0.5em;
-  }
+  } */
+  
+  /* Variables */
+:root {
+  --primary: #024d86;
+  --primary-dark: #013a6b;
+  --secondary: #3f7989;
+  --accent: #f5a623;
+  --light: #f8f9fa;
+  --dark: #2c3e50;
+  --gray: #e0e0e0;
+  --error: #ff3860;
+}
+
+  
+  #companyadm {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    padding-top: 15px;
+    border-radius: 8px;
+    border: #3ca1efe6 solid;
+    display: flex
+;
+    color: white;
+    flex-direction: column;
+    width: 30%;
+    height: 73px;
+    box-shadow: 0px 1px 4px 1px #9a96ac;
+    margin: 0.5em;
+}
   #companyadm p{
     font-size: 12px;
   }
@@ -91,11 +118,10 @@
     color: white;
     font-size: 11.5px;
     display: flex;
-    flex-direction: column;
     align-items: center;
   }
   .me-2{
-    height: 2em;
+    height: 1em;
     width: 2em;
   }
   .ptachestyle{

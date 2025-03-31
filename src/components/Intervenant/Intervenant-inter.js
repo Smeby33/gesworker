@@ -151,6 +151,7 @@ const formatDate = (date) => {
                 <p className="intervenant-col">Email: {intervenant.email || 'Non renseigné'}</p>
                 <p className="intervenant-col">ID: {intervenant.id || 'Non disponible'}</p>
               </div>
+            
               
               {taskAssigned === intervenant.id && (
                 <div className="intervenant-details">

@@ -185,9 +185,6 @@ function Tasksinter() {
         <button onClick={() => setViewMode('grid')} className={viewMode === 'grid' ? 'active' : ''}>
           <FaTh /> Grille
         </button>
-        <button onClick={() => setAjoutertache(prev => !prev)}>
-          <FaUserPlus/> Tâches
-        </button>
       </div>
 
       <div className="filter-buttons">

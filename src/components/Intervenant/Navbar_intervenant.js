@@ -34,7 +34,7 @@ function Navbar() {
       localStorage.removeItem("currentUser");
 
       toast.success("Vous êtes maintenant déconnecté.");
-      navigate("/");
+      navigate("/"); 
     } catch (error) {
       console.error("Erreur lors de la déconnexion :", error);
       toast.error("Erreur lors de la déconnexion !");

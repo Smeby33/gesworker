@@ -519,7 +519,7 @@ table tr:hover td {
   max-width: 1200px;
   margin: 2rem auto;
   padding: 1.5rem;
-  background-color: #f9f9f9;
+  background: linear-gradient(15deg, #372e20, #5251505e);
   border-radius: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -757,4 +757,51 @@ table tr:hover td {
 }
 
 /* ... (conservez tous les autres styles existants) */
+
+/* CustomCalendar.css */
+.calendar-task.dragging {
+  opacity: 0.5;
+  background-color: #e0e0e0;
+}
+
+.calendar-day.drop-target {
+  background-color: #f0f8ff;
+  border: 2px dashed #1e90ff;
+}
+
+.error-message {
+  padding: 10px;
+  background-color: #ffebee;
+  color: #c62828;
+  border-radius: 4px;
+  margin: 10px 0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.error-message button {
+  background: none;
+  border: none;
+  color: #c62828;
+  cursor: pointer;
+  font-size: 1.2em;
+}
+
+.updating-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0,0,0,0.1);
+  border-radius: 50%;
+  border-top-color: #1e90ff;
+  animation: spin 1s ease-in-out infinite;
+  margin-left: 8px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+
 

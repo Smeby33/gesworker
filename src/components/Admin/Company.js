@@ -195,6 +195,7 @@ function Company() {
   };
 
   return (
+    <div className='company-containerparentadmin' >
     <div className="company-container">
       <h3 id="clients">Liste des Clients</h3>
 
@@ -333,6 +334,7 @@ function Company() {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }

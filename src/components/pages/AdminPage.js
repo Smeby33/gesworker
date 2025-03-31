@@ -80,7 +80,7 @@ function AdminPage() {
           <p className="company-name">{adminData.company_name}</p>
         </header>
 
-        <div className="btnshow">
+        {/* <div className="btnshow">
           <button
             id="toggle-buttonrecent"
             className="nav-button"
@@ -99,7 +99,7 @@ function AdminPage() {
               </>
             )}
           </button>
-        </div>
+        </div> */}
 
         {showRecentActivities && (
           <div className="company">

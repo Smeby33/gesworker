@@ -72,7 +72,7 @@ function IntervenantPage() {
         <h1 className='animationh3a'>
           Bienvenue intervenant {intervenantName} dans votre tableau de bord 
         </h1>
-        <div className="btnshow">
+        {/* <div className="btnshow">
           <button
             id="toggle-buttonrecent"
             className="nav-button"
@@ -81,7 +81,7 @@ function IntervenantPage() {
             {showRecentActivities ? <FaEyeSlash className="btnnavicon" /> : <FaEye className="btnnavicon" />}
             <a className="nav-link"> Historiques</a>
           </button>
-        </div>
+        </div> */}
         {showRecentActivities && (
           <div className="company">
             <RecentActivities />

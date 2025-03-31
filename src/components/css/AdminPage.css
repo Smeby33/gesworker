@@ -30,7 +30,6 @@
   background: linear-gradient(15deg, #808080, #000000); /* Fond blanc pour les éléments d'entreprise */
 }
 .AdminPagemain{
-  margin-top: 2em;
   width: 80%;
   display: flex;
   flex-direction: column;
@@ -41,7 +40,8 @@
     min-height: 100vh;
     position: relative;
     display: flex;
-    background: linear-gradient(135deg, #000428, #004e92);
+    /* background: linear-gradient(135deg, #0004285e, #004e9271); */
+    background-color: white;
   }
   
   .adminpagepart1 {
@@ -128,7 +128,6 @@
 }
 
 .admin-header {
-  margin-bottom: 2rem;
   text-align: center;
 }
 
@@ -193,7 +192,9 @@
 }
 
 .welcome-title {
+  color: #855b5b;
   animation: fadeIn 0.6s ease-out forwards;
+
 }
 
 /* Responsive */

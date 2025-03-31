@@ -121,6 +121,7 @@ function Company() {
   };
 
   return (
+    <div className='company-containerparent'>
     <div className="company-container">
       <ToastContainer />
       <h3 id="clients">Liste des Clients</h3>
@@ -138,9 +139,7 @@ function Company() {
         >
           <FaTh /> Grille
         </button>
-        <button onClick={() => setAjouterCompany(!ajouterCompany)}>
-          <FaPlusCircle/> Client
-        </button>
+       
       </div>
 
       <div className={`client-view ${viewMode}`}>
@@ -228,6 +227,7 @@ function Company() {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }

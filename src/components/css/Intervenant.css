@@ -1,7 +1,7 @@
 .intervenant-container {
   position: relative; 
     margin: 20px;
-    background: linear-gradient(15deg, #e2950a, #f49a0f);
+    background: linear-gradient(15deg, #372e20, #5251505e);
     padding: 20px;
     border-radius: 8px;
   }
@@ -47,6 +47,9 @@
   .grid-item .task-item2{
     display: flex;
     flex-direction: column;
+  }
+  .grid-item img{
+    display: flex;
   }
   .grid-item .intervenant-row{
     display: flex;

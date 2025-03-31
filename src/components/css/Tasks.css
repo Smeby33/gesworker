@@ -1,6 +1,6 @@
 .tasks-container {
-    background: linear-gradient(15deg, #e2950a, #f49a0f);
-    padding: 20px;
+  background: linear-gradient(15deg, #372e20, #5251505e);
+  padding: 20px;
     border-radius: 8px;
   }
   .tasks-container h3{
@@ -555,3 +555,110 @@ h5 {
 
 /* Reste du CSS (formulaire, etc.) reste similaire */
   
+
+/* les boutonns de prioritess */
+
+/* Conteneur principal des filtres de priorité */
+.priority-filters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 15px 0;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  flex-wrap: wrap;
+}
+
+/* Texte "Priorité:" */
+.priority-filters span {
+  font-weight: 600;
+  color: #495057;
+  margin-right: 5px;
+  font-size: 14px;
+}
+
+/* Style de base pour tous les boutons de priorité */
+.priority-filters button {
+  padding: 8px 12px;
+  border: none;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+/* Bouton "Toutes" */
+.priority-filters button:first-of-type {
+  background-color: #e9ecef;
+  color: #495057;
+}
+
+/* Bouton actif */
+.priority-filters button.active {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* Couleurs spécifiques pour chaque priorité */
+.priority-filters button[style*="background-color: #ff6b6b"] { /* Priorité Maximale */
+  background-color: #ff6b6b !important;
+  color: white;
+}
+
+.priority-filters button[style*="background-color: #ffa502"] { /* Priorité Élevée */
+  background-color: #ffa502 !important;
+  color: white;
+}
+
+.priority-filters button[style*="background-color: #feca57"] { /* Priorité Moyenne */
+  background-color: #feca57 !important;
+  color: #333;
+}
+
+.priority-filters button[style*="background-color: #48dbfb"] { /* Priorité Faible */
+  background-color: #48dbfb !important;
+  color: #333;
+}
+
+.priority-filters button[style*="background-color: #c8d6e5"] { /* Priorité Nulle */
+  background-color: #c8d6e5 !important;
+  color: #333;
+}
+
+/* Effet au survol */
+.priority-filters button:hover:not(.active) {
+  opacity: 0.9;
+  transform: translateY(-1px);
+}
+
+/* Style responsive pour petits écrans */
+@media (max-width: 768px) {
+  .priority-filters {
+    gap: 6px;
+    padding: 10px;
+  }
+  
+  .priority-filters button {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+}
+
+/* Style pour le badge de priorité dans les tâches */
+.task-priority {
+  padding: 4px 10px !important;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}

@@ -1,17 +1,16 @@
 import React, { useEffect, useState, useMemo, useRef } from 'react';
 import PropTypes from 'prop-types';
-import Calendar from 'react-calendar';
+import CalendarView from './CalendarView';
 import { getAuth } from "firebase/auth";
 import { FaTh, FaList, FaCheckCircle, FaHourglassHalf, FaExclamationTriangle, FaEdit, FaFilePdf, FaCalendarAlt } from 'react-icons/fa';
 import { PDFDownloadLink } from '@react-pdf/renderer';
 import { saveAs } from 'file-saver';
-import { createEvents } from 'ics'; // Import modifié ici
+import { createEvents } from 'ics';
 import '../css/CustomCalendar.css';
 
 // Composant pour le PDF (à personnaliser)
 const TasksPDF = ({ tasks }) => (
   <div>
-    {/* Structure du PDF - à adapter avec @react-pdf/renderer */}
     <h1>Liste des Tâches</h1>
     <ul>
       {tasks.map(task => (
@@ -35,25 +34,7 @@ function CustomCalendar() {
   const [dragTask, setDragTask] = useState(null);
   const auth = getAuth();
   const [currentDate, setCurrentDate] = useState(new Date());
-  const calendarRef = useRef(null);
   const [isUpdating, setIsUpdating] = useState(false);
-
-  // Définition du type de tâche
-  const taskShape = {
-    id: PropTypes.string.isRequired,
-    titre: PropTypes.string,
-    date_debut: PropTypes.instanceOf(Date),
-    date_fin: PropTypes.instanceOf(Date),
-    categories: PropTypes.arrayOf(
-      PropTypes.shape({
-        name: PropTypes.string,
-        sousStatut: PropTypes.string
-      })
-    ),
-    intervenants: PropTypes.arrayOf(PropTypes.string),
-    company: PropTypes.string,
-    statut: PropTypes.oneOf(['En attente', 'Terminé'])
-  };
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -69,7 +50,7 @@ function CustomCalendar() {
             throw new Error(`Erreur HTTP: ${response.status}`);
           }
           const data = await response.json();
-          console.log("nos taches recus sont",data)
+          console.log("les taches recus sont",data)
           const formattedData = data.map(task => ({
             ...task,
             date_debut: task.date_debut ? new Date(task.date_debut) : null,
@@ -95,7 +76,6 @@ function CustomCalendar() {
     fetchTasks();
   }, [auth, auth.currentUser]);
 
-  // Optimisation du filtrage avec useMemo
   const filteredTasks = useMemo(() => {
     if (!tasks.length) return [];
     
@@ -103,7 +83,6 @@ function CustomCalendar() {
     return tasks.filter((task) => {
       if (!task.date_debut) return false;
       
-      // Filtrage par période
       const taskDate = task.date_debut;
       let periodMatch = true;
       
@@ -127,7 +106,6 @@ function CustomCalendar() {
         );
       }
       
-      // Filtrage par statut
       const statusMatch = filterStatus === 'all' || task.statut === filterStatus;
       
       return periodMatch && statusMatch;
@@ -156,16 +134,12 @@ function CustomCalendar() {
     
     setTasks(updatedTasks);
     setEditingTask(null);
-    
-    // Ici, vous pourriez aussi sauvegarder les changements sur le serveur
-    // await saveTaskToServer(editingTask);
   };
-
 
   const updateTaskOnServer = async (task) => {
     try {
       const response = await fetch(`http://localhost:5000/taches/${task.id}`, {
-        method: 'PUT', // ou 'PATCH' selon votre API
+        method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
@@ -198,15 +172,13 @@ function CustomCalendar() {
     if (!dragTask || isUpdating) return;
     setIsUpdating(true);
   
-    // Crée une copie de la date pour éviter les effets de bord
     const newDate = new Date(date);
-    newDate.setHours(12, 0, 0, 0); // Fixe à midi
+    newDate.setHours(12, 0, 0, 0);
   
-    // Calcule la nouvelle date de fin si elle existe
     let newEndDate = null;
     if (dragTask.date_fin) {
       const durationInDays = Math.floor(
-        (new Date(dragTask.date_fin) - new Date(dragTask.date_debut)) / 
+        (new Date(dragTask.date_fin) - new Date(dragTask.date_debut)) /  // Parenthèse corrigée
         (1000 * 60 * 60 * 24)
       );
       newEndDate = new Date(newDate);
@@ -220,10 +192,8 @@ function CustomCalendar() {
     };
   
     try {
-      // Mise à jour sur le serveur
       const savedTask = await updateTaskOnServer(updatedTask);
       
-      // Mise à jour locale seulement après confirmation du serveur
       const updatedTasks = tasks.map(task => 
         task.id === savedTask.id ? {
           ...savedTask,
@@ -235,7 +205,6 @@ function CustomCalendar() {
       setTasks(updatedTasks);
     } catch (error) {
       console.error("Erreur lors du déplacement de la tâche :", error);
-      // Vous pourriez ajouter ici un message d'erreur à l'utilisateur
     } finally {
       setIsUpdating(false);
       setDragTask(null);
@@ -244,18 +213,6 @@ function CustomCalendar() {
 
   const handleDragOver = (e) => {
     e.preventDefault();
-  };
-
-  const exportToPDF = () => {
-    // Utilisation réelle avec PDFDownloadLink
-    return (
-      <PDFDownloadLink 
-        document={<TasksPDF tasks={filteredTasks} />} 
-        fileName="taches.pdf"
-      >
-        {({ loading }) => (loading ? 'Génération...' : 'Exporter en PDF')}
-      </PDFDownloadLink>
-    );
   };
 
   const exportToICal = () => {
@@ -289,18 +246,6 @@ function CustomCalendar() {
   
     const blob = new Blob([value], { type: 'text/calendar;charset=utf-8' });
     saveAs(blob, 'taches.ics');
-  };
-
-  const getTasksForDay = (date) => {
-    return tasks.filter((task) => {
-      console.log("nous avons recus les dates",date)
-      if (!task.date_debut) return false;
-      return (
-        task.date_debut.getFullYear() === date.getFullYear() &&
-        task.date_debut.getMonth() === date.getMonth() &&
-        task.date_debut.getDate() === date.getDate()
-      );
-    });
   };
 
   if (isLoading) {
@@ -345,9 +290,9 @@ function CustomCalendar() {
           </select>
         </div>
         <div className="export-buttons">
-          <button onClick={exportToICal} className="export-btn">
+          {/* <button onClick={exportToICal} className="export-btn">
             <FaCalendarAlt /> Exporter iCal
-          </button>
+          </button> */}
           <PDFDownloadLink 
             document={<TasksPDF tasks={filteredTasks} />} 
             fileName="taches.pdf"
@@ -382,7 +327,6 @@ function CustomCalendar() {
         </div>
       </div>
 
-      {/* Modal d'édition */}
       {editingTask && (
         <div className="edit-modal">
           <div className="modal-content">
@@ -476,49 +420,17 @@ function CustomCalendar() {
       )}
 
       {viewMode === 'calendar' && (
-        <div 
-          id="calendar-view" 
-          role="tabpanel"
-          ref={calendarRef}
-          onDragOver={handleDragOver}
-        >
-          <Calendar
-            value={currentDate}
-            onChange={setCurrentDate}
-            tileContent={({ date, view }) => {
-              if (view === 'month') {
-                const dayTasks = getTasksForDay(date);
-                return dayTasks.length > 0 ? (
-                  <div 
-                    className="calendar-day"
-                    onDrop={(e) => handleDrop(date, e)}
-                    onDragOver={handleDragOver}
-                  >
-                    {dayTasks.map((task) => (
-                      <div
-                      key={task.id}
-                      className={`calendar-task ${task.statut === 'Terminé' ? 'completed' : 'pending'} ${dragTask?.id === task.id ? 'dragging' : ''}`}
-                      draggable
-                      onDragStart={(e) => handleDragStart(task, e)}
-                      onClick={() => handleEditTask(task)}
-                      aria-label={`Tâche ${task.titre}, statut ${task.statut}`}
-                    >
-                      {task.titre}
-                      {isUpdating && dragTask?.id === task.id && <span className="updating-spinner"></span>}
-                    </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div 
-                    className="calendar-day empty"
-                    onDrop={(e) => handleDrop(date, e)}
-                    onDragOver={handleDragOver}
-                  />
-                );
-              }
-            }}
-          />
-        </div>
+        <CalendarView
+          currentDate={currentDate}
+          setCurrentDate={setCurrentDate}
+          tasks={tasks}
+          handleEditTask={handleEditTask}
+          handleDragStart={handleDragStart}
+          handleDrop={handleDrop}
+          handleDragOver={handleDragOver}
+          dragTask={dragTask}
+          isUpdating={isUpdating}
+        />
       )}
     </div>
   );

@@ -198,7 +198,7 @@
   max-width: 100%;
   margin: 0 auto;
   padding: 20px;
-  background-color: #f9f9f9;
+  background: linear-gradient(15deg, #372e20, #5251505e);
   border-radius: 8px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
@@ -346,23 +346,300 @@ button.react-calendar__navigation__arrow:hover {
 
 
 
+/* CALENDRIER PRINCIPAL */
+.calendar-view-container {
+  font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 20px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
 
+/* EN-TÊTE DU CALENDRIER */
+.react-calendar__navigation {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eaeef2;
+}
 
-.calendar-task.dragging {
-  opacity: 0.5;
+.react-calendar__navigation button {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.react-calendar__navigation button:hover {
+  background: #e2e8f0;
+  transform: translateY(-1px);
+}
+
+.react-calendar__navigation__label {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1e293b;
+}
+
+/* JOURS DE LA SEMAINE */
+.react-calendar__month-view__weekdays {
+  text-align: center;
+  text-transform: uppercase;
+  font-weight: 600;
+  font-size: 0.75rem;
+  color: #64748b;
+  margin-bottom: 10px;
+}
+
+.react-calendar__month-view__weekdays__weekday {
+  padding: 0.5em;
+}
+
+/* CELLULES DES JOURS */
+.react-calendar__tile {
+  max-width: 100%;
+  padding: 12px 6px;
+  background: rgb(117, 137, 158);
+  border: none;
+  text-align: center;
+  position: relative;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  overflow-y: scroll;
+}
+
+.react-calendar__tile:enabled:hover {
+  background-color: #162738;
+}
+
+.react-calendar__tile--now {
+  background-color: #e0f2fe;
+  color: #0369a1;
+  font-weight: 600;
+}
+
+.react-calendar__tile--active {
+  background-color: #3b82f6;
+  color: white;
+}
+
+/* CONTENU DES JOURS (TÂCHES) */
+.calendar-day {
+  min-height: 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 4px;
+}
+
+.calendar-task {
+  background-color: #3b82f6;
+  color: white;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendar-task:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.completed {
+  background-color: #10b981;
+}
+
+.pending {
+  background-color: #f59e0b;
+}
+
+.overdue {
+  background-color: #ef4444;
+  animation: pulse 2s infinite;
+}
+
+.dragging {
+  opacity: 0.7;
+  box-shadow: 0 0 0 2px #3b82f6;
+}
+
+/* ANIMATIONS */
+@keyframes pulse {
+  0% { opacity: 0.9; }
+  50% { opacity: 0.7; }
+  100% { opacity: 0.9; }
 }
 
 .updating-spinner {
   display: inline-block;
   width: 12px;
   height: 12px;
-  border: 2px solid rgba(255,255,255,0.3);
+  border: 2px solid rgba(255, 255, 255, 0.3);
   border-radius: 50%;
-  border-top-color: #fff;
-  animation: spin 1s ease-in-out infinite;
+  border-top-color: white;
+  animation: spin 1s linear infinite;
   margin-left: 5px;
 }
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* BOUTONS D'EXPORT */
+.calendar-export-buttons {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.export-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #334155;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.export-btn:hover {
+  background-color: #f8fafc;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* MODAL D'ÉDITION */
+.edit-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 25px;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  color: #1e293b;
+  font-size: 1.5rem;
+}
+
+.modal-content label {
+  display: block;
+  margin-bottom: 15px;
+  color: #475569;
+  font-weight: 500;
+}
+
+.modal-content input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  margin-top: 5px;
+  font-size: 1rem;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.modal-actions button {
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modal-actions button[type="submit"] {
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+}
+
+.modal-actions button[type="button"] {
+  background-color: #f1f5f9;
+  color: #64748b;
+  border: none;
+}
+
+/* ÉTATS DE CHARGEMENT ET ERREUR */
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  color: #64748b;
+  font-weight: 500;
+}
+
+.error-container {
+  padding: 20px;
+  background-color: #fee2e2;
+  color: #b91c1c;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.error-container button {
+  margin-top: 10px;
+  padding: 8px 16px;
+  background-color: #ef4444;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .calendar-view-container {
+    padding: 10px;
+  }
+  
+  .react-calendar__tile {
+    padding: 8px 2px;
+    font-size: 0.8rem;
+  }
+  
+  .calendar-task {
+    font-size: 0.65rem;
+    padding: 4px 6px;
+  }
 }

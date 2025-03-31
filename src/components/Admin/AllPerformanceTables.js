@@ -9,7 +9,7 @@ function AllPerformanceTables() {
   const [performances, setPerformances] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [viewMode, setViewMode] = useState('grid');
+  const [viewMode, setViewMode] = useState('list');
   const auth = getAuth();
   const currentUser = auth.currentUser;
 
@@ -65,17 +65,18 @@ function AllPerformanceTables() {
         </h2>
         
         <div className="view-selector">
-          <button 
-            onClick={() => setViewMode('grid')} 
-            className={viewMode === 'grid' ? 'active' : ''}
-          >
-            <FaTh /> Grille
-          </button>
+          
           <button 
             onClick={() => setViewMode('list')} 
             className={viewMode === 'list' ? 'active' : ''}
           >
             <FaList /> Liste
+          </button>
+          <button 
+            onClick={() => setViewMode('grid')} 
+            className={viewMode === 'grid' ? 'active' : ''}
+          >
+            <FaTh /> Grille
           </button>
         </div>
       </div>

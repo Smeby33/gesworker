@@ -5,13 +5,23 @@ import TaskComments from '../Intervenant/TaskComments';
  import { FaCheckCircle,FaUserPlus, FaHourglassHalf, FaTh, FaTimesCircle, FaFilter, FaList,FaMailBulk, FaExclamationTriangle } from 'react-icons/fa';
 import '../css/Tasks.css';
 
+
+const PRIORITIES = [
+  { id: 1, label: 'Priorité Maximale' },
+  { id: 2, label: 'Priorité Élevée' },
+  { id: 3, label: 'Priorité Moyenne' },
+  { id: 4, label: 'Priorité Faible' },
+  { id: 5, label: 'Priorité Nulle' }
+];
+
 function Tasks() {
   const [tasks, setTasks] = useState([]);
   const [filteredTasks, setFilteredTasks] = useState([]);
   const [filter, setFilter] = useState('');
+  const [priorityFilter, setPriorityFilter] = useState(null); // Nouvel état pour le filtre de priorité
   const [noTasksMessage, setNoTasksMessage] = useState('');
   const [comments, setComments] = useState({});
-  const [currentUser, setCurrentUser] = useState('Admin'); // Simuler un utilisateur connecté
+  const [currentUser, setCurrentUser] = useState('Admin');
   const [taskStats, setTaskStats] = useState({});
   const [viewMode, setViewMode] = useState('list');
   const [ajoutertache, setAjoutertache] = useState(null);
@@ -22,6 +32,17 @@ function Tasks() {
   const [adminEmail, setAdminEmail] = useState('');
   const auth = getAuth();
     
+
+  const getPriorityColor = (priorityId) => {
+    switch(priorityId) {
+      case 1: return '#ff6b6b'; // Rouge
+      case 2: return '#ffa502'; // Orange
+      case 3: return '#feca57'; // Jaune
+      case 4: return '#48dbfb'; // Bleu clair
+      case 5: return '#c8d6e5'; // Gris
+      default: return '#ddd';   // Gris par défaut
+    }
+  };
   // Récupérer les tâches et commentaires depuis le localStorage
   useEffect(() => {
     const fetchTasks = async () => {
@@ -178,6 +199,11 @@ function Tasks() {
     filterTasks(tasks, status);
   };
 
+  const handlePriorityFilterChange = (priorityId) => {
+    setPriorityFilter(priorityId);
+    filterTasks(tasks, filter);
+  };
+
   // Filtrer les tâches en fonction du statut
   const filterTasks = (tasks, status) => {
     let filtered;
@@ -191,6 +217,17 @@ function Tasks() {
       filtered = tasks.filter(task => task.statut === status);
       setNoTasksMessage(filtered.length === 0 ? `Vous n'avez aucune tâche ${status.toLowerCase()}.` : '');
     }
+    if (priorityFilter) {
+      filtered = filtered.filter(task => task.priorite === priorityFilter);
+    }
+
+    // Tri par priorité (la plus haute priorité en premier)
+    filtered.sort((a, b) => {
+      if (!a.priorite) return 1;
+      if (!b.priorite) return -1;
+      return a.priorite - b.priorite;
+    });
+
     setFilteredTasks(filtered);
   };
 
@@ -233,50 +270,73 @@ function Tasks() {
 
   return (
     <div className="tasks-container">
-      <h3 id="taches">Liste des Tâches</h3>
-      <div className="countertask">
-        <p className="ptachestyle">Tâches terminées : {taskStats['Terminé'] || 0}</p>
-        <p className="ptachestyle">Tâches En cours : {taskStats['En cours'] || 0}</p>
-        <p className="ptachestyle">Tâches En attente : {taskStats['En attente'] || 0}</p>
-        <p className="ptachestyle">Tâches Annulé : {taskStats['Annulé'] || 0}</p>
-        <p className="ptachestyle">Tâches en retard : {taskStats.overdue || 0}</p>
+    <h3 id="taches">Liste des Tâches</h3>
+    <div className="countertask">
+      <p className="ptachestyle">Tâches terminées : {taskStats['Terminé'] || 0}</p>
+      <p className="ptachestyle">Tâches En cours : {taskStats['En cours'] || 0}</p>
+      <p className="ptachestyle">Tâches En attente : {taskStats['En attente'] || 0}</p>
+      <p className="ptachestyle">Tâches Annulé : {taskStats['Annulé'] || 0}</p>
+      <p className="ptachestyle">Tâches en retard : {taskStats.overdue || 0}</p>
+    </div>
+    
+    <div className="view-selector">
+      <button onClick={() => setViewMode('list')} className={viewMode === 'list' ? 'active' : ''}>
+        <FaList /> Liste
+      </button>
+      <button onClick={() => setViewMode('grid')} className={viewMode === 'grid' ? 'active' : ''}>
+        <FaTh /> Grille
+      </button>
+      <button onClick={() => setAjoutertache((prev) => !prev)}>
+        <FaUserPlus/> Tâches
+      </button>
+    </div>
+
+    <div className="filter-buttons">
+      <button onClick={() => handleFilterChange('')} className={filter === '' ? 'active' : ''}>
+        <FaFilter /> Tous
+      </button>
+      <button onClick={() => handleFilterChange('En cours')} className={filter === 'En cours' ? 'active' : ''}>
+        <FaHourglassHalf /> En cours
+      </button>
+      <button onClick={() => handleFilterChange('Terminé')} className={filter === 'Terminé' ? 'active' : ''}>
+        <FaCheckCircle /> Terminé
+      </button>
+      <button onClick={() => handleFilterChange('Annulé')} className={filter === 'Annulé' ? 'active' : ''}>
+        <FaTimesCircle /> Annulé
+      </button>
+      <button onClick={() => handleFilterChange('overdue')} className={filter === 'overdue' ? 'active overdue' : ''}>
+        <FaExclamationTriangle /> En retard
+      </button>
+    </div>
+
+    <div className="priority-filters">
+      <span>Priorité: </span>
+      <button 
+        onClick={() => handlePriorityFilterChange(null)} 
+        className={!priorityFilter ? 'active' : ''}
+      >
+        Toutes
+      </button>
+      {PRIORITIES.map(priority => (
+        <button
+          key={priority.id}
+          onClick={() => handlePriorityFilterChange(priority.id)}
+          className={priorityFilter === priority.id ? 'active' : ''}
+          style={{ backgroundColor: getPriorityColor(priority.id) }}
+        >
+          {priority.label}
+        </button>
+      ))}
+    </div>
+
+    {noTasksMessage && <p className="no-tasks-message"><span>{noTasksMessage}</span></p>}
+    
+    {filteredTasks.length === 0 && !noTasksMessage ? (
+      <div>
+        <p>Aucune tâche trouvée.</p>
+        <TaskCreation/>
       </div>
-      <div className="view-selector">
-        <button onClick={() => setViewMode('list')} className={viewMode === 'list' ? 'active' : ''}>
-          <FaList /> Liste
-        </button>
-        <button onClick={() => setViewMode('grid')} className={viewMode === 'grid' ? 'active' : ''}>
-          <FaTh /> Grille
-        </button>
-        <button onClick={() => setAjoutertache((prev) => !prev)} >
-          <FaUserPlus/> Tâches
-        </button>
-        
-      </div>
-      <div className="filter-buttons">
-        <button onClick={() => handleFilterChange('')} className={filter === '' ? 'active' : ''}>
-          <FaFilter /> Tous
-        </button>
-        <button onClick={() => handleFilterChange('En cours')} className={filter === 'En cours' ? 'active' : ''}>
-          <FaHourglassHalf /> En cours
-        </button>
-        <button onClick={() => handleFilterChange('Terminé')} className={filter === 'Terminé' ? 'active' : ''}>
-          <FaCheckCircle /> Terminé
-        </button>
-        <button onClick={() => handleFilterChange('Annulé')} className={filter === 'Annulé' ? 'active' : ''}>
-          <FaTimesCircle /> Annulé
-        </button>
-        <button onClick={() => handleFilterChange('overdue')} className={filter === 'overdue' ? 'active overdue' : ''}>
-          <FaExclamationTriangle /> En retard
-        </button>
-      </div>
-      {noTasksMessage && <p className="no-tasks-message"><span>{noTasksMessage}</span></p>}
-      {filteredTasks.length === 0 && !noTasksMessage ? (
-        <div>
-            <p>Aucune tâche trouvée.</p>
-            <TaskCreation/>
-        </div>
-      ) : (
+    ) : (
         <div className={`tasks-view ${viewMode}`}>
           {filteredTasks.map(task =>{ 
             console.log(task.date_debut);

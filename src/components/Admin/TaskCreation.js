@@ -128,6 +128,7 @@ function TaskCreation() {
     <div className="task-creation-container">
       <ToastContainer />
       <h3>Création de Tâche</h3>
+      <div className="form-wrapper">
 
       <form onSubmit={handleTaskCreation} className=''>
         <div>
@@ -194,8 +195,8 @@ function TaskCreation() {
               </option>
             ))}
           </select>
-        </div>
-        <div>
+
+          <div>
           <label>Entreprise :</label>
           <select
             value={selectedCompany}
@@ -209,7 +210,9 @@ function TaskCreation() {
               </option>
             ))}
           </select>
+        </div> 
         </div>
+        
 
         <div>
           <label>Date de début :</label>
@@ -231,6 +234,7 @@ function TaskCreation() {
 
         <button type="submit">Créer la tâche</button>
       </form>
+      </div>
     </div>
   );
 }

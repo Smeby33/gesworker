@@ -1,10 +1,24 @@
 .company-container {
     position: relative;
     z-index: 0;
-    background: linear-gradient(15deg, #e2950a, #f49a0f);
+    background: linear-gradient(15deg, #372e20, #5251505e);
     padding: 20px;
     border-radius: 10px;
   }
+  /* .company-containerparent {
+    position: relative;
+    z-index: 0;
+    background-image: url(https://i.pinimg.com/736x/1a/0c/8f/1a0c8fa7bc4e7d85ffc76739ed2a618a.jpg);
+    padding: 20px;
+    border-radius: 10px;
+  }
+  .company-containerparentadmin {
+    position: relative;
+    z-index: 0;
+    background-image: url(https://i.pinimg.com/736x/1a/0c/8f/1a0c8fa7bc4e7d85ffc76739ed2a618a.jpg);
+    padding: 20px;
+    border-radius: 10px;
+  } */
   .company-container h3 {
     color: white;
   }
