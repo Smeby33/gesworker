@@ -12,6 +12,16 @@ const App = () => {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading] = useState(true);
   const [message, setErrorMessage] = useState("");
+  const [minimumLoadingDone, setMinimumLoadingDone] = useState(false);
+
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setMinimumLoadingDone(true);
+    }, 3000); // 3 secondes
+
+    return () => clearTimeout(timer);
+  }, []);
 
   useEffect(() => {
     const auth = getAuth();
@@ -91,8 +101,7 @@ const App = () => {
       console.error("Erreur lors de la déconnexion :", error);
     }
   };
-
-  if (loading) return <LoadingScreen />;
+  if (loading || !minimumLoadingDone) return <LoadingScreen />;
 
   return (
     <Router>
