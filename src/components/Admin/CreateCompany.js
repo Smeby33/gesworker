@@ -32,7 +32,7 @@ function CreateCompany({ onCompanyCreated }) {
         };
   
         // Envoi de la requête au serveur
-        const response = await axios.post("http://localhost:5000/clients/ajout", newCompany);
+        const response = await axios.post("https://gesworkerback.onrender.com/clients/ajout", newCompany);
   
         if (response.status === 201) {
           toast.success("Entreprise créée avec succès");

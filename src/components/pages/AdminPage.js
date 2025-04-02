@@ -26,7 +26,7 @@ function AdminPage() {
       if (auth.currentUser) {
         try {
           const adminUID = auth.currentUser.uid;
-          const response = await axios.get(`http://localhost:5000/users/getUser/${adminUID}`);
+          const response = await axios.get(`https://gesworkerback.onrender.com/users/getUser/${adminUID}`);
           
           if (response.data) {
             setAdminData({

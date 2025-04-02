@@ -45,7 +45,7 @@ function Dashboard() {
       setAdminEmail(auth.currentUser.email);
       const adminUID = auth.currentUser.uid;
       try {
-        const response = await fetch(`http://localhost:5000/clients/client/${adminUID}`);
+        const response = await fetch(`https://gesworkerback.onrender.com/clients/client/${adminUID}`);
         const data = await response.json();
         setCountClients(data.length); // Met à jour l'état avec le nombre de clients
       } catch (error) {
@@ -64,7 +64,7 @@ function Dashboard() {
       setAdminEmail(auth.currentUser.email);
       const adminUID = auth.currentUser.uid;
       try {
-        const response = await fetch(`http://localhost:5000/intervenants/recuperertout/${adminUID}`);
+        const response = await fetch(`https://gesworkerback.onrender.com/intervenants/recuperertout/${adminUID}`);
         const data = await response.json();
         setCountIntervenants(data.length); // Met à jour l'état avec le nombre de clients
       } catch (error) {
@@ -82,7 +82,7 @@ function Dashboard() {
 // 2. Modifiez légèrement la fonction fetch
 const fetchcountTaskCategories = async () => {
   try {
-    const response = await axios.get("http://localhost:5000/categories/toutescategories");
+    const response = await axios.get("https://gesworkerback.onrender.com/categories/toutescategories");
     setCountTaskCategories(response.data?.length || 0); // Ajout de la sécurité ?
   } catch (error) {
     console.error("Erreur:", error);
@@ -106,7 +106,7 @@ useEffect(() => {
         const adminUID = auth.currentUser.uid;
         try {
       
-        const response = await fetch(`http://localhost:5000/performances/all/${adminUID}`);
+        const response = await fetch(`https://gesworkerback.onrender.com/performances/all/${adminUID}`);
         if (!response.ok) {
           throw new Error("Erreur lors de la récupération des performances");
         }
@@ -137,7 +137,7 @@ useEffect(() => {
         setAdminEmail(auth.currentUser.email);
         const adminUID = auth.currentUser.uid;
         try {
-          const response = await fetch(`http://localhost:5000/taches/tasks-by-owner/${adminUID}`);
+          const response = await fetch(`https://gesworkerback.onrender.com/taches/tasks-by-owner/${adminUID}`);
           const data = await response.json();
           console.log("nous voulons les taches pour tout le monde ",data)
           setCountTasks(data.total);

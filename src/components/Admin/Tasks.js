@@ -50,7 +50,7 @@ function Tasks() {
         setAdminEmail(auth.currentUser.email);
         const adminUID = auth.currentUser.uid;
         try {
-          const response = await fetch(`http://localhost:5000/taches/tasks-by-owner/${adminUID}`);
+          const response = await fetch(`https://gesworkerback.onrender.com/taches/tasks-by-owner/${adminUID}`);
           const data = await response.json();
           console.log("Données reçues :", data);
           if (Array.isArray(data)) {
@@ -164,7 +164,7 @@ function Tasks() {
         console.log("Données envoyées :", { statut: 'Terminé', categories });
         console.log(categories)
         
-        const response = await fetch(`http://localhost:5000/taches/updatestatus/${id}`, {
+        const response = await fetch(`https://gesworkerback.onrender.com/taches/updatestatus/${id}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',

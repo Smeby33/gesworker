@@ -28,7 +28,7 @@ function CalendarView({
     setError(null);
 
     try {
-      const response = await fetch(`http://localhost:5000/taches/tasks-by-owner/${auth.currentUser.uid}`);
+      const response = await fetch(`https://gesworkerback.onrender.com/taches/tasks-by-owner/${auth.currentUser.uid}`);
       if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
       
       const data = await response.json();
@@ -91,7 +91,7 @@ function CalendarView({
         statut: updatedTask.statut || 'En cours'
       };
 
-      const response = await fetch(`http://localhost:5000/taches/update-task/${updatedTask.id}`, {
+      const response = await fetch(`https://gesworkerback.onrender.com/taches/update-task/${updatedTask.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

@@ -30,7 +30,7 @@ function TaskCategories() {
   // 📌 Récupérer les catégories depuis l'API
   useEffect(() => {
     axios
-      .get("http://localhost:5000/categories/toutescategories")
+      .get("https://gesworkerback.onrender.com/categories/toutescategories")
       .then((response) => {
         setCategories(response.data);
       })
@@ -43,7 +43,7 @@ function TaskCategories() {
   const addCategory = () => {
     if (newCategoryName.trim()) {
       axios
-        .post("http://localhost:5000/categories/ajouterunecategorie", {
+        .post("https://gesworkerback.onrender.com/categories/ajouterunecategorie", {
           name: newCategoryName,
           icon: newCategoryIcon,
         })
@@ -60,7 +60,7 @@ function TaskCategories() {
   // 📌 Supprimer une catégorie
   const deleteCategory = (categoryId) => {
     axios
-      .delete(`http://localhost:5000/categories/suprimerunecategorie/${categoryId}`)
+      .delete(`https://gesworkerback.onrender.com/categories/suprimerunecategorie/${categoryId}`)
       .then(() => {
         setCategories(categories.filter((category) => category.id !== categoryId));
       })
@@ -79,7 +79,7 @@ function TaskCategories() {
   // 📌 Sauvegarder la modification
   const saveCategory = () => {
     axios
-      .put(`http://localhost:5000/categories/modifierunegategorie/${editingCategory.id}`, {
+      .put(`https://gesworkerback.onrender.com/categories/modifierunegategorie/${editingCategory.id}`, {
         name: editedCategoryName,
         icon: editedCategoryIcon,
       })

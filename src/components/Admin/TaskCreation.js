@@ -31,11 +31,11 @@ function TaskCreation() {
   
         try {
           const [prioritesRes, intervenantsRes, tasksRes, companiesRes, categoriesRes] = await Promise.all([
-            fetch('http://localhost:5000/prioritys/toutesprioritys'),
-            fetch(`http://localhost:5000/intervenants/recuperertout/${adminUID}`),
-            fetch(`http://localhost:5000/taches/tasks-by-owner/${adminUID}`),
-            fetch(`http://localhost:5000/clients/client/${adminUID}`),
-            fetch('http://localhost:5000/categories/toutescategories'),
+            fetch('https://gesworkerback.onrender.com/prioritys/toutesprioritys'),
+            fetch(`https://gesworkerback.onrender.com/intervenants/recuperertout/${adminUID}`),
+            fetch(`https://gesworkerback.onrender.com/taches/tasks-by-owner/${adminUID}`),
+            fetch(`https://gesworkerback.onrender.com/clients/client/${adminUID}`),
+            fetch('https://gesworkerback.onrender.com/categories/toutescategories'),
           ]);
   
           setPriorités(await prioritesRes.json());
@@ -94,7 +94,7 @@ function TaskCreation() {
     console.log("Données envoyées au backend:", JSON.stringify(newTask, null, 2));
 
     try {
-        const response = await fetch('http://localhost:5000/taches/add-task', {
+        const response = await fetch('https://gesworkerback.onrender.com/taches/add-task', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -41,7 +41,7 @@ function ProfilePicture() {
         
 
         // Appel à l'API backend
-        const response = await axios.get(`http://localhost:5000/users/getUser/${adminUID}`);
+        const response = await axios.get(`https://gesworkerback.onrender.com/users/getUser/${adminUID}`);
         
         // Mettre à jour l'état avec les données reçues
         setUsername(response.data.name); // Utilisez le champ approprié (name ou username)
@@ -57,7 +57,7 @@ function ProfilePicture() {
   const fetchProfilePicture = async (userId) => {
     try {
       setIsLoading(true);
-      const response = await fetch(`http://localhost:5000/users/getProfilePicture/${userId}`);
+      const response = await fetch(`https://gesworkerback.onrender.com/users/getProfilePicture/${userId}`);
       
       if (!response.ok) {
         throw new Error(`Erreur HTTP: ${response.status}`);
@@ -149,7 +149,7 @@ function ProfilePicture() {
       }
       console.log("les donnes pour limage recus sont",imageUrl)
 
-      const response = await fetch(`http://localhost:5000/users/updateProfilePicture/${user.uid}`, {
+      const response = await fetch(`https://gesworkerback.onrender.com/users/updateProfilePicture/${user.uid}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

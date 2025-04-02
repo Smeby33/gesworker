@@ -23,7 +23,7 @@ function AllPerformanceTables() {
 
       try {
         setLoading(true);
-        const response = await fetch(`http://localhost:5000/performances/all/${currentUser.uid}`);
+        const response = await fetch(`https://gesworkerback.onrender.com/performances/all/${currentUser.uid}`);
         
         if (!response.ok) {
           throw new Error("Erreur lors de la récupération des performances");

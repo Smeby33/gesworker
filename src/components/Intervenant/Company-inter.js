@@ -27,7 +27,7 @@ function Company() {
         
         try {
           // Récupérer les entreprises
-          const companiesResponse = await fetch(`http://localhost:5000/intervenantinters/entreprises/intervenant/${adminUID}`);
+          const companiesResponse = await fetch(`https://gesworkerback.onrender.com/intervenantinters/entreprises/intervenant/${adminUID}`);
           const companiesData = await companiesResponse.json();
           setCompanies(companiesData);
           
@@ -35,7 +35,7 @@ function Company() {
           const tasksMap = {};
           for (const company of companiesData) {
             try {
-              const tasksResponse = await fetch(`http://localhost:5000/intervenantinters/tasks/company/${company.id}`);
+              const tasksResponse = await fetch(`https://gesworkerback.onrender.com/intervenantinters/tasks/company/${company.id}`);
               const tasksData = await tasksResponse.json();
               console.log(tasksData)
               

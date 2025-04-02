@@ -28,7 +28,7 @@ function Intervenantinter() {
         setCurrentUser(user);
 
         // Récupérer les intervenants du même propriétaire
-        const intervenantsResponse = await axios.get(`http://localhost:5000/intervenantinters/mesintervenants/${user.uid}`);
+        const intervenantsResponse = await axios.get(`https://gesworkerback.onrender.com/intervenantinters/mesintervenants/${user.uid}`);
         
         // Gestion robuste des données reçues
         const receivedIntervenants = intervenantsResponse.data?.data || intervenantsResponse.data;
@@ -36,7 +36,7 @@ function Intervenantinter() {
         setIntervenants(Array.isArray(receivedIntervenants) ? receivedIntervenants : []);
 
         // Récupérer les tâches
-        const tasksResponse = await axios.get(`http://localhost:5000/taches/intervenantinters/${user.uid}`);
+        const tasksResponse = await axios.get(`https://gesworkerback.onrender.com/taches/intervenantinters/${user.uid}`);
         const receivedTasks = tasksResponse.data?.data || tasksResponse.data;
         console.log("Tâches reçues (DETAILS):", receivedTasks);
         setTasks(Array.isArray(receivedTasks) ? receivedTasks : []);

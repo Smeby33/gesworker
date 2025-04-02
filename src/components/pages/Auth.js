@@ -82,7 +82,7 @@ function Auth({ onLoginSuccess }) {
         company_name: isAdmin && companyName ? companyName : null,
       };
   
-      const response = await fetch("http://localhost:5000/users/addUser", {
+      const response = await fetch("https://gesworkerback.onrender.com/users/addUser", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(newUser),
@@ -109,12 +109,12 @@ function Auth({ onLoginSuccess }) {
       const user = userCredential.user;
   
       // Vérifier si l'utilisateur est enregistré dans `users`
-      const response = await fetch(`http://localhost:5000/users/getUser/${user.uid}`);
+      const response = await fetch(`https://gesworkerback.onrender.com/users/getUser/${user.uid}`);
       const userData = response.ok ? await response.json() : null;
   
       // Si pas dans `users`, chercher dans `intervenants`
       if (!userData) {
-        const intervenantResponse = await fetch(`http://localhost:5000/intervenants/recupererun/${user.uid}`);
+        const intervenantResponse = await fetch(`https://gesworkerback.onrender.com/intervenants/recupererun/${user.uid}`);
         const intervenantData = intervenantResponse.ok ? await intervenantResponse.json() : null;
   
         if (intervenantData) {
@@ -166,7 +166,7 @@ function Auth({ onLoginSuccess }) {
         >
           <h1>ROPONA<span> & ROBIANDJA</span></h1>
           <p className="tagline">
-          Voir plus loins,voir mieux 
+          Voir loin,travailler mieux 
           </p>
         </div>
 

@@ -15,7 +15,7 @@ const TaskComments = ({ taskId, currentUser }) => {
   const [editingCommentId, setEditingCommentId] = useState(null);
   const [replyToCommentId, setReplyToCommentId] = useState(null);
   const commentInputRef = useRef(null);
-  const API_BASE_URL = 'http://localhost:5000/comments';
+  const API_BASE_URL = 'https://gesworkerback.onrender.com/comments';
 
   // Charger les commentaires depuis l'API
   const fetchComments = async () => {

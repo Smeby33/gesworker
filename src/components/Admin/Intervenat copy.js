@@ -53,7 +53,7 @@ useEffect(() => {
       setAdminEmail(auth.currentUser.email);
       const adminUID = auth.currentUser.uid;
       try {
-        const response = await fetch(`http://localhost:5000/taches/tasks-by-owner/${adminUID}`);
+        const response = await fetch(`https://gesworkerback.onrender.com/taches/tasks-by-owner/${adminUID}`);
         const data = await response.json();
         setTasks(data);
       } catch (error) {
@@ -68,7 +68,7 @@ useEffect(() => {
       setAdminEmail(auth.currentUser.email);
       const adminUID = auth.currentUser.uid;
       try {
-        const response = await fetch(`http://localhost:5000/intervenants/recuperertout/${adminUID}`);
+        const response = await fetch(`https://gesworkerback.onrender.com/intervenants/recuperertout/${adminUID}`);
         const data = await response.json();
         setIntervenants(data);
       } catch (error) {
@@ -83,7 +83,7 @@ useEffect(() => {
       setAdminEmail(auth.currentUser.email);
       const adminUID = auth.currentUser.uid;
       try {
-        const response = await fetch(`http://localhost:5000/clients/client/${adminUID}`);
+        const response = await fetch(`https://gesworkerback.onrender.com/clients/client/${adminUID}`);
         const data = await response.json();
         setCompanies(data);
       } catch (error) {
@@ -96,7 +96,7 @@ useEffect(() => {
   const fetchCategories = async () => {
     
       try {
-        const response = await fetch(`http://localhost:5000/categories/toutescategories`);
+        const response = await fetch(`https://gesworkerback.onrender.com/categories/toutescategories`);
         const data = await response.json();
         setCategories(data);
       } catch (error) {
@@ -151,7 +151,7 @@ const handleIntervenantChange = (intervenant) => {
 //   console.log("Données envoyées au backend:", JSON.stringify(newTask, null, 2));
 
 //     try {
-//         const response = await fetch('http://localhost:5000/taches/add-task', {
+//         const response = await fetch('https://gesworkerback.onrender.com/taches/add-task', {
 //             method: 'POST',
 //             headers: {
 //                 'Content-Type': 'application/json',
@@ -210,7 +210,7 @@ const handleIntervenantChange = (intervenant) => {
     console.log("Données envoyées au backend:", JSON.stringify(newTask, null, 2));
 
     try {
-        const response = await fetch('http://localhost:5000/taches/add-task', {
+        const response = await fetch('https://gesworkerback.onrender.com/taches/add-task', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -284,7 +284,7 @@ useEffect(() => {
       setAdminEmail(auth.currentUser.email);
       const adminUID = auth.currentUser.uid;
       try {
-        const response = await fetch(`http://localhost:5000/intervenants/recuperertout/${adminUID}`);
+        const response = await fetch(`https://gesworkerback.onrender.com/intervenants/recuperertout/${adminUID}`);
         const data = await response.json();
         setIntervenants(data);
       } catch (error) {
@@ -299,7 +299,7 @@ useEffect(() => {
       setAdminEmail(auth.currentUser.email);
       const adminUID = auth.currentUser.uid;
       try {
-        const response = await fetch(`http://localhost:5000/clients/client/${adminUID}`);
+        const response = await fetch(`https://gesworkerback.onrender.com/clients/client/${adminUID}`);
         const data = await response.json();
         setCompanies(data);
       } catch (error) {
@@ -312,7 +312,7 @@ useEffect(() => {
   const fetchCategories = async () => {
     
       try {
-        const response = await fetch(`http://localhost:5000/categories/toutescategories`);
+        const response = await fetch(`https://gesworkerback.onrender.com/categories/toutescategories`);
         const data = await response.json();
         setCategories(data);
       } catch (error) {

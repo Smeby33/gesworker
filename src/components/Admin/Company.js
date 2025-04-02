@@ -65,7 +65,7 @@ function Company() {
   useEffect(() => { 
     const fetchCategories = async () => {
       try {
-        const response = await fetch("http://localhost:5000/categories/toutescategories");
+        const response = await fetch("https://gesworkerback.onrender.com/categories/toutescategories");
         const data = await response.json();
         setCategories(data);
       } catch (error) {
@@ -82,7 +82,7 @@ function Company() {
         setAdminEmail(auth.currentUser.email);
         const adminUID = auth.currentUser.uid;
         try {
-          const response = await fetch(`http://localhost:5000/intervenats/recuperertout/${adminUID}`);
+          const response = await fetch(`https://gesworkerback.onrender.com/intervenats/recuperertout/${adminUID}`);
           const data = await response.json();
           setIntervenants(data);
         } catch (error) {
@@ -100,7 +100,7 @@ function Company() {
         setAdminEmail(auth.currentUser.email);
         const adminUID = auth.currentUser.uid;
       try {
-        const response = await fetch(`http://localhost:5000/clients/client/${adminUID}`);
+        const response = await fetch(`https://gesworkerback.onrender.com/clients/client/${adminUID}`);
         const data = await response.json();
         setCompanies(data);
       } catch (error) {

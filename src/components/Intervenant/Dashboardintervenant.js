@@ -55,7 +55,7 @@ function Dashboardintervenant() {
         
         try {
           // Récupérer les tâches de l'intervenant
-          const tasksResponse = await fetch(`http://localhost:5000/taches/intervenantinters/${userId}`);
+          const tasksResponse = await fetch(`https://gesworkerback.onrender.com/taches/intervenantinters/${userId}`);
           const tasksData = await tasksResponse.json();
           
           if (Array.isArray(tasksData)) {
@@ -71,13 +71,13 @@ function Dashboardintervenant() {
           }
 
           // Compter les clients
-          const clientsResponse = await fetch(`http://localhost:5000/intervenantinters/entreprises/intervenant/${userId}`);
+          const clientsResponse = await fetch(`https://gesworkerback.onrender.com/intervenantinters/entreprises/intervenant/${userId}`);
           const clientsCount = await clientsResponse.json();
           console.log("Clients:", clientsCount);
           setCountClients(clientsCount.length);
 
           // Compter les intervenants
-          const intervenantsResponse = await fetch(`http://localhost:5000/intervenantinters/mesintervenants/${userId}`);
+          const intervenantsResponse = await fetch(`https://gesworkerback.onrender.com/intervenantinters/mesintervenants/${userId}`);
           const intervenantsCount = await intervenantsResponse.json();
           console.log("Intervenants:", intervenantsCount);
           setCountIntervenants(intervenantsCount.count);

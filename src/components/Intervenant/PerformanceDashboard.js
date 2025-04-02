@@ -43,7 +43,7 @@ function PerformanceDashboard() {
 
   const fetchPerformanceData = async (userId) => {
     try {
-      const response = await fetch(`http://localhost:5000/performances/${userId}`);
+      const response = await fetch(`https://gesworkerback.onrender.com/performances/${userId}`);
       if (!response.ok) throw new Error("Erreur réseau");
       return await response.json();
     } catch (error) {
@@ -56,7 +56,7 @@ function PerformanceDashboard() {
 
   const fetchUserTasks = async (userId) => {
     try {
-      const response = await fetch(`http://localhost:5000/taches/intervenantinters/${userId}`);
+      const response = await fetch(`https://gesworkerback.onrender.com/taches/intervenantinters/${userId}`);
       if (!response.ok) throw new Error(`Erreur HTTP: ${response.status}`);
       
       const data = await response.json();
@@ -117,7 +117,7 @@ function PerformanceDashboard() {
   const updatePerformanceInDatabase = async (userId, performance) => {
     try {
 
-      const userResponse = await fetch(`http://localhost:5000/intervenants/recupererun/${userId}`);
+      const userResponse = await fetch(`https://gesworkerback.onrender.com/intervenants/recupererun/${userId}`);
       const userData = await userResponse.json();
       setNom(userData.name); // Stockez le nom dans le state
       console.log("le nom",userData.name)
@@ -138,7 +138,7 @@ function PerformanceDashboard() {
   
       console.log("📤 Données envoyées à la route POST /performance/add :", payload);
   
-      const response = await fetch("http://localhost:5000/performances/add", {
+      const response = await fetch("https://gesworkerback.onrender.com/performances/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),

@@ -32,7 +32,7 @@ const App = () => {
           
           // 1. Check users table
           try {
-            const userResponse = await axios.get(`http://localhost:5000/users/getUser/${user.uid}`);
+            const userResponse = await axios.get(`https://gesworkerback.onrender.com/users/getUser/${user.uid}`);
             const userData = userResponse.data;
     
             if (userData && userData.is_admin !== undefined) {
@@ -47,7 +47,7 @@ const App = () => {
     
           // 2. Check intervenants table
           try {
-            const intervenantResponse = await axios.get(`http://localhost:5000/intervenants/recupererun/${user.uid}`);
+            const intervenantResponse = await axios.get(`https://gesworkerback.onrender.com/intervenants/recupererun/${user.uid}`);
             const intervenantData = intervenantResponse.data;
     
             if (intervenantData) {

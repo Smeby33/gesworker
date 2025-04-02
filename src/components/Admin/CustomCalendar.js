@@ -45,7 +45,7 @@ function CustomCalendar() {
         const adminUID = auth.currentUser.uid;
         
         try {
-          const response = await fetch(`http://localhost:5000/taches/tasks-by-owner/${adminUID}`);
+          const response = await fetch(`https://gesworkerback.onrender.com/taches/tasks-by-owner/${adminUID}`);
           if (!response.ok) {
             throw new Error(`Erreur HTTP: ${response.status}`);
           }
@@ -138,7 +138,7 @@ function CustomCalendar() {
 
   const updateTaskOnServer = async (task) => {
     try {
-      const response = await fetch(`http://localhost:5000/taches/${task.id}`, {
+      const response = await fetch(`https://gesworkerback.onrender.com/taches/${task.id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

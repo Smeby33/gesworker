@@ -27,7 +27,7 @@ function Tasksinter() {
         setAdminEmail(auth.currentUser.email);
         const adminUID = auth.currentUser.uid;
         try {
-          const response = await fetch(`http://localhost:5000/taches/intervenant/${adminUID}`);
+          const response = await fetch(`https://gesworkerback.onrender.com/taches/intervenant/${adminUID}`);
           const data = await response.json();
 
           if (Array.isArray(data)) {
@@ -120,7 +120,7 @@ function Tasksinter() {
 
   const updateTaskStatus = async (id, newStatus, categories = []) => {
     try {
-      const response = await fetch(`http://localhost:5000/taches/updatestatus/${id}`, {
+      const response = await fetch(`https://gesworkerback.onrender.com/taches/updatestatus/${id}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ statut: newStatus, categories }),

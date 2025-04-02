@@ -30,7 +30,7 @@ function IntervenantPage() {
         
 
         // Appel à l'API backend
-        const response = await axios.get(`http://localhost:5000/intervenants/recupererun/${adminUID}`);
+        const response = await axios.get(`https://gesworkerback.onrender.com/intervenants/recupererun/${adminUID}`);
         
         // Mettre à jour l'état avec les données reçues
         setIntervenantName(response.data.name); // Utilisez le champ approprié (name ou username)

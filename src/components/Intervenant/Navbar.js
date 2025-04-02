@@ -50,8 +50,8 @@ function Navbar() {
       const fetchData = async () => {
         try {
           const [tasksRes, intervenantsRes] = await Promise.all([
-            fetch(`http://localhost:5000/taches/tasks-by-owner/${adminUID}`),
-            fetch(`http://localhost:5000/intervenants/recuperertout/${adminUID}`)
+            fetch(`https://gesworkerback.onrender.com/taches/tasks-by-owner/${adminUID}`),
+            fetch(`https://gesworkerback.onrender.com/intervenants/recuperertout/${adminUID}`)
           ]);
 
           setTasks(await tasksRes.json());

@@ -22,7 +22,7 @@ function CreateIntervenant({ onIntervenantAdded }) {
         const adminUID = auth.currentUser.uid;
 
         try {
-          const response = await fetch(`http://localhost:5000/users/getUser/${adminUID}`);
+          const response = await fetch(`https://gesworkerback.onrender.com/users/getUser/${adminUID}`);
           const data = await response.json();
 
           if (!response.ok) throw new Error(data.error || "Erreur récupération admin.");
@@ -43,7 +43,7 @@ function CreateIntervenant({ onIntervenantAdded }) {
 
   const createIntervenantAPI = async (intervenant) => {
     try {
-      const response = await fetch('http://localhost:5000/intervenants/ajouterun', {
+      const response = await fetch('https://gesworkerback.onrender.com/intervenants/ajouterun', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
