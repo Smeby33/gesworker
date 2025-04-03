@@ -70,7 +70,7 @@ function Auth({ onLoginSuccess }) {
     }
   };
 
-  const handleSignup = async () => {
+  const handleSignup = async (e) => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
@@ -98,6 +98,7 @@ function Auth({ onLoginSuccess }) {
       alert("Inscription réussie !");
       setIsAuthenticated(true);
       setCurrentUser(newUser);
+      e.preventDefault()
     } catch (error) {
       console.error("Erreur complète:", error);
       setErrorMessage(error.message || "Une erreur est survenue.");
