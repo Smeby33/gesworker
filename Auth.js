@@ -4,7 +4,6 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "fire
 import { auth } from "./firebaseConfig";
 import { motion } from 'framer-motion';
 import '../css/Auth.css';
-import axios from 'axios';
 
 function Auth({ onLoginSuccess }) {
   const [username, setUsername] = useState("");
@@ -77,21 +76,18 @@ function Auth({ onLoginSuccess }) {
   
       const newUser = {
         id: user.uid,
-        name: username,
-        password,
+        username,
         email,
         is_admin: isAdmin ? 1 : 0,
         company_name: isAdmin && companyName ? companyName : null,
       };
-      console.log(newUser);
-      
   
-      const response = await axios.post(
-        "https://gesworkerback.onrender.com/users/addUser",
-        newUser,
-        { headers: { "Content-Type": "application/json" } }
-    );
-      
+      const response = await fetch("https://gesworkerback.onrender.com/users/addUser", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newUser),
+      });
+  
       if (!response.ok) {
         throw new Error("Erreur lors de l'inscription.");
       }
