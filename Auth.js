@@ -4,6 +4,7 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "fire
 import { auth } from "./firebaseConfig";
 import { motion } from 'framer-motion';
 import '../css/Auth.css';
+import axios from 'axios';
 
 function Auth({ onLoginSuccess }) {
   const [username, setUsername] = useState("");
@@ -76,18 +77,21 @@ function Auth({ onLoginSuccess }) {
   
       const newUser = {
         id: user.uid,
-        username,
+        name: username,
+        password,
         email,
         is_admin: isAdmin ? 1 : 0,
         company_name: isAdmin && companyName ? companyName : null,
       };
+      console.log(newUser);
+      
   
-      const response = await fetch("http://localhost:5000/users/addUser", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newUser),
-      });
-  
+      const response = await axios.post(
+        "https://gesworkerback.onrender.com/users/addUser",
+        newUser,
+        { headers: { "Content-Type": "application/json" } }
+    );
+      
       if (!response.ok) {
         throw new Error("Erreur lors de l'inscription.");
       }
@@ -109,12 +113,12 @@ function Auth({ onLoginSuccess }) {
       const user = userCredential.user;
   
       // Vérifier si l'utilisateur est enregistré dans `users`
-      const response = await fetch(`http://localhost:5000/users/getUser/${user.uid}`);
+      const response = await fetch(`https://gesworkerback.onrender.com/users/getUser/${user.uid}`);
       const userData = response.ok ? await response.json() : null;
   
       // Si pas dans `users`, chercher dans `intervenants`
       if (!userData) {
-        const intervenantResponse = await fetch(`http://localhost:5000/intervenants/recupererun/${user.uid}`);
+        const intervenantResponse = await fetch(`https://gesworkerback.onrender.com/intervenants/recupererun/${user.uid}`);
         const intervenantData = intervenantResponse.ok ? await intervenantResponse.json() : null;
   
         if (intervenantData) {
