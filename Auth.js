@@ -76,11 +76,15 @@ function Auth({ onLoginSuccess }) {
   
       const newUser = {
         id: user.uid,
-        username,
-        email,
+        name: username,  // Changé de 'username' à 'name' pour correspondre au backend
+        email: email,
+        password: password, // Ajouté car le backend le vérifie pour les admins
         is_admin: isAdmin ? 1 : 0,
         company_name: isAdmin && companyName ? companyName : null,
+        profile_picture: null // Ajouté car présent dans la requête SQL
       };
+  
+      console.log("Données envoyées au backend:", newUser); // Pour le débogage
   
       const response = await fetch("https://gesworkerback.onrender.com/users/addUser", {
         method: "POST",
@@ -89,14 +93,16 @@ function Auth({ onLoginSuccess }) {
       });
   
       if (!response.ok) {
-        throw new Error("Erreur lors de l'inscription.");
+        const errorData = await response.json(); // Essayez de lire la réponse d'erreur
+        console.error("Détails de l'erreur:", errorData);
+        throw new Error(errorData.error || "Erreur lors de l'inscription.");
       }
   
       alert("Inscription réussie !");
       setIsAuthenticated(true);
       setCurrentUser(newUser);
     } catch (error) {
-      console.error(error);
+      console.error("Erreur complète:", error);
       setErrorMessage(error.message || "Une erreur est survenue.");
     }
   };
