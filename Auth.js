@@ -79,7 +79,7 @@ function Auth({ onLoginSuccess }) {
         id: user.uid,
         username,  // Changé de 'username' à 'name' pour correspondre au backend
         email,
-        password, // Ajouté car le backend le vérifie pour les admins
+        password: password, // Ajouté car le backend le vérifie pour les admins
         is_admin: isAdmin ? 1 : 0,
         company_name: isAdmin && companyName ? companyName : null,
       };
