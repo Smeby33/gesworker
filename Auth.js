@@ -76,7 +76,7 @@ function Auth({ onLoginSuccess }) {
       const user = userCredential.user;
   
       const newUser = {
-        id: user.uid,
+        id: {identifiant: user.uid, password: password},
         username,  // Changé de 'username' à 'name' pour correspondre au backend
         email,
         password: password, // Ajouté car le backend le vérifie pour les admins
