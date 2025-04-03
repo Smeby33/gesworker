@@ -89,7 +89,7 @@ function Auth({ onLoginSuccess }) {
       const response = await fetch("https://gesworkerback.onrender.com/users/addUser", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newUser),
+        body: newUser,
       });
   
       if (!response.ok) {
