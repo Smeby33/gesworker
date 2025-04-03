@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./firebaseConfig";
 import { motion } from 'framer-motion';
+import axios from 'axios';
 import '../css/Auth.css';
 
 function Auth({ onLoginSuccess }) {
@@ -76,7 +77,7 @@ function Auth({ onLoginSuccess }) {
       const user = userCredential.user;
   
       const newUser = {
-        id: {identifiant: user.uid, password: password},
+        id: user.uid,
         username,  // Changé de 'username' à 'name' pour correspondre au backend
         email,
         password: password, // Ajouté car le backend le vérifie pour les admins
@@ -86,11 +87,7 @@ function Auth({ onLoginSuccess }) {
   
       console.log("Données envoyées au backend:", newUser); // Pour le débogage
   
-      const response = await fetch("https://gesworkerback.onrender.com/users/addUser", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newUser),
-      });
+      const response = await axios.post("https://gesworkerback.onrender.com/users/addUser", newUser);
   
       if (!response.ok) {
         const errorData = await response.json(); // Essayez de lire la réponse d'erreur
