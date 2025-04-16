@@ -1,12 +1,12 @@
 .intervenant-container {
   position: relative; 
     margin: 20px;
-    background: linear-gradient(15deg, #372e20, #5251505e);
+    /* background: linear-gradient(15deg, #372e20, #5251505e); */
     padding: 20px;
     border-radius: 8px;
   }
   .intervenant-container h3{
-    color: white;
+    color: #03de4e;
   }
   
   .intervenant-list {

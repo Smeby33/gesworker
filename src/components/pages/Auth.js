@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./firebaseConfig";
 import { motion } from 'framer-motion';
+import axios from 'axios';
 import '../css/Auth.css';
 
 function Auth({ onLoginSuccess }) {
@@ -69,37 +70,39 @@ function Auth({ onLoginSuccess }) {
     }
   };
 
-  const handleSignup = async () => {
+  const handleSignup = async (e) => {
+
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
   
       const newUser = {
         id: user.uid,
-        username,
+        username,  // Changé de 'username' à 'name' pour correspondre au backend
         email,
+        password: password, // Ajouté car le backend le vérifie pour les admins
         is_admin: isAdmin ? 1 : 0,
         company_name: isAdmin && companyName ? companyName : null,
       };
   
-      const response = await fetch("https://gesworkerback.onrender.com/users/addUser", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newUser),
-      });
+      console.log("Données envoyées au backend:", newUser); // Pour le débogage
+  
+      const response = await axios.post("https://gesworkerback.onrender.com/users/addUser", newUser);
   
       if (!response.ok) {
-        throw new Error("Erreur lors de l'inscription.");
+        const errorData = await response.json(); // Essayez de lire la réponse d'erreur
+        console.error("Détails de l'erreur:", errorData);
+        throw new Error(errorData.error || "Erreur lors de l'inscription.");
       }
   
       alert("Inscription réussie !");
       setIsAuthenticated(true);
       setCurrentUser(newUser);
     } catch (error) {
-      console.error(error);
+      console.error("Erreur complète:", error);
       setErrorMessage(error.message || "Une erreur est survenue.");
     }
-  };
+  }
 
   const handleLogin = async () => {
     try {
@@ -164,7 +167,7 @@ function Auth({ onLoginSuccess }) {
           animate={{ y: 0, opacity: 1 }}
           transition={{ delay: 0.3 }}
         >
-          <h1>ROPONA<span> & ROBIANDJA</span></h1>
+          <h1>ROPONA<span> & RODIANDJA</span></h1>
           <p className="tagline">
           Voir loin,travailler mieux 
           </p>
@@ -207,7 +210,7 @@ function Auth({ onLoginSuccess }) {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="auth-form">
+        {/* <form  className="auth-form"> */}
           {isSignup && (
             <div className="input-group">
               <label>Nom d'utilisateur</label>
@@ -301,11 +304,12 @@ function Auth({ onLoginSuccess }) {
           )}
 
           <button
-            type="submit"
+            // type="submit"
             whileHover={{ scale: 1.03 }}
             whileTap={{ scale: 0.98 }}
             className="submit-btn"
             disabled={loading}
+            onClick={handleSubmit}
           >
             {loading ? (
               <span className="spinner"></span>
@@ -323,7 +327,7 @@ function Auth({ onLoginSuccess }) {
               ⚠️ {errorMessage}
             </div>
           )}
-        </form>
+        {/* </form> */}
 
         <div className="auth-switch">
           <p>

@@ -1,10 +1,10 @@
 .tasks-container {
-  background: linear-gradient(15deg, #372e20, #5251505e);
+  /* background: linear-gradient(15deg, #372e20, #5251505e); */
   padding: 20px;
     border-radius: 8px;
   }
   .tasks-container h3{
-    color: white;
+    color: #03de4e;
   }
   
   .tasks-list {
@@ -95,6 +95,8 @@
 .filter-buttons button{
   border-radius: 5px;
   background:none;
+  color: #03de4e;
+
  }
  .filter-buttons {
   display: flex;
