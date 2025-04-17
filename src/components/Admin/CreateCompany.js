@@ -4,14 +4,23 @@ import axios from 'axios';
 import '../css/CreateCompany.css';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {
+  FaUserPlus,
+  FaFileMedical,
+  FaList,
+  FaPlusCircle,
+  FaTimes,
+  FaTh
+} from 'react-icons/fa';
 
-function CreateCompany({ onCompanyCreated }) {
+function CreateCompany({ onCompanyCreated , closeForm}) {
   const [companyName, setCompanyName] = useState('');
   const [contact, setContact] = useState('');
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
   const [description, setDescription] = useState('');
   const [loading, setLoading] = useState(false); // Pour gérer l'état du bouton
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -61,6 +70,19 @@ function CreateCompany({ onCompanyCreated }) {
 
   return (
     <div className="max-w-md mx-auto p-6 mt-10" id='form'>
+
+      <button
+                className="close-buttoncompanytask"
+                onClick={(e) => {
+                  e.stopPropagation(); // Empêche la propagation
+                  e.preventDefault(); // Empêche tout comportement par défaut
+                  closeForm(); // Appelle la fonction de fermeture
+                }}
+                aria-label="Fermer le formulaire"
+              >
+                <FaTimes />
+              </button>
+      
       <h3 className="text-xl font-semibold mb-4" id='Form-company'>Créer une Entreprise</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>

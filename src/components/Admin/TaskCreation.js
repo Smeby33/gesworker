@@ -2,10 +2,18 @@ import React, { useEffect, useState } from 'react';
 import '../css/TaskCreation.css';
 import { toast, ToastContainer } from 'react-toastify';
 import { signOut, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import {
+  FaUserPlus,
+  FaFileMedical,
+  FaList,
+  FaPlusCircle,
+  FaTimes,
+  FaTh
+} from 'react-icons/fa';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-function TaskCreation() {
+function TaskCreation({closeForm}) {
   const [tasks, setTasks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [intervenants, setIntervenants] = useState([]);  
@@ -126,9 +134,19 @@ function TaskCreation() {
 
   return (
     <div className="task-creation-container">
+
       <ToastContainer />
+            
       <h3>Création de Tâche</h3>
       <div className="form-wrapper">
+      
+      <button
+      className="close-buttoncompanytask"
+      onClick={closeForm}
+      aria-label="Fermer le formulaire"
+      >
+      <FaTimes />
+      </button>
 
       <form onSubmit={handleTaskCreation} className=''>
         <div>

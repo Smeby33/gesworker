@@ -26,7 +26,7 @@ function AllPerformanceTables() {
         const response = await fetch(`https://gesworkerback.onrender.com/performances/all/${currentUser.uid}`);
         
         if (!response.ok) {
-          throw new Error("Erreur lors de la récupération des performances");
+          throw new Error("Aucune donnée de performance disponible");
         }
         
         const data = await response.json();

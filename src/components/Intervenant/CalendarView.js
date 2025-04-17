@@ -19,7 +19,6 @@ function CalendarView() {
         }));
         setEvents(tasks);
       })
-      .catch(error => console.error('Error fetching tasks:', error));
   }, []);
 
   return (

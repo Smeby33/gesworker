@@ -212,7 +212,13 @@ function Company() {
       </div>
 
       {showCreateCompany && (
-        <CreateCompany onCompanyCreated={handleCompanyCreation} />
+         <CreateCompany 
+         onCompanyCreated={handleCompanyCreation}
+         closeForm={() => {
+           setShowCreateCompany(false);
+           closeForm(); // Appel à la fonction originale si nécessaire
+         }}
+       />
       )}
 
       <div className={`client-view ${viewMode}`}>
@@ -272,24 +278,16 @@ function Company() {
                       setIntervenants(updatedIntervenants);
                       closeForm();
                     }}
-                    onClose={closeForm}
+                    closeForm={closeForm}
                   />
                 )}
 
                 {expandedCompany === company && formToShow === 'task' && (
-                  <div className="task-creation-container" id="form">
-                    <ToastContainer />
-                    <div className="buttoncompanytask">
-                      <button
-                        className="close-buttoncompanytask"
-                        onClick={closeForm}
-                        aria-label="Fermer le formulaire"
-                      >
-                        <FaTimes />
-                      </button>
-                    </div>
-                    <TaskCreation/>
-                  </div>
+                    <TaskCreation
+                    closeForm={() => {
+                      setShowCreateCompany(false);
+                      closeForm(); // Appel à la fonction originale si nécessaire
+                    }}/>
                 )}
 
                 {hoveredCompany === company && (
@@ -306,7 +304,7 @@ function Company() {
                         >
                           <strong><p>Catégorie: {task.categories && task.categories.length > 0 ? 
                             task.categories.map((cat, idx) => <p key={idx}>-{cat.name}</p>) : 
-                            <div className="intervenant-col">Aucune catégorie.</div>}</p></strong>
+                              <div className="intervenant-col">Aucune catégorie.</div>}</p></strong>
                           <p>Statut: {task.statut}</p>
                           <p>Date limite: {task.dateFin}</p>
                           <div className="task-item-ul3">
@@ -330,7 +328,9 @@ function Company() {
         ) : (
           <div>
             <p>Aucun client trouvé</p>
-            <CreateCompany onCompanyCreated={handleCompanyCreation} />
+            <CreateCompany onCompanyCreated={handleCompanyCreation} 
+             closeForm={closeForm}
+            />
           </div>
         )}
       </div>
