@@ -90,7 +90,7 @@ function Auth({ onLoginSuccess }) {
         is_admin: isAdmin ? 1 : 0,
         company_name: isAdmin ? companyName : null
       };
-  
+      console.log("les donnes envoyee sont", userData);
       const response = await axios.post("https://gesworkerback.onrender.com/users/addUser", userData);
       
       if (!response.data.success) {
