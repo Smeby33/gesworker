@@ -1,43 +1,163 @@
 import React, { useState, useEffect } from 'react';
 import { Container, Row } from 'react-bootstrap';
-import { FaUsers, FaUserTie, FaTasks, FaUserGraduate, FaCalendarAlt, FaExclamationTriangle } from 'react-icons/fa'; // ajout des icônes nécessaires
+import { FaUsers, FaUserTie, FaCalendarAlt,FaTasks, FaUserGraduate, FaCheckCircle, FaHourglassHalf, FaExclamationTriangle } from 'react-icons/fa';
 import Company from './Company';
+import { signOut, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import Intervenant from './Intervenant';
 import TaskCategories from '../Intervenant/TaskCategories'; // Assurez-vous que le chemin est correct
 import Tasks from './Tasks'; // Import du composant Tasks
 import '../css/Dashboard.css';
 import AllPerformanceTables from './AllPerformanceTables';
+import axios from "axios";
 import CustomCalendar from './CustomCalendar';
+import { Await } from 'react-router-dom';
 
 function Dashboard() {
   const [selectedView, setSelectedView] = useState('clients');
   const [taskStats, setTaskStats] = useState({});
+  const [adminEmail, setAdminEmail] = useState('');
+  const auth = getAuth();
+  const [performances, setPerformances] = useState([]);
+  const [countClients, setCountClients] = useState(0);
+  const [countIntervenants, setCountIntervenants] = useState(0);
+  const [showTaskStats, setShowTaskStats] = useState(false);
+  const [countTasks, setCountTasks] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [tasks, setTasks] = useState([]);
+  const [countTaskCategories, setCountTaskCategories] = useState(0);
+  // ^ minuscule ici
+  
+  useEffect(() => {
+    const unsubscribe = auth.onAuthStateChanged((user) => {
+      if (user) {
+        fetchcountClients();
+        fetchcountIntervenants();
+      }
+    });
+  
+    return () => unsubscribe();
+  }, [auth]);
   
   // Fonction pour compter les clients
-  const countClients = () => {
-    const clientsData = JSON.parse(localStorage.getItem('clients')) || [];
-    return clientsData.length;
-  };
-  // Fonction pour compter les taskCategories
-  const countTaskCategories = () => {
-    const taskCategoriesData = JSON.parse(localStorage.getItem('taskCategories')) || [];
-    return taskCategoriesData.length;
+  const fetchcountClients = async () => {
+    if (auth.currentUser) {
+      setAdminEmail(auth.currentUser.email);
+      const adminUID = auth.currentUser.uid;
+      try {
+        const response = await fetch(`https://gesworkerback.onrender.com/clients/client/${adminUID}`);
+        const data = await response.json();
+        setCountClients(data.length); // Met à jour l'état avec le nombre de clients
+      } catch (error) {
+        console.error("Erreur lors de la récupération des intervenants :", error);
+      }
+    }
   };
   
+  
+  useEffect(() => {
+    fetchcountClients();
+  }, []);
+
+  const fetchcountIntervenants = async () => {
+    if (auth.currentUser) {
+      setAdminEmail(auth.currentUser.email);
+      const adminUID = auth.currentUser.uid;
+      try {
+        const response = await fetch(`https://gesworkerback.onrender.com/intervenants/recuperertout/${adminUID}`);
+        const data = await response.json();
+        setCountIntervenants(data.length); // Met à jour l'état avec le nombre de clients
+      } catch (error) {
+        console.error("Erreur lors de la récupération des intervenants :", error);
+      }
+    }
+  };
+  
+  
+  useEffect(() => {
+    fetchcountIntervenants();
+  }, []);
+
+  // Fonction pour compter les taskCategories
+// 2. Modifiez légèrement la fonction fetch
+const fetchcountTaskCategories = async () => {
+  try {
+    const response = await axios.get("https://gesworkerback.onrender.com/categories/toutescategories");
+    setCountTaskCategories(response.data?.length || 0); // Ajout de la sécurité ?
+  } catch (error) {
+    console.error("Erreur:", error);
+    setCountTaskCategories(0);
+  }
+};
+
+// 3. useEffect corrigé
+useEffect(() => {
+  const fetchData = async () => {
+    if (auth.currentUser) {
+      await fetchcountTaskCategories();
+    }
+  };
+  fetchData();
+}, [auth.currentUser]);
+
+    const fetchPerformances = async () => {
+      if (auth.currentUser) {
+        setAdminEmail(auth.currentUser.email);
+        const adminUID = auth.currentUser.uid;
+        try {
+      
+        const response = await fetch(`https://gesworkerback.onrender.com/performances/all/${adminUID}`);
+        if (!response.ok) {
+          throw new Error("Erreur lors de la récupération des performances");
+        }
+        const data = await response.json();
+        setPerformances(data.length);
+        console.log(data);
+      } catch (err) {
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+    };
+
+    useEffect(() => {
+    fetchPerformances();
+  }, [auth.currentUser]);
   // Fonction pour compter les performances
   const countPerformances = () => {
     const performancesData = JSON.parse(localStorage.getItem('performance')) || [];
     return performancesData.length;
   };
   // Fonction pour compter les intervenants
-  const countIntervenants = () => {
-    const intervenantData = JSON.parse(localStorage.getItem('intervenant')) || [];
-    return intervenantData.length;
-  };
-  const counttask = () => {
-    const taskData = JSON.parse(localStorage.getItem('tasks')) || [];
-    return taskData.length;
-  };
+  
+  useEffect(() => {
+    const fetchTaskCount = async () => {
+      if (auth.currentUser) {
+        setAdminEmail(auth.currentUser.email);
+        const adminUID = auth.currentUser.uid;
+        try {
+          const response = await fetch(`https://gesworkerback.onrender.com/taches/tasks-by-owner/${adminUID}`);
+          const data = await response.json();
+          console.log("nous voulons les taches pour tout le monde ",data)
+          setCountTasks(data.total);
+          if (Array.isArray(data)) {
+            setTasks(data);
+            setCountTasks(data.length);
+            setTaskStats(countTasksByStatus(data));
+          }  // Met à jour l'état avec le nombre de tâches
+        } catch (error) {
+          console.error("Erreur lors du comptage des tâches :", error);
+          setCountTasks(0);  // Définit 0 en cas d'erreur pour éviter un état vide
+        }
+      }
+    };
+  
+    fetchTaskCount();
+  }, [auth.currentUser]); // Ajout d'une dépendance pour exécuter l'effet quand l'utilisateur change
+  
+
+
 
   // Fonction pour compter les tâches par statut
   const countTasksByStatus = (tasks) => {
@@ -95,7 +215,7 @@ function Dashboard() {
               <a href="#intervenants">
                 <FaUserTie className="me-2" /> Intervenants
               </a>
-              <p>total : {countIntervenants()}</p>
+              <p>total : {countIntervenants}</p>
             </div>
             <div
               id="companyadm"
@@ -105,17 +225,32 @@ function Dashboard() {
               <a href="#clients">
                 <FaUsers className="me-2" />Clients
               </a>
-              <p>total: {countClients()}</p>
+              <p>total: {countClients}</p>
             </div>
             <div
               id="companyadm"
               className="w-24% d-flex align-items-center"
               onClick={() => setSelectedView('taches')}
+              onMouseEnter={() => setShowTaskStats(true)}
+              onMouseLeave={() => setShowTaskStats(false)}
             >
               <a href="#taches">
                 <FaTasks className="me-2" /> Liste des Tâches
               </a>
-              <p>total: {counttask()}</p>
+              <p>total: {countTasks}</p>
+                            {showTaskStats && (
+                              <div className="task-stats">
+                                <span className="stat-completed">
+                                  {taskStats['Terminé']} <FaCheckCircle /> 
+                                </span>
+                                <span className="stat-in-progress">
+                                  {taskStats['En cours']} <FaHourglassHalf />
+                                </span>
+                                <span className="stat-overdue">
+                                  {taskStats.overdue} <FaExclamationTriangle />
+                                </span>
+                              </div>
+                            )}
             </div>
             <div
               id="companyadm"
@@ -134,7 +269,7 @@ function Dashboard() {
               <a href="#Performances">
                 <FaUserGraduate className="me-2" /> Performances
               </a>
-              <p>total: {countPerformances()}</p>
+               { <p>total: {performances}</p>}
 
             </div>
             <div
@@ -145,7 +280,7 @@ function Dashboard() {
               <a href="#Action">
                 <FaTasks className="me-2" /> Nos actions
               </a>
-              <p>total: {countTaskCategories()}</p>
+              <p>total: {countTaskCategories}</p>
 
               
             </div>

@@ -1,58 +1,149 @@
+// 
+
+
 import React, { useEffect, useState } from 'react';
-import CreateCompany from  './CreateCompany';
-import CreateIntervenant from  './CreateIntervenant';
-import TaskCreation from './TaskCreation';
+import CreateCompany from './CreateCompany';
+import TaskCreation from './TaskCreacomp';
+import CreateIntervenant from './CreateIntervenant';
+import { getAuth } from "firebase/auth";
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import '../css/Company.css'; // Assure-toi que le chemin est correct
+import '../css/Company.css';
 import {
   FaUserPlus,
   FaFileMedical,
-  FaBuilding,
   FaList,
+  FaPlusCircle,
   FaTimes,
   FaTh
 } from 'react-icons/fa';
 
 function Company() {
+  // États simplifiés et consolidés
   const [companies, setCompanies] = useState([]);
   const [hoveredCompany, setHoveredCompany] = useState(null);
-  const [activeCompanyIndex, setActiveCompanyIndex] = useState(null); 
-  const [selectedCompanyForTask, setSelectedCompanyForTask] = useState(null);// Devient spécifique
-  const [viewMode, setViewMode] = useState('list'); // Vue par défaut : liste
-  const [showIntervenantForm, setShowIntervenantForm] = useState(false);
-  const [selectedCompanyForIntervenant, setSelectedCompanyForIntervenant] = useState(null);
-
+  const [viewMode, setViewMode] = useState('list');
+  const [showCreateCompany, setShowCreateCompany] = useState(false);
+  const [expandedCompany, setExpandedCompany] = useState(null);
+  const [formToShow, setFormToShow] = useState(null); // 'intervenant' ou 'task'
+  const [selectedCompany, setSelectedCompany] = useState(null);
+  
+  const [adminEmail, setAdminEmail] = useState('');
+  const auth = getAuth();
 
   const [tasks, setTasks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [intervenants, setIntervenants] = useState([]);
-
-  // États pour les champs du formulaire
+  
+  // États du formulaire de tâche
   const [titre, setTitre] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedIntervenants, setSelectedIntervenants] = useState([]);
-  const [selectedCompany, setSelectedCompany] = useState('');
   const [dateDebut, setDateDebut] = useState(new Date().toISOString().slice(0, 16));
   const [dateFin, setDateFin] = useState('');
 
-  useEffect(() => {
-    // Récupération des données depuis le localStorage
-    const storedCategories = JSON.parse(localStorage.getItem('taskCategories')) || [];
-    const storedIntervenants = JSON.parse(localStorage.getItem('intervenant')) || [];
-    const storedCompanies = JSON.parse(localStorage.getItem('clients')) || [];
-    const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+  // Chargement des données
 
-    setCategories(storedCategories);
-    setIntervenants(storedIntervenants);
-    setCompanies(storedCompanies);
-    setTasks(storedTasks);
+  const toggleCompanyActions = (company) => {
+    if (expandedCompany === company) {
+      setExpandedCompany(null);
+      setFormToShow(null);
+    } else {
+      setExpandedCompany(company);
+      setSelectedCompany(company);
+    }
+  };
+
+  const showForm = (formType) => {
+    setFormToShow(formType);
+  };
+
+  const closeForm = () => {
+    setFormToShow(null);
+  };
+
+  useEffect(() => { 
+    const fetchCategories = async () => {
+      try {
+        const response = await fetch("https://gesworkerback.onrender.com/categories/toutescategories");
+        const data = await response.json();
+        setCategories(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des catégories :", error);
+      }
+    };
+
+    fetchCategories();
   }, []);
 
+  useEffect(() => {
+    const fetchIntervenants = async () => {
+      if (auth.currentUser) {
+        setAdminEmail(auth.currentUser.email);
+        const adminUID = auth.currentUser.uid;
+        try {
+          const response = await fetch(`https://gesworkerback.onrender.com/intervenats/recuperertout/${adminUID}`);
+          const data = await response.json();
+          setIntervenants(data);
+        } catch (error) {
+          console.error("Erreur lors de la récupération des intervenants :", error);
+        }
+      }
+    };
+  
+    fetchIntervenants();
+  }, [auth.currentUser]);
+
+  useEffect(() => {
+    const fetchCompanies = async () => {
+      if (auth.currentUser) {
+        setAdminEmail(auth.currentUser.email);
+        const adminUID = auth.currentUser.uid;
+      try {
+        const response = await fetch(`https://gesworkerback.onrender.com/clients/client/${adminUID}`);
+        const data = await response.json();
+        setCompanies(data);
+      } catch (error) {
+        console.error("Erreur lors de la récupération des entreprises :", error);
+      }
+    }
+    };
+
+    fetchCompanies();
+  }, [auth.currentUser]);
+
+  // Fonctions utilitaires
   const saveTasksToLocalStorage = (tasks) => {
     localStorage.setItem('tasks', JSON.stringify(tasks));
   };
 
+  const getTasksForCompany = (companyName) => {
+    const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    return storedTasks.filter((task) => task.company === companyName);
+  };
+
+  const getTaskBackgroundColor = (task) => {
+    const today = new Date();
+    const dateFin = new Date(task.dateFin);
+    const diffTime = dateFin - today;
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (task.statut !== 'Terminé' && diffDays < 0) {
+      return 'pink';
+    } else if (diffDays <= 3 && diffDays >= 0) {
+      return 'orange';
+    }
+    return 'white';
+  };
+
+  // Gestion des formulaires
+  const handleCompanyCreation = () => {
+    const updatedCompanies = JSON.parse(localStorage.getItem('clients')) || [];
+    setCompanies(updatedCompanies);
+    setShowCreateCompany(false);
+  };
+
+  // Gestion des tâches
   const handleCategoryChange = (category) => {
     const categoryExists = selectedCategories.find((cat) => cat.name === category.name);
     if (categoryExists) {
@@ -73,127 +164,63 @@ function Company() {
   const handleTaskCreation = (e) => {
     e.preventDefault();
 
+    if (!selectedCompany) {
+      toast.error('Veuillez sélectionner une entreprise avant de créer une tâche.');
+      return;
+    }
+
     const newTask = {
       id: tasks.length + 1,
       titre,
-      company: selectedCompanyForTask?.companyName,
+      company: selectedCompany.company_name,
       categories: selectedCategories,
       intervenants: selectedIntervenants,
       dateDebut,
       dateFin: dateFin || dateDebut,
       statut: 'En attente',
     };
-    if (!selectedCompanyForTask) {
-      toast.error('Veuillez sélectionner une entreprise avant de créer une tâche.');
-      return;
-    }
+
     const updatedTasks = [...tasks, newTask];
     setTasks(updatedTasks);
     saveTasksToLocalStorage(updatedTasks);
     toast.success('Tâche créée avec succès !');
 
-    // Réinitialisation des champs
+    // Réinitialisation
     setTitre('');
     setSelectedCategories([]);
     setSelectedIntervenants([]);
-    setSelectedCompany('');
     setDateDebut(new Date().toISOString().slice(0, 16));
     setDateFin('');
+    closeForm();
   };
-
-
-
-
-  
-  
-  useEffect(() => {
-    const storedCompanies = JSON.parse(localStorage.getItem('clients')) || [];
-    setCompanies(storedCompanies);
-  }, []);
-
-  // Récupère les tâches associées à une entreprise
-  const getTasksForCompany = (companyName) => {
-    const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    return storedTasks.filter((task) => task.company === companyName);
-  };
-
-  // Fonction pour déterminer le style de la tâche en fonction de la date limite
-  const getTaskBackgroundColor = (task) => {
-    const today = new Date();
-    const dateFin = new Date(task.dateFin);
-    const diffTime = dateFin - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convertir en jours
-
-    if (task.statut !== 'Terminé' && diffDays < 0) {
-      return 'pink'; // Si la date est dépassée et la tâche non terminée
-    } else if (diffDays <= 3 && diffDays >= 0) {
-      return 'orange'; // Si la date limite est dans 3 jours ou moins
-    }
-    return 'white'; // Couleur par défaut
-  };
-
-  // Met à jour la liste des entreprises après la création
-  const handleCompanyCreation = () => {
-    const updatedCompanies = JSON.parse(localStorage.getItem('clients')) || [];
-    setCompanies(updatedCompanies);
-    setActiveCompanyIndex(null); // Fermer tous les formulaires
-  };
-// Fonction pour afficher TaskCreation pour une entreprise
-const handleAddTaskClick = (companyIndex) => {
-  setSelectedCompanyForTask(
-    selectedCompanyForTask === companyIndex ? null : companyIndex
-  ); // Permet de basculer entre afficher/masquer
-};
-
-
-
-//fonction pour empecher le dedoublemment 
-const handleIntervenantFormToggle = (companyIndex) => {
-  setShowIntervenantForm(showIntervenantForm === companyIndex ? null : companyIndex); // Bascule l'état
-};
-
-
-
-
-
-useEffect(() => {
-  // Récupérer les données depuis le local storage
-  const storedCategories = JSON.parse(localStorage.getItem('taskCategories')) || [];
-  const storedIntervenants = JSON.parse(localStorage.getItem('intervenant')) || [];
-  const storedCompanies = JSON.parse(localStorage.getItem('clients')) || [];
-  const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-
-  setCategories(storedCategories);
-  setIntervenants(storedIntervenants);
-  setCompanies(storedCompanies);
-  setTasks(storedTasks);
-}, []);
-
-
-
-
 
   return (
+    <div className='company-containerparentadmin' >
     <div className="company-container">
       <h3 id="clients">Liste des Clients</h3>
 
-      {/* Sélecteur de vue */}
       <div className="view-selector">
-        <button
-          onClick={() => setViewMode('list')}
-          className={viewMode === 'list' ? 'active' : ''}
-        >
+        <button onClick={() => setViewMode('list')} className={viewMode === 'list' ? 'active' : ''}>
           <FaList /> Liste
         </button>
-        <button
-          onClick={() => setViewMode('grid')}
-          className={viewMode === 'grid' ? 'active' : ''}
-        >
+        <button onClick={() => setViewMode('grid')} className={viewMode === 'grid' ? 'active' : ''}>
           <FaTh /> Grille
+        </button>
+        <button onClick={() => setShowCreateCompany(!showCreateCompany)}>
+          <FaPlusCircle/> Client
         </button>
       </div>
 
-      {/* Conteneur des clients */}
+      {showCreateCompany && (
+         <CreateCompany 
+         onCompanyCreated={handleCompanyCreation}
+         closeForm={() => {
+           setShowCreateCompany(false);
+           closeForm(); // Appel à la fonction originale si nécessaire
+         }}
+       />
+      )}
+
       <div className={`client-view ${viewMode}`}>
         {companies.length > 0 ? (
           companies.map((company, index) => (
@@ -203,171 +230,82 @@ useEffect(() => {
               onMouseEnter={() => setHoveredCompany(company)}
               onMouseLeave={() => setHoveredCompany(null)}
             >
-              <div className="navclient">
-                <div className="btnnav">
-                <button className="nav-button"
-                  onClick={() => handleIntervenantFormToggle(index)} // Passe l'index de l'entreprise
-                >
-                  <FaUserPlus className="btnnavicon"/>
-                    <a href="#form-intervenant" className="nav-link">
-                       Add Intervenant
-                    </a>
-                  </button>
-                </div>
-                <div className="btnnav">
-                  <button className="nav-button" onClick={() => 
-                      setActiveCompanyIndex(activeCompanyIndex === index ? null : index)
-                    }>
-                      <FaBuilding className="btnnavicon" />
-                    <a  className="nav-link">
-                       Add Entreprise
-                    </a>
-                  </button>
-                </div>
-                <div className="btnnav">
-                <button
-                  className="nav-button"
-                  onClick={() =>
-                    setSelectedCompanyForTask(
-                      selectedCompanyForTask?.companyName === company.companyName
-                        ? null
-                        : company
-                    )
-                  }
-                >
-                    <FaFileMedical className="btnnavicon" />
-                    <a className="nav-link">
-                       Add Tâches
-                    </a>
-                  </button>
-                </div>
-              </div>
               <div className="affichagetable">
+                <div 
+                  className="company-row" 
+                  onClick={() => toggleCompanyActions(company)}
+                >
+                  <div className="company-col">{company.company_name}</div>
+                  <div className="company-col">{company.contact}</div>
+                  <div className="company-col">{company.email}</div>
+                  <div className="company-col">{company.address}</div>
+                  <div className="company-col">{company.description}</div>
+                </div>
 
-              <div className="company-row">
-                <div className="company-col">{company.companyName}</div>
-                <div className="company-col">{company.contact}</div>
-                <div className="company-col">{company.email}</div>
-                <div className="company-col">{company.address}</div>
-                <div className="company-col">{company.description}</div>
-              </div>
+                {expandedCompany === company && (
+                  <div className="navclient">
+                    <div className="btnnav">
+                      <button 
+                        className="nav-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          showForm('intervenant');
+                        }}
+                      >
+                        <FaUserPlus className="btnnavicon"/>
+                        <span className="nav-link">Add Intervenant</span>
+                      </button>
+                    </div>
 
-              {showIntervenantForm === index && (
-                <div>
-                  <CreateIntervenant 
-                    onIntervenantAdded={(updatedIntervenants) =>
-                      setIntervenants(updatedIntervenants)
-                      
-                    }
-                  />
+                    <div className="btnnav">
+                      <button
+                        className="nav-button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          showForm('task');
+                        }}
+                      >
+                        <FaFileMedical className="btnnavicon" />
+                        <span className="nav-link">Add Tâches</span>
+                      </button>
+                    </div>
                   </div>
                 )}
-              {activeCompanyIndex === index && (
-                <CreateCompany onCompanyCreated={handleCompanyCreation} className="company-details1" />
-              )}
-               {/* Afficher le composant TaskCreation si une entreprise est sélectionnée */}
-               {selectedCompanyForTask?.companyName ===
-                company.companyName && (
-                  <div className="task-creation-container" id="form" >
-      <ToastContainer />
-      <div className="buttoncompanytask">
-          <button
-            className="close-buttoncompanytask"
-            onClick={() => setSelectedCompanyForTask(null)} // Réinitialiser pour fermer le formulaire
-            aria-label="Fermer le formulaire"
-          >
-            <FaTimes />
-          </button>
-      </div>
-      <h3>Création de Tâche</h3>
 
-      <form onSubmit={handleTaskCreation}>
-        <div>
-          <label>Titre de la tâche :</label>
-          <input
-            type="text"
-            value={titre}
-            onChange={(e) => setTitre(e.target.value)}
-            required
-          />
-        </div>
+                {expandedCompany === company && formToShow === 'intervenant' && (
+                  <CreateIntervenant 
+                    onIntervenantAdded={(updatedIntervenants) => {
+                      setIntervenants(updatedIntervenants);
+                      closeForm();
+                    }}
+                    closeForm={closeForm}
+                  />
+                )}
 
-        <div>
-          <label>Catégories de tâche :</label>
-          <div className="checkbox-group">
-            {categories.map((category, index) => (
-              <div key={index}>
-                <input
-                  type="checkbox"
-                  id={`category-${index}`}
-                  value={category.name}
-                  checked={selectedCategories.some((cat) => cat.name === category.name)}
-                  onChange={() => handleCategoryChange(category)}
-                />
-                <label htmlFor={`category-${index}`}>
-                  <img src={category.icon} alt="" className="icon" /> {category.name}
-                </label>
-              </div>
-            ))}
-          </div>
-        </div>
+                {expandedCompany === company && formToShow === 'task' && (
+                    <TaskCreation
+                    closeForm={() => {
+                      setShowCreateCompany(false);
+                      closeForm(); // Appel à la fonction originale si nécessaire
+                    }}/>
+                )}
 
-        <div>
-          <label>Intervenants :</label>
-          <div className="checkbox-group">
-            {intervenants.map((intervenant, index) => (
-              <div key={index}>
-                <input
-                  type="checkbox"
-                  id={`intervenant-${index}`}
-                  value={intervenant.name}
-                  checked={selectedIntervenants.includes(intervenant.name)}
-                  onChange={() => handleIntervenantChange(intervenant.name)}
-                />
-                <label htmlFor={`intervenant-${index}`}>
-                  <img src={intervenant.icon} alt="" className="icon" /> {intervenant.name}
-                </label>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div>
-          <label>Date de début :</label>
-          <input
-            type="datetime-local"
-            value={dateDebut}
-            onChange={(e) => setDateDebut(e.target.value)}
-          />
-        </div>
-
-        <div>
-          <label>Date de fin :</label>
-          <input
-            type="datetime-local"
-            value={dateFin}
-            onChange={(e) => setDateFin(e.target.value)}
-          />
-        </div>
-
-        <button type="submit">Créer la tâche</button>
-      </form>
-    </div>
-              )}
-
-              {hoveredCompany && hoveredCompany.companyName === company.companyName && (
-                <div className="company-details">
-                  <h4>Détails de l'entreprise: {company.companyName}</h4>
+                {hoveredCompany === company && (
+                  <div className="company-details">
+                  <h4>Détails de l'entreprise: {company.company_name}</h4>
                   <div className="tasks">
                     <h5>Tâches associées à cette entreprise</h5>
-                    {getTasksForCompany(company.companyName).length > 0 ? (
-                      getTasksForCompany(company.companyName).map((task, index) => (
+                    {getTasksForCompany(company.company_name).length > 0 ? (
+                      getTasksForCompany(company.company_name).map((task, index) => (
                         <div
                           key={index}
                           className="task-item3"
                           style={{ backgroundColor: getTaskBackgroundColor(task) }}
                         >
-                          <strong>{task.categories.join(', ')}</strong> - Statut: {task.statut}
+                          <strong><p>Catégorie: {task.categories && task.categories.length > 0 ? 
+                            task.categories.map((cat, idx) => <p key={idx}>-{cat.name}</p>) : 
+                              <div className="intervenant-col">Aucune catégorie.</div>}</p></strong>
+                          <p>Statut: {task.statut}</p>
                           <p>Date limite: {task.dateFin}</p>
                           <div className="task-item-ul3">
                             {task.intervenants.map((intervenant, i) => (
@@ -383,14 +321,20 @@ useEffect(() => {
                     )}
                   </div>
                 </div>
-              )}
+                )}
               </div>
             </div>
           ))
         ) : (
-          <p>Aucun client trouvé.</p>
+          <div>
+            <p>Aucun client trouvé</p>
+            <CreateCompany onCompanyCreated={handleCompanyCreation} 
+             closeForm={closeForm}
+            />
+          </div>
         )}
       </div>
+    </div>
     </div>
   );
 }

@@ -17,17 +17,17 @@
     background-color: #495057;
   }
   
-  .contenu {
+  /* .contenu {
     padding: 20px;
     border-radius: 5px;
     box-shadow: 0px 1px 4px 1px #9a96ac;
-    background: #d5926246; /* Fond clair pour la section des entreprises */
+    background: #d5926246; 
     box-shadow: 0px 1px 4px 1px #9a96ac;
     border: #f7d7c6 solid;
 
 
 
-  }
+  } */
   .nav-buttons button {
     display: flex;
     justify-content: space-evenly;
@@ -66,14 +66,13 @@
     text-decoration: none;
     color: white;
     display: flex;
-    flex-direction: column;
     align-items: center;
   }
-  #companyadm {
-    background:#024d86; /* Fond clair pour la section des entreprises */
-    ; /* Fond clair pour la section des entreprises */
-    padding-top: 15px; /* Espace autour du contenu */
-    border-radius: 8px; /* Coins arrondis */
+  /* #companyadm {
+    background:#024d86;
+
+    padding-top: 15px; 
+    border-radius: 8px; 
     border: #3ca1efe6 solid;
     display: flex;
     color: white;
@@ -82,7 +81,36 @@
     height: 106px;
     box-shadow: 0px 1px 4px 1px #9a96ac;
     margin: 0.5em;
-  }
+  } */
+  
+  /* Variables */
+:root {
+    --primary: #1b803ea3;
+    --primary-dark: #1dca5a;
+    --secondary: #03de4e;
+    --accent: #f5a623;
+    --light: #f8f9fa;
+    --dark: #2c3e50;
+    --gray: #e0e0e0;
+    --moi: #1b803ea3;
+    --error: #ff3860;
+}
+
+  
+  #companyadm {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    padding-top: 5px;
+    border-radius: 8px;
+    border: #3ca1efe6 solid;
+    display: flex
+;
+    color: white;
+    flex-direction: column;
+    width: 30%;
+    height: 50px;
+    box-shadow: 0px 1px 4px 1px #9a96ac;
+    margin: 0.5em;
+}
   #companyadm p{
     font-size: 12px;
   }
@@ -91,18 +119,106 @@
     color: white;
     font-size: 11.5px;
     display: flex;
-    flex-direction: column;
     align-items: center;
   }
   .me-2{
-    height: 2em;
+    height: 1em;
     width: 2em;
   }
   .ptachestyle{
     font-size:10px;
-    color: white;
+    color: #03de4e;
   }
   .countertask{
     display: flex;
     justify-content: space-between;
   }
+
+  /* mes taches  */
+  /* Ajoutez ceci à votre Dashboard.css */
+
+.task-menu-item {
+  position: relative;
+}
+
+.task-stats {
+  position: absolute;
+  left: 0;
+  top: 100%;
+  background: white;
+  padding: 8px;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 10;
+  display: flex;
+  gap: 10px;
+  min-width: 150px;
+  justify-content: space-around;
+}
+
+.task-stats span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.stat-completed {
+  color: #28a745;
+}
+
+.stat-in-progress {
+  color: #ffc107;
+}
+
+.stat-overdue {
+  color: #dc3545;
+}
+
+/* Animation pour l'apparition */
+.task-stats {
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* dresse */
+
+.task-stats {
+  position: absolute;
+  background: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+  z-index: 100;
+  display: flex;
+  gap: 15px;
+  margin-top: 5px;
+}
+
+.stat-completed, .stat-in-progress, .stat-overdue {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.9rem;
+}
+
+.stat-completed {
+  color: #28a745;
+}
+
+.stat-in-progress {
+  color: #ffc107;
+}
+
+.stat-overdue {
+  color: #dc3545;
+}
+
+.task-menu-item, .performance-menu-item {
+  position: relative;
+}

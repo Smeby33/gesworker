@@ -1,139 +1,235 @@
 import React, { useEffect, useState } from 'react';
-import '../css/Company.css'; // Assure-toi que le chemin est correct
-import { FaList, FaTh } from 'react-icons/fa';
+import { getAuth } from "firebase/auth";
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import '../css/Company.css';
+import {
+  FaList,
+  FaPlusCircle,
+  FaTh
+} from 'react-icons/fa';
 
-function Companyinter() {
+function Company() {
   const [companies, setCompanies] = useState([]);
-  const [tasks, setTasks] = useState([]);
-  const [currentUser, setCurrentUser] = useState(null); // Utilisateur connecté
-  const [hoveredCompany, setHoveredCompany] = useState(null);
-  const [viewMode, setViewMode] = useState('list'); // 'list' ou 'grid'
+  const [hoveredCompany, setHoveredCompany] = useState(null); 
+  const [ajouterCompany, setAjouterCompany] = useState(null);
+  const [viewMode, setViewMode] = useState('list');
+  const [adminEmail, setAdminEmail] = useState('');
+  const auth = getAuth();
+  
+  const [tasksByCompany, setTasksByCompany] = useState({});
 
   useEffect(() => {
-    // Charger l'utilisateur connecté depuis le localStorage
-    const storedUser = JSON.parse(localStorage.getItem('currentUser')) || {};
-    setCurrentUser(storedUser);
+    const fetchCompaniesAndTasks = async () => {
+      if (auth.currentUser) {
+        setAdminEmail(auth.currentUser.email);
+        const adminUID = auth.currentUser.uid;
+        
+        try {
+          // Récupérer les entreprises
+          const companiesResponse = await fetch(`https://gesworkerback.onrender.com/intervenantinters/entreprises/intervenant/${adminUID}`);
+          const companiesData = await companiesResponse.json();
+          setCompanies(companiesData);
+          
+          // Pour chaque entreprise, récupérer les tâches
+          const tasksMap = {};
+          for (const company of companiesData) {
+            try {
+              const tasksResponse = await fetch(`https://gesworkerback.onrender.com/intervenantinters/tasks/company/${company.id}`);
+              const tasksData = await tasksResponse.json();
+              console.log(tasksData)
+              
+              // Formater les tâches pour avoir des tableaux d'objets pour categories et intervenants
+              const formattedTasks = tasksData.map(task => {
+                // Convertir les catégories en tableau d'objets
+                let categoriesArray = [];
+                if (Array.isArray(task.categories)) {
+                  categoriesArray = task.categories;
+                } else if (typeof task.categories === 'string') {
+                  categoriesArray = task.categories.split(', ').map(cat => ({
+                    id: Math.random().toString(36).substr(2, 9), // ID temporaire
+                    name: cat.trim()
+                  }));
+                }
 
-    // Charger les entreprises depuis le localStorage
-    const storedCompanies = JSON.parse(localStorage.getItem('clients')) || [];
-    setCompanies(storedCompanies);
+                // Convertir les intervenants en tableau d'objets
+                let intervenantsArray = [];
+                if (Array.isArray(task.intervenants)) {
+                  intervenantsArray = task.intervenants;
+                } else if (typeof task.intervenants === 'string') {
+                  intervenantsArray = task.intervenants.split(', ').map(int => ({
+                    id: Math.random().toString(36).substr(2, 9), // ID temporaire
+                    name: int.trim()
+                  }));
+                }
 
-    // Charger les tâches depuis le localStorage
-    const storedTasks = JSON.parse(localStorage.getItem('tasks')) || [];
-    setTasks(storedTasks);
-  }, []);
+                return {
+                  ...task,
+                  categories: categoriesArray,
+                  intervenants: intervenantsArray
+                };
+              });
+              
+              tasksMap[company.id] = formattedTasks;
+            } catch (error) {
+              console.error(`Erreur lors de la récupération des tâches pour l'entreprise ${company.id}:`, error);
+              tasksMap[company.id] = [];
+            }
+          }
+          setTasksByCompany(tasksMap);
+          
+        } catch (error) {
+          console.error("Erreur lors de la récupération des entreprises :", error);
+          toast.error("Erreur lors de la récupération des données");
+        }
+      }
+    };
 
-  // Récupère les tâches associées à une entreprise
-  const getTasksForCompany = (companyName) => {
-    return tasks.filter((task) => task.company === companyName);
+    fetchCompaniesAndTasks();
+  }, [auth.currentUser]);
+
+  const getTasksForCompany = (companyId) => {
+    return tasksByCompany[companyId] || [];
   };
 
-  // Filtrer les entreprises en fonction des tâches partagées ou de l'entreprise
-  const filteredCompanies = companies.filter((company) => {
-    // Vérifie si l'entreprise a des tâches en commun avec l'utilisateur
-    const hasCommonTask = tasks.some((task) =>
-      task.company === company.companyName && 
-      task.intervenants.includes(currentUser.name)
-    );
-    return hasCommonTask || company.companyName === currentUser.company; // Filtrer par entreprise
-  });
-
-  // Fonction pour déterminer le style de la tâche en fonction de la date limite
   const getTaskBackgroundColor = (task) => {
+    if (!task.date_fin) return 'white';
+    
     const today = new Date();
-    const dateFin = new Date(task.dateFin);
+    const dateFin = new Date(task.date_fin);
     const diffTime = dateFin - today;
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)); // Convertir en jours
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     if (task.statut !== 'Terminé' && diffDays < 0) {
-      return 'red'; // Si la date est dépassée et la tâche non terminée
+      return 'pink';
     } else if (diffDays <= 3 && diffDays >= 0) {
-      return 'orange'; // Si la date limite est dans 3 jours ou moins
+      return 'orange';
     }
-    return 'white'; // Couleur par défaut
+    return 'white';
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'Non spécifiée';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
   };
 
   return (
+    <div className='company-containerparent'>
     <div className="company-container">
-      <h3>Liste des Clients</h3>
+      <ToastContainer />
+      <h3 id="clients">Liste des Clients</h3>
 
-      {/* Boutons pour basculer entre les vues */}
-      <div className="view-toggle">
+      <div className="view-selector">
         <button
-          className={`toggle-btn ${viewMode === 'list' ? 'active' : ''}`}
           onClick={() => setViewMode('list')}
+          className={viewMode === 'list' ? 'active' : ''}
         >
-          <FaList /> Vue Liste
+          <FaList /> Liste
         </button>
         <button
-          className={`toggle-btn ${viewMode === 'grid' ? 'active' : ''}`}
           onClick={() => setViewMode('grid')}
+          className={viewMode === 'grid' ? 'active' : ''}
         >
-          <FaTh /> Vue Grille
+          <FaTh /> Grille
         </button>
+       
       </div>
 
-      {/* Affichage des entreprises */}
-      <div className={`client-${viewMode}`}>
-        {filteredCompanies.length > 0 ? (
-          filteredCompanies.map((company, index) => (
+      <div className={`client-view ${viewMode}`}>
+        {companies.length > 0 ? (
+          companies.map((company) => (
             <div
-              key={index}
-              className={`client-item ${viewMode === 'grid' ? 'grid-item' : ''}`}
-              onMouseEnter={() => setHoveredCompany(company)}
-              onMouseLeave={() => setHoveredCompany(null)}
+              key={company.id}
+              className={`client-item ${hoveredCompany?.id === company.id ? 'hovered' : ''}`}
             >
-              <div className="company-row">
-                  <strong className="company-col" >{company.companyName}</strong>
-                  <p className="company-col" ><span>Contact:</span> {company.contact}</p>
-                  <p className="company-col" ><span>Email:</span> {company.email}</p>
-                  <p className="company-col" ><span>Adresse:</span> {company.address}</p>
-                  <p className="company-col" ><span>Description:</span> {company.description}</p>
-              </div>
-
-              {hoveredCompany && hoveredCompany.companyName === company.companyName && (
-                <div className="company-details">
-                  <h4>Détails de l'entreprise: {company.companyName}</h4>
-                  <div className="tasks">
-                    <h5>Tâches associées à cette entreprise</h5>
-                    {getTasksForCompany(company.companyName).length > 0 ? (
-                      getTasksForCompany(company.companyName).map((task, index) => (
-                        <div
-                          key={index}
-                          className="task-item3"
-                          style={{ backgroundColor: getTaskBackgroundColor(task) }}
-                        >
-                          <strong>{task.categories && task.categories.length > 0 ? task.categories.map((cat, index) => (
-                      
-                      
-                        
-                      <span >  -{cat.name}  </span> 
-                  
-                
-                  
-                )) : <div  className="intervenant-col" >Aucune catégorie.</div >}</strong> - Statut: {task.statut}
-                          <p>Date limite: {task.dateFin}</p>
-                          <div className="task-item-ul3">
-                            {task.intervenants.map((intervenant, i) => (
-                              <div key={i}><p>{intervenant}</p></div>
-                            ))}
-                          </div>
-                        </div>
-                      ))
-                    ) : (
-                      <p>Aucune tâche pour cette entreprise.</p>
-                    )}
+              <div className="affichagetable">
+                <div className="company-row">
+                  <div className="company-col"
+                    onClick={() => setHoveredCompany(company)}
+                    onDoubleClick={() => setHoveredCompany(null)}>
+                    {company.company_name}
                   </div>
+                  <div className="company-col">{company.contact || 'Non spécifié'}</div>
+                  <div className="company-col">{company.email || 'Non spécifié'}</div>
+                  <div className="company-col">{company.address || 'Non spécifié'}</div>
+                  <div className="company-col">{company.description || 'Aucune description'}</div>
                 </div>
-              )}
+
+                {hoveredCompany?.id === company.id && (
+                  <div className="company-details">
+                    <h4>Détails de l'entreprise: {company.company_name}</h4>
+                    <div className="tasks">
+                      <h5>Tâches associées ({getTasksForCompany(company.id).length})</h5>
+                      {getTasksForCompany(company.id).length > 0 ? (
+                        <div className="tasks-list">
+                          {getTasksForCompany(company.id).map((task) => (
+                            <div
+                              key={task.id}
+                              className="task-item3"
+                              style={{ backgroundColor: getTaskBackgroundColor(task) }}
+                            >
+                              <h4>{task.title}</h4>
+                              <p><strong>Statut:</strong> {task.statut || 'Non spécifié'}</p>
+                              
+                              <div className="task-categories">
+                                <strong>Catégories:</strong>
+                                {task.categories?.length > 0 ? (
+                                  <div className="categories-list">
+                                    {task.categories.map((category) => (
+                                      <span key={category.id} className="cate">
+                                        {category.name}
+                                      </span>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <span className="no-data">Aucune catégorie</span>
+                                )}
+                              </div>
+                              
+                              <p><strong>Dates:</strong> {formatDate(task.date_debut)} → {formatDate(task.date_fin)}</p>
+                              
+                              <div className="task-intervenants">
+                                <strong>Intervenants:</strong>
+                                {task.intervenants?.length > 0 ? (
+                                  <div className="intervenants-list">
+                                    {task.intervenants.map((intervenant) => (
+                                      <div key={intervenant.id} className="cate">
+                                        {intervenant.name}
+                                      </div>
+                                    ))}
+                                  </div>
+                                ) : (
+                                  <span className="no-data">Aucun intervenant</span>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="no-tasks">Aucune tâche pour cette entreprise.</p>
+                      )}
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           ))
         ) : (
-          <p>Aucune entreprise avec des tâches partagées ou dans la même entreprise.</p>
+          <div className="no-companies">
+            <p>Aucun client trouvé</p>
+          </div>
         )}
       </div>
+    </div>
     </div>
   );
 }
 
-export default Companyinter;
+export default Company;

@@ -2,18 +2,10 @@ import React, { useEffect, useState } from 'react';
 import '../css/TaskCreation.css';
 import { toast, ToastContainer } from 'react-toastify';
 import { signOut, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-import {
-  FaUserPlus,
-  FaFileMedical,
-  FaList,
-  FaPlusCircle,
-  FaTimes,
-  FaTh
-} from 'react-icons/fa';
 
 import 'react-toastify/dist/ReactToastify.css';
 
-function TaskCreation({closeForm}) {
+function TaskCreation() {
   const [tasks, setTasks] = useState([]);
   const [categories, setCategories] = useState([]);
   const [intervenants, setIntervenants] = useState([]);  
@@ -134,21 +126,10 @@ function TaskCreation({closeForm}) {
 
   return (
     <div className="task-creation-container">
-
       <ToastContainer />
-            
       <h3>Création de Tâche</h3>
-      <div className="form-wrapper">
-      
-      <button
-      className="close-buttoncompanytask"
-      onClick={closeForm}
-      aria-label="Fermer le formulaire"
-      >
-      <FaTimes />
-      </button>
 
-      <form onSubmit={handleTaskCreation} className=''>
+      <form onSubmit={handleTaskCreation} className='formi'>
         <div>
           <label>Titre de la tâche :</label>
           <input
@@ -213,8 +194,8 @@ function TaskCreation({closeForm}) {
               </option>
             ))}
           </select>
-
-          <div>
+        </div>
+        <div>
           <label>Entreprise :</label>
           <select
             value={selectedCompany}
@@ -228,9 +209,7 @@ function TaskCreation({closeForm}) {
               </option>
             ))}
           </select>
-        </div> 
         </div>
-        
 
         <div>
           <label>Date de début :</label>
@@ -252,7 +231,6 @@ function TaskCreation({closeForm}) {
 
         <button type="submit">Créer la tâche</button>
       </form>
-      </div>
     </div>
   );
 }

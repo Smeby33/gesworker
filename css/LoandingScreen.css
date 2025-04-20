@@ -1,81 +1,98 @@
-/* LoadingScreen.css */
+/* Variables */
+:root {
+  :root {
+    --primary: #1b803ea3;
+    --primary-dark: #1dca5a;
+    --secondary: ##03de4e;
+    --accent: #f5a623;
+    --light: #f8f9fa;
+    --dark: #2c3e50;
+    --gray: #e0e0e0;
+    --moi: #1b803ea3;
+    --error: #ff3860;
+  }
+}
 
+/* Base */
 .loading-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-    background: linear-gradient(15deg, #06060a, #002d5a);
-    color: #333;
-    font-family: 'Arial', sans-serif;
-  }
-  
-  /* Animation pour l'icône */
-  .app-icon {
-    width: 300px;
-    height: 300px;
-    margin-bottom: 20px;
-    border-radius: 150px;
-    animation: rotate 2s linear 3;
-  }
-  
-  /* Texte avec une animation de type machine à écrire */
-  .animationh3 {
-    font-size: 1.5rem;
-    color: #5b8c85;
-    margin-bottom: 15px;
-    overflow: hidden;
-    border-right: 2px solid #5b8c85;
-    white-space: nowrap;
-    width: 0;
-    animation: typing 3s steps(30, end) forwards, blink 0.7s infinite step-end alternate;
-  }
-  
-  /* Animation du texte "Chargement..." */
-  h1 {
-    font-size: 2rem;
-    color: #000000;
-    animation: fade-in 2s ease-in-out infinite alternate;
-  }
-  
-  /* Animation de rotation */
-  @keyframes rotate {
-    from {
-      transform: rotate(0deg);
-    }
-    to {
-      transform: rotate(360deg);
-    }
-  }
-  
-  /* Animation de type machine à écrire */
-  @keyframes typing {
-    from {
-      width: 0;
-    }
-    to {
-      width: 500px; /* Ajuste la largeur selon la longueur de ton texte */
-    }
-  }
-  
-  /* Animation du curseur clignotant */
-  @keyframes blink {
-    from, to {
-      border-color: transparent;
-    }
-    50% {
-      border-color: #000000;
-    }
-  }
-  
-  /* Animation de fondu pour le texte */
-  @keyframes fade-in {
-    from {
-      opacity: 0.5;
-    }
-    to {
-      opacity: 2;
-    }
-  }
-  
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  width: 100vw;
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  text-align: center;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+}
+
+/* Logo */
+.app-icon {
+  width: 500px;
+  height: 300px;
+  object-fit: contain;
+  margin-bottom: 2rem;
+  animation: pulse 3s infinite ease-in-out;
+}
+
+/* Texte */
+.loading-screen h1 {
+  font-size: 2rem;
+  font-weight: 300;
+  margin-top: 2rem;
+  position: relative;
+}
+
+.loading-screen h1::after {
+  content: '';
+  display: block;
+  width: 50px;
+  height: 3px;
+  background: var(--accent);
+  margin: 1rem auto 0;
+  animation: expand 1.5s infinite ease-in-out;
+}
+
+.animationh3 {
+  font-size: 1.5rem;
+  font-weight: 400;
+  margin-bottom: 1rem;
+  opacity: 0;
+  animation: fadeIn 1s ease-out forwards;
+}
+
+/* Animations */
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 1; }
+  50% { transform: scale(1.05); opacity: 0.9; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes expand {
+  0% { width: 30px; opacity: 0.3; }
+  50% { width: 80px; opacity: 1; }
+  100% { width: 30px; opacity: 0.3; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Points de suspension animés */
+.loading-screen h1::before {
+  content: '...';
+  position: absolute;
+  width: 0;
+  overflow: hidden;
+  animation: dots 1.5s infinite steps(4);
+}
+
+@keyframes dots {
+  0% { width: 0; }
+  100% { width: 3ch; }
+}

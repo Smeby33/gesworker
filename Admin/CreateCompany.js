@@ -1,48 +1,87 @@
 import React, { useState } from 'react';
-import '../css/CreateCompany.css'; // Vérifiez que le chemin est correct
+import { auth } from "../pages/firebaseConfig";
+import axios from 'axios';
+import '../css/CreateCompany.css';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import {
+  FaUserPlus,
+  FaFileMedical,
+  FaList,
+  FaPlusCircle,
+  FaTimes,
+  FaTh
+} from 'react-icons/fa';
 
-function CreateCompany({ onCompanyCreated }) {
+function CreateCompany({ onCompanyCreated , closeForm}) {
   const [companyName, setCompanyName] = useState('');
   const [contact, setContact] = useState('');
   const [email, setEmail] = useState('');
   const [address, setAddress] = useState('');
   const [description, setDescription] = useState('');
+  const [loading, setLoading] = useState(false); // Pour gérer l'état du bouton
 
-  const handleSubmit = (e) => {
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // Créer un nouvel objet entreprise
-    const newCompany = {
-      companyName,
-      contact,
-      email,
-      address,
-      description,
-      timestamp: new Date().getTime(),
-    };
-
-    // Récupérer les entreprises existantes depuis le local storage
-    const existingCompanies = JSON.parse(localStorage.getItem('clients')) || [];
-    // Ajouter la nouvelle entreprise
-    const updatedCompanies = [...existingCompanies, newCompany];
-    // Mettre à jour le local storage
-    localStorage.setItem('clients', JSON.stringify(updatedCompanies));
-
-    // Réinitialiser les champs du formulaire
-    setCompanyName('');
-    setContact('');
-    setEmail('');
-    setAddress('');
-    setDescription('');
-
-    toast.success('Entreprise créée avec succès');
-    onCompanyCreated();
+    setLoading(true);
+  
+    try {
+      if (auth.currentUser) {
+        const adminUID = auth.currentUser.uid;
+  
+        // Création de l'objet à envoyer
+        const newCompany = {
+          company_name: companyName,
+          contact,
+          email,
+          address,
+          description,
+          proprietaire: adminUID,
+        };
+  
+        // Envoi de la requête au serveur
+        const response = await axios.post("https://gesworkerback.onrender.com/clients/ajout", newCompany);
+  
+        if (response.status === 201) {
+          toast.success("Entreprise créée avec succès");
+  
+          // Réinitialisation des champs après succès
+          setCompanyName('');
+          setContact('');
+          setEmail('');
+          setAddress('');
+          setDescription('');
+  
+          // Notifier le parent que l'entreprise a été créée
+          onCompanyCreated();
+        }
+      } else {
+        toast.error("Utilisateur non authentifié !");
+      }
+    } catch (error) {  // Assure-toi que cette accolade n'est pas mal indentée
+      console.error("Erreur lors de l'ajout de l'entreprise :", error);
+      toast.error("Une erreur est survenue lors de la création de l'entreprise");
+    } finally {
+      setLoading(false);
+    }
   };
+  
 
   return (
     <div className="max-w-md mx-auto p-6 mt-10" id='form'>
+
+      <button
+                className="close-buttoncompanytask"
+                onClick={(e) => {
+                  e.stopPropagation(); // Empêche la propagation
+                  e.preventDefault(); // Empêche tout comportement par défaut
+                  closeForm(); // Appelle la fonction de fermeture
+                }}
+                aria-label="Fermer le formulaire"
+              >
+                <FaTimes />
+              </button>
       
       <h3 className="text-xl font-semibold mb-4" id='Form-company'>Créer une Entreprise</h3>
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -99,12 +138,20 @@ function CreateCompany({ onCompanyCreated }) {
             className="w-full px-3 py-2 border border-gray-300 rounded"
           />
         </div>
-        <button type="submit" className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700" id='button-company'>
-          Créer
+        <button 
+          type="submit" 
+          className="w-full py-2 bg-blue-600 text-white rounded hover:bg-blue-700 disabled:opacity-50"
+          id='button-company'
+          disabled={loading} // Désactive le bouton pendant le chargement
+        >
+          {loading ? "Création..." : "Créer"}
         </button>
       </form>
+      <ToastContainer />
     </div>
   );
 }
+
+
 
 export default CreateCompany;

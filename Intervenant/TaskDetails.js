@@ -7,7 +7,7 @@ function TaskDetails() {
   const [task, setTask] = useState(null);
 
   useEffect(() => {
-    axios.get(`http://localhost:5000/tasks/${id}`)
+    axios.get(`https://gesworkerback.onrender.com/tasks/${id}`)
       .then(response => setTask(response.data))
       .catch(error => console.error('Error fetching task details:', error));
   }, [id]);
