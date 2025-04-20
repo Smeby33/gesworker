@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { signOut, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { signOut, deleteUser,getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import '../css/CreateIntervenant.css';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -77,7 +77,6 @@ function CreateIntervenant({ onIntervenantAdded,closeForm }) {
   };
 
   
-  
   const handleSubmit = async (e) => {
     e.preventDefault();
   
@@ -89,49 +88,73 @@ function CreateIntervenant({ onIntervenantAdded,closeForm }) {
     const password = generatePassword(name);
   
     try {
-      if (!adminPassword) {
-        toast.error("Impossible de récupérer le mot de passe de l'admin.");
+      if (!auth.currentUser) {
+        toast.error("Aucun administrateur connecté");
         return;
       }
   
-      if (auth.currentUser) {
-        const adminUID = auth.currentUser.uid;
+      const adminUID = auth.currentUser.uid;
   
-        // 1️⃣ Création sur Firebase avec le mot de passe généré
-        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-        const user = userCredential.user;
+      // 1. Création du compte Firebase
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const firebaseUser = userCredential.user; // Renommé de 'user' à 'firebaseUser' pour plus de clarté
   
-        // 2️⃣ Si la création Firebase est réussie, on prépare les données pour la base de données
-        const newIntervenant = {
-          id: user.uid,        // Utilisation de l'UID Firebase
-          name,
-          email,
-          phone,
-          role,
-          password,            // Enregistrement du mot de passe généré
-          profilePicture,
-          timestamp: new Date().getTime(),
-          proprietaire: adminUID,
-        };
+      // 2. Préparation des données pour la BD
+      const newIntervenant = {
+        id: firebaseUser.uid,
+        name,
+        email,
+        phone,
+        role,
+        password,
+        profilePicture,
+        timestamp: new Date().getTime(),
+        proprietaire: adminUID,
+      };
   
-        // 3️⃣ Envoi des données à la base de données via l'API
-        await createIntervenantAPI(newIntervenant);
+      // 3. Enregistrement dans la base de données
+      await createIntervenantAPI(newIntervenant);
   
-        if (onIntervenantAdded) onIntervenantAdded(newIntervenant);
+      // 4. Actualisation du token (alternative à la reconnexion)
+      await auth.currentUser.getIdToken(true);
   
-        toast.success("Intervenant ajouté avec succès !");
-  
-        // 4️⃣ Déconnexion de l'admin et reconnexion automatique
-        await signOut(auth);
-        await signInWithEmailAndPassword(auth, adminEmail, adminPassword);
-        toast.info("Reconnexion automatique réussie ✅");
+      // 5. Feedback et callback
+      toast.success("Intervenant créé avec succès !");
+      if (onIntervenantAdded) {
+        onIntervenantAdded(newIntervenant);
       }
+  
+      // Reset du formulaire
+      setName('');
+      setEmail('');
+      setPhone('');
+      setRole('');
+      setProfilePicture('');
+  
     } catch (error) {
       console.error("Erreur:", error);
-      toast.error("Une erreur est survenue lors de l'ajout");
+      
+      let errorMessage = "Erreur lors de la création";
+      if (error.code === 'auth/email-already-in-use') {
+        errorMessage = "Cet email est déjà utilisé";
+      } else if (error.message.includes('foreign key constraint')) {
+        errorMessage = "Erreur de lien avec l'administrateur";
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+  
+      toast.error(errorMessage);
+      
+      // Suppression du compte Firebase si l'enregistrement BD a échoué
+      if (error.userCredential) { // Vérifie si userCredential existe dans l'erreur
+        try {
+          await deleteUser(error.userCredential.user);
+        } catch (deleteError) {
+          console.error("Erreur suppression compte:", deleteError);
+        }
+      }
     }
   };
-  
 
   return (
     <div className="max-w-md mx-auto p-6 mt-10" id="form-intervenant">
