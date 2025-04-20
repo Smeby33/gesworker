@@ -84,7 +84,7 @@ function Auth({ onLoginSuccess }) {
   
       const userData = {
         id: user.uid,
-        name:name || email.split('@')[0], // Fallback si username vide
+        name:name, // Fallback si username vide
         email: email,
         password: password,
         is_admin: isAdmin ? 1 : 0,
