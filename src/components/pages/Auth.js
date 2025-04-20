@@ -7,7 +7,7 @@ import axios from 'axios';
 import '../css/Auth.css';
 
 function Auth({ onLoginSuccess }) {
-  const [username, setUsername] = useState("");
+  const [name, setname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -78,7 +78,7 @@ function Auth({ onLoginSuccess }) {
   
       const newUser = {
         id: user.uid,
-        username,  // Changé de 'username' à 'name' pour correspondre au backend
+        name,  // Changé de 'username' à 'name' pour correspondre au backend
         email,
         password: password, // Ajouté car le backend le vérifie pour les admins
         is_admin: isAdmin ? 1 : 0,
@@ -216,7 +216,7 @@ function Auth({ onLoginSuccess }) {
               <label>Nom d'utilisateur</label>
               <input 
                 type="text" 
-                value={username}
+                value={name}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Votre nom complet"
                 className="input-field"
