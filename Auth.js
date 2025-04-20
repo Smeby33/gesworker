@@ -84,13 +84,13 @@ function Auth({ onLoginSuccess }) {
   
       const userData = {
         id: user.uid,
-        name:name, // Fallback si username vide
+        name:name || email.split('@')[0], // Fallback si username vide
         email: email,
         password: password,
         is_admin: isAdmin ? 1 : 0,
         company_name: isAdmin ? companyName : null
       };
-      console.log("les donnes envoyee sont", userData);
+  
       const response = await axios.post("https://gesworkerback.onrender.com/users/addUser", userData);
       
       if (!response.data.success) {
