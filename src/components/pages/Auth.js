@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "./firebaseConfig";
-import { motion } from 'framer-motion';
 import axios from 'axios';
 import '../css/Auth.css';
 
@@ -70,79 +69,120 @@ function Auth({ onLoginSuccess }) {
     }
   };
 
-  const handleSignup = async (e) => {
-
+  const handleSignup = async () => {
     try {
+      setLoading(true);
+      setErrorMessage("");
+  
+      // Validation obligatoire
+      if (!name && !email) {
+        throw new Error("Un nom d'utilisateur ou email est requis");
+      }
+  
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
   
-      const newUser = {
+      const userData = {
         id: user.uid,
-        name,  // Changé de 'username' à 'name' pour correspondre au backend
-        email,
-        password: password, // Ajouté car le backend le vérifie pour les admins
+        name:name || email.split('@')[0], // Fallback si username vide
+        email: email,
+        password: password,
         is_admin: isAdmin ? 1 : 0,
-        company_name: isAdmin && companyName ? companyName : null,
+        company_name: isAdmin ? companyName : null
       };
   
-      console.log("Données envoyées au backend:", newUser); // Pour le débogage
-  
-      const response = await axios.post("https://gesworkerback.onrender.com/users/addUser", newUser);
-  
-      if (!response.ok) {
-        const errorData = await response.json(); // Essayez de lire la réponse d'erreur
-        console.error("Détails de l'erreur:", errorData);
-        throw new Error(errorData.error || "Erreur lors de l'inscription.");
-      }
-  
-      alert("Inscription réussie !");
-      setIsAuthenticated(true);
-      setCurrentUser(newUser);
-    } catch (error) {
-      console.error("Erreur complète:", error);
-      setErrorMessage(error.message || "Une erreur est survenue.");
-    }
-  }
-
-  const handleLogin = async () => {
-    try {
-      await auth.signOut();  // Déconnexion pour éviter les conflits
-  
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-  
-      // Vérifier si l'utilisateur est enregistré dans `users`
-      const response = await fetch(`https://gesworkerback.onrender.com/users/getUser/${user.uid}`);
-      const userData = response.ok ? await response.json() : null;
-  
-      // Si pas dans `users`, chercher dans `intervenants`
-      if (!userData) {
-        const intervenantResponse = await fetch(`https://gesworkerback.onrender.com/intervenants/recupererun/${user.uid}`);
-        const intervenantData = intervenantResponse.ok ? await intervenantResponse.json() : null;
-  
-        if (intervenantData) {
-          setIsAuthenticated(true);
-          setCurrentUser(intervenantData);
-          navigate("/intervenant");
-          return;
-        } else {
-          setErrorMessage("Votre compte n'est pas encore enregistré. Veuillez contacter un administrateur.");
-          return;
-        }
+      const response = await axios.post("https://gesworkerback.onrender.com/users/addUser", userData);
+      
+      if (!response.data.success) {
+        throw new Error(response.data.message || "Erreur lors de l'inscription");
       }
   
       setIsAuthenticated(true);
       setCurrentUser(userData);
+      navigate(userData.is_admin ? "/admin" : "/intervenant");
   
-      if (userData.is_admin !== 1) {  
-        navigate("/intervenant");
-      } else {
-        onLoginSuccess(userData);
-        navigate("/admin");
-      }
     } catch (error) {
-      console.error("Erreur lors de la connexion:", error);
-      setErrorMessage(error.message || "Une erreur est survenue lors de la connexion.");
+      console.error("Erreur inscription:", error);
+      let errorMessage = "Erreur lors de l'inscription";
+      
+      if (error.code === "auth/email-already-in-use") {
+        errorMessage = "Cet email est déjà utilisé";
+      } else if (error.response?.data?.error) {
+        errorMessage = error.response.data.error;
+      }
+      
+      setErrorMessage(errorMessage);
+      
+      // Nettoyage
+      if (auth.currentUser) {
+        try {
+          await auth.currentUser.delete();
+        } catch (deleteError) {
+          console.error("Erreur suppression compte:", deleteError);
+        }
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleLogin = async () => {
+    try {
+      setLoading(true);
+      setErrorMessage("");
+  
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+  
+      // Vérifier d'abord dans la table users
+      try {
+        const userResponse = await axios.get(`https://gesworkerback.onrender.com/users/getUser/${user.uid}`);
+        if (userResponse.data) {
+          setIsAuthenticated(true);
+          setCurrentUser(userResponse.data);
+          if (userResponse.data.is_admin === 1) {
+            navigate("/admin");
+          } else {
+            navigate("/intervenant");
+          }
+          return;
+        }
+      } catch (userError) {
+        if (userError.response?.status !== 404) throw userError;
+      }
+  
+      // Si pas trouvé dans users, vérifier dans intervenants
+      try {
+        const intervenantResponse = await axios.get(`https://gesworkerback.onrender.com/intervenants/recupererun/${user.uid}`);
+        if (intervenantResponse.data) {
+          setIsAuthenticated(true);
+          setCurrentUser({ ...intervenantResponse.data, is_admin: false });
+          navigate("/intervenant");
+          return;
+        }
+      } catch (intervenantError) {
+        if (intervenantError.response?.status === 404) {
+          setErrorMessage("Compte non enregistré. Contactez un administrateur.");
+        } else {
+          throw intervenantError;
+        }
+      }
+  
+      // Si aucun compte trouvé
+      setErrorMessage("Identifiants incorrects ou compte non enregistré");
+      await auth.signOut();
+    } catch (error) {
+      console.error("Erreur connexion:", error);
+      let errorMessage = "Erreur de connexion";
+      if (error.code === "auth/invalid-credential") {
+        errorMessage = "Email ou mot de passe incorrect";
+      } else if (error.code === "auth/too-many-requests") {
+        errorMessage = "Trop de tentatives. Réessayez plus tard";
+      }
+      setErrorMessage(errorMessage);
+      await auth.signOut();
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -217,7 +257,7 @@ function Auth({ onLoginSuccess }) {
               <input 
                 type="text" 
                 value={name}
-                onChange={(e) => setUsername(e.target.value)}
+                onChange={(e) => setname(e.target.value)}
                 placeholder="Votre nom complet"
                 className="input-field"
                 required
