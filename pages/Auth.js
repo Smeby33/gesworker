@@ -1,217 +1,302 @@
-import React, { useState, useEffect } from 'react';
-import { useNavigate, useLocation } from 'react-router-dom';
+import React, { useState } from 'react';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "./firebaseConfig";
+import axios from 'axios';
 import '../css/Auth.css';
 
-function Auth({ onLoginSuccess }) {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
-  const [isSignup, setIsSignup] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState('');
+function Auth({ onLoginSuccess, errorMessage: propErrorMessage }) {
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
   const [isAdmin, setIsAdmin] = useState(false);
-  const [adminPassword, setAdminPassword] = useState('');
-  const [companyName, setCompanyName] = useState('');
-  const ADMIN_PASSWORD = '0832@gesWORker';
+  const [adminPassword, setAdminPassword] = useState("");
+  const [companyName, setCompanyName] = useState("");
+  const [localErrorMessage, setLocalErrorMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [isSignup, setIsSignup] = useState(false);
 
-  const navigate = useNavigate();
-  const location = useLocation();
-  const redirectTo = location.state?.redirectTo || '/';
+  const ADMIN_PASSWORD = process.env.REACT_APP_ADMIN_PASSWORD || "0832@gesWORker";
 
-  useEffect(() => {
-    const savedUsers = JSON.parse(localStorage.getItem('users')) || [];
-    const savedIntervenants = JSON.parse(localStorage.getItem('intervenants')) || [];
-    localStorage.setItem('users', JSON.stringify(savedUsers));
-    localStorage.setItem('intervenants', JSON.stringify(savedIntervenants));
-  }, []);
+  const errorMessage = propErrorMessage || localErrorMessage;
 
-  const handleSubmit = (e) => {
+  const validateFields = () => {
+    if (!email || !password) {
+      setLocalErrorMessage("Veuillez remplir tous les champs obligatoires.");
+      return false;
+    }
+    if (isSignup && password !== confirmPassword) {
+      setLocalErrorMessage("Les mots de passe ne correspondent pas.");
+      return false;
+    }
+    if (isAdmin && adminPassword !== ADMIN_PASSWORD) {
+      setLocalErrorMessage("Mot de passe administrateur incorrect.");
+      return false;
+    }
+    return true;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (isSignup) {
-      handleSignup();
-    } else {
-      handleLogin();
+    setLocalErrorMessage("");
+
+    if (!validateFields()) return;
+
+    setLoading(true);
+
+    try {
+      if (isSignup) {
+        await handleSignup();
+      } else {
+        await handleLogin();
+      }
+    } catch (error) {
+      console.error("Authentication error:", error);
+      setLocalErrorMessage(error.message || "Une erreur est survenue.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleSignup = () => {
-    if (password !== confirmPassword) {
-      alert('Les mots de passe ne correspondent pas');
-      return;
+  const handleSignup = async () => {
+    if (!name && !email) {
+      throw new Error("Un nom d'utilisateur ou email est requis");
     }
 
-    if (isAdmin) {
-      if (adminPassword !== ADMIN_PASSWORD) {
-        alert('Mot de passe administrateur incorrect');
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    const userData = {
+      id: user.uid,
+      name: name || email.split('@')[0],
+      email: email,
+      password: password,
+      is_admin: isAdmin ? 1 : 0,
+      company_name: isAdmin ? companyName : null
+    };
+
+    const response = await axios.post("https://gesworkerback.onrender.com/users/addUser", userData);
+    
+    if (!response.data.success) {
+      throw new Error(response.data.message || "Erreur lors de l'inscription");
+    }
+
+    // Nettoyage du formulaire après succès
+    setName("");
+    setEmail("");
+    setPassword("");
+    setConfirmPassword("");
+    setIsAdmin(false);
+    setAdminPassword("");
+    setCompanyName("");
+
+    onLoginSuccess(userData);
+  };
+
+  const handleLogin = async () => {
+    const userCredential = await signInWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
+
+    // Vérifier d'abord dans la table users
+    try {
+      const userResponse = await axios.get(`https://gesworkerback.onrender.com/users/getUser/${user.uid}`);
+      if (userResponse.data) {
+        onLoginSuccess(userResponse.data);
         return;
       }
-      if (!companyName) {
-        alert("Le nom de l'entreprise est requis pour l'inscription en tant qu'admin");
+    } catch (userError) {
+      if (userError.response?.status !== 404) throw userError;
+    }
+
+    // Si pas trouvé dans users, vérifier dans intervenants
+    try {
+      const intervenantResponse = await axios.get(`https://gesworkerback.onrender.com/intervenants/recupererun/${user.uid}`);
+      if (intervenantResponse.data) {
+        onLoginSuccess({ ...intervenantResponse.data, is_admin: false });
         return;
       }
+    } catch (intervenantError) {
+      if (intervenantError.response?.status !== 404) throw intervenantError;
     }
 
-    const savedUsers = JSON.parse(localStorage.getItem('users')) || [];
-    const savedIntervenants = JSON.parse(localStorage.getItem('intervenants')) || [];
-    const existingUser = savedUsers.find((user) => user.username === username);
-
-    if (existingUser) {
-      alert("Nom d'utilisateur déjà pris");
-      return;
-    }
-
-    const newUser = { username, password, isAdmin, companyName };
-    if (isAdmin) {
-      savedUsers.push(newUser);
-      localStorage.setItem('users', JSON.stringify(savedUsers));
-    } else {
-      const newIntervenant = { username, password, isAdmin, name: username, id: `INT-${Date.now()}` };
-      savedIntervenants.push(newIntervenant);
-      localStorage.setItem('intervenants', JSON.stringify(savedIntervenants));
-    }
-
-    alert('Inscription réussie ! Vous pouvez maintenant vous connecter.');
-    setIsSignup(false);
+    throw new Error("Compte non enregistré. Contactez un administrateur.");
   };
 
-  const handleLogin = () => {
-    const savedUsers = JSON.parse(localStorage.getItem('users')) || [];
-    const savedIntervenant = JSON.parse(localStorage.getItem('intervenant')) || [];
+  // ... (le reste du JSX reste inchangé)
   
-    // Combine admins et intervenants
-    const allUsers = [
-      ...savedUsers.map((user) => ({ ...user, type: 'admin' })),
-      ...savedIntervenant.map((intervenant) => ({
-        username: intervenant.name,  // Utiliser 'name' comme username pour les intervenants
-        password: intervenant.password,
-        type: 'intervenant',
-        ...intervenant,
-      })),
-    ];
-  
-    // Normalise le nom d'utilisateur saisi (en enlevant les espaces)
-    const normalizedUsername = username.trim().toLowerCase();
-  
-    // Recherche utilisateur en utilisant 'username' et 'password'
-    const user = allUsers.find(
-      (user) => user.username.toLowerCase().trim() === normalizedUsername && user.password === password
-    );
-  
-    if (user) {
-      localStorage.setItem('currentUser', JSON.stringify(user));
-      onLoginSuccess(user);
-  
-      // Redirige en fonction du type d'utilisateur
-      if (user.type === 'admin') {
-        navigate('/admin');
-      } else if (user.type === 'intervenant') {
-        navigate('/intervenant');
-      }
-    } else {
-      alert("Nom d'utilisateur ou mot de passe incorrect");
-    }
-  };
-  
-  
-  
-
   return (
-    <div className="divauth">
-      <div className="auth1">
-        <div className="auth1part1">
-          <h1>GESWOKER</h1>
-          <h6 className='animationh3'>Organisez , maximisez et gérez votre équipe</h6>
+    <div className="auth-container">
+      {/* Partie Gauche - Branding */}
+      <div className="auth-hero">
+        <div className="logo-wrapper">
+          <img 
+            src="/logo.png" 
+            alt="RobiPona Logo" 
+            className="logo-pulse"
+          />
         </div>
-        <div className="auth1part2">
-          <p className='animationh4'>
-          Gesworker est une application simple et intuitive conçue pour optimiser  la gestion et le suivi<br /> 
-           des tâches en entreprise. Elle permet aux administrateurs de créer, assigner et suivre des tâches <br /> 
-           variées (TVA, rapprochement bancaire, reporting, etc.), tout en offrant aux
-            intervenants une <br /> interface dédiée pour mettre à jour les statuts, ajouter des 
-            commentaires et collaborer <br /> efficacement.
-          
-           Grâce à son design épuré, ses notifications intelligentes et sa sécurité <br /> 
-           renforcée, Gesworker centralise les informations et améliore la productivité. Une solution  <br />fiable pour coordonner vos équipes et simplifier vos processus internes.
-          </p>
+        
+        <div>
+          <h1>ROPONA<span> & RODIANDJA</span></h1>
+          <p className="tagline">Voir loin, travailler mieux</p>
+        </div>
+
+        <div className="features">
+          <div className="feature-item">
+            <span className="icon">✓</span>
+            <span>Gestion centralisée des tâches</span>
+          </div>
+          <div className="feature-item">
+            <span className="icon">✓</span>
+            <span>Suivi en temps réel</span>
+          </div>
+          <div className="feature-item">
+            <span className="icon">✓</span>
+            <span>Interface intuitive</span>
+          </div>
         </div>
       </div>
-      <div className="auth2">
-      <img src="/logo513.png" alt="" height={400} width={500}/>
-        <div className="auth">
-          <h1>{isSignup ? 'Inscription' : 'Connexion'}</h1>
-          <form onSubmit={handleSubmit} className="form1">
-            <div className="utilisateur">
-              <label>Nom d'utilisateur:</label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+
+      {/* Partie Droite - Formulaire */}
+      <div className="auth-form-container">
+        <div className="form-header">
+          <h2>{isSignup ? 'Créer un compte' : 'Connectez-vous'}</h2>
+          <p>
+            {isSignup 
+              ? 'Rejoignez notre plateforme en 1 minute' 
+              : 'Accédez à votre tableau de bord'}
+          </p>
+        </div>
+
+        {isSignup && (
+          <div className="input-group">
+            <label>Nom d'utilisateur</label>
+            <input 
+              type="text" 
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Votre nom complet"
+              className="input-field"
+              required
+            />
+          </div>
+        )}
+
+        <div className="input-group">
+          <label>Email</label>
+          <input 
+            type="email" 
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="exemple@votreentreprise.com"
+            className="input-field"
+            required
+          />
+        </div>
+
+        <div className="input-group">
+          <label>Mot de passe</label>
+          <input 
+            type="password" 
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder={isSignup ? "Créez un mot de passe" : "Entrez votre mot de passe"}
+            className="input-field"
+            required
+          />
+        </div>
+
+        {isSignup && (
+          <>
+            <div className="input-group">
+              <label>Confirmer le mot de passe</label>
+              <input 
+                type="password" 
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                placeholder="Retapez votre mot de passe"
+                className="input-field"
                 required
               />
             </div>
-            <div className="utilisateur">
-              <label>Mot de passe:</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
+
+            <div className="input-group checkbox-group">
+              <label>
+                <input 
+                  type="checkbox" 
+                  checked={isAdmin} 
+                  onChange={(e) => setIsAdmin(e.target.checked)}
+                />
+                <span>Inscription en tant qu'admin</span>
+              </label>
             </div>
-            {isSignup && (
-              <>
-                <div className="utilisateur">
-                  <label>Confirmer le mot de passe:</label>
-                  <input
-                    type="password"
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    required
-                  />
-                </div>
-                <div className="utilisateur">
-                  <label>
-                    <input
-                      type="checkbox"
-                      checked={isAdmin}
-                      onChange={(e) => setIsAdmin(e.target.checked)}
-                    />
-                    Inscription en tant qu'admin
-                  </label>
-                </div>
-                {isAdmin && (
-                  <>
-                    <div className="utilisateur">
-                      <label>Mot de passe administrateur:</label>
-                      <input
-                        type="password"
-                        value={adminPassword}
-                        onChange={(e) => setAdminPassword(e.target.value)}
-                        required
-                      />
-                    </div>
-                    <div className="utilisateur">
-                      <label>Nom de l'entreprise:</label>
-                      <input
-                        type="text"
-                        value={companyName}
-                        onChange={(e) => setCompanyName(e.target.value)}
-                        required
-                      />
-                    </div>
-                  </>
-                )}
-              </>
+
+            {isAdmin && (
+              <div className="input-group">
+                <label>Mot de passe administrateur</label>
+                <input 
+                  type="password" 
+                  value={adminPassword}
+                  onChange={(e) => setAdminPassword(e.target.value)}
+                  placeholder="Mot de passe admin requis"
+                  className="input-field"
+                  required
+                />
+              </div>
             )}
-            <button className="boutonauth1" type="submit">
-              {isSignup ? 'S\'inscrire' : 'Se connecter'}
+
+            {isAdmin && (
+              <div className="input-group">
+                <label>Nom de l'entreprise</label>
+                <input 
+                  type="text" 
+                  value={companyName}
+                  onChange={(e) => setCompanyName(e.target.value)}
+                  placeholder="Nom de votre société"
+                  className="input-field"
+                />
+              </div>
+            )}
+          </>
+        )}
+
+        <button
+          className="submit-btn"
+          disabled={loading}
+          onClick={handleSubmit}
+        >
+          {loading ? (
+            <span className="spinner"></span>
+          ) : (
+            isSignup ? "S'inscrire gratuitement" : "Se connecter"
+          )}
+        </button>
+
+        {errorMessage && (
+          <div className="error-message">
+            ⚠️ {errorMessage}
+          </div>
+        )}
+
+        <div className="auth-switch">
+          <p>
+            {isSignup 
+              ? 'Déjà un compte ?' 
+              : 'Nouveau sur RobiPona ?'}
+            <button 
+              onClick={() => {
+                setIsSignup(!isSignup);
+                setLocalErrorMessage("");
+              }}
+              className="switch-btn"
+            >
+              {isSignup ? 'Connectez-vous' : 'Créer un compte'}
             </button>
-          </form>
-          <button className="boutonauth2" onClick={() => setIsSignup(!isSignup)}>
-            {isSignup ? 'Déjà inscrit ? Connectez-vous' : 'Pas encore de compte ? Inscrivez-vous'}
-          </button>
+          </p>
         </div>
       </div>
     </div>
   );
 }
 
-export default Auth;
+export default Auth; 
