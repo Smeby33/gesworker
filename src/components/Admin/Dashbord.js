@@ -208,27 +208,33 @@ useEffect(() => {
           <div className="butondash1adm">
             
             <div
-              id="companyadm"
+              id="companyad1"
               className="w-24% mb-2 d-flex align-items-center"
               onClick={() => setSelectedView('intervenants')}
             >
               <a href="#intervenants">
                 <FaUserTie className="me-2" /> Intervenants
               </a>
-              <p>total : {countIntervenants}</p>
+              <p className='petitp'>total : {countIntervenants}</p>
             </div>
+
+
+
             <div
-              id="companyadm"
+              id="companyad2"
               className="w-24% mb-2 d-flex align-items-center"
               onClick={() => setSelectedView('clients')}
             >
               <a href="#clients">
                 <FaUsers className="me-2" />Clients
               </a>
-              <p>total: {countClients}</p>
+              <p className='petitp'>total: {countClients}</p>
             </div>
+
+
+
             <div
-              id="companyadm"
+              id="companyad3"
               className="w-24% d-flex align-items-center"
               onClick={() => setSelectedView('taches')}
               onMouseEnter={() => setShowTaskStats(true)}
@@ -237,7 +243,7 @@ useEffect(() => {
               <a href="#taches">
                 <FaTasks className="me-2" /> Liste des Tâches
               </a>
-              <p>total: {countTasks}</p>
+              <p className='petitp' >total: {countTasks}</p>
                             {showTaskStats && (
                               <div className="task-stats">
                                 <span className="stat-completed">
@@ -252,8 +258,11 @@ useEffect(() => {
                               </div>
                             )}
             </div>
+
+
+
             <div
-              id="companyadm"
+              id="companyad4"
               className="w-24% d-flex align-items-center"
               onClick={() => setSelectedView('Calendrier')}
             >
@@ -261,29 +270,39 @@ useEffect(() => {
                 <FaCalendarAlt className="me-2" /> Calendrier
               </a>
             </div>
+
+
+
             <div
-              id="companyadm"
+              id="companyad5"
               className="w-24% d-flex align-items-center"
               onClick={() => setSelectedView('Performance')}
             >
               <a href="#Performances">
                 <FaUserGraduate className="me-2" /> Performances
               </a>
-               { <p>total: {performances}</p>}
+               { <p className='petitp' >total: {performances}</p>}
 
             </div>
+
+
+
             <div
-              id="companyadm"
+              id="companyad6"
               className="w-24% d-flex align-items-center"
               onClick={() => setSelectedView('actions')}
             >
               <a href="#Action">
                 <FaTasks className="me-2" /> Nos actions
               </a>
-              <p>total: {countTaskCategories}</p>
+              <p className='petitp'>total: {countTaskCategories}</p>
 
               
             </div>
+
+
+
+
           </div>
         </div>
 

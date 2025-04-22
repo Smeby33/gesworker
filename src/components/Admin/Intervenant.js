@@ -58,12 +58,18 @@ function Intervenant() {
     };
 
     const getTasksForIntervenant = (intervenantName) => {
+        if (!Array.isArray(tasks)) return []; // sécurité en cas de problème
+    
         return tasks.filter(task => {
             if (!task.intervenants) return false;
-            return task.intervenants.split(",").map(name => name.trim().toLowerCase()).includes(intervenantName.toLowerCase());
-            console.log('getTasksForIntervenant')
+    
+            return task.intervenants
+                .split(",")
+                .map(name => name.trim().toLowerCase())
+                .includes(intervenantName.toLowerCase());
         });
     };
+    
 
     const getTaskBackgroundColor = (task) => {
         const today = new Date();
@@ -95,12 +101,12 @@ function Intervenant() {
 
                             {showCompanyBtn === index && (
                                 <div className="navclient">
-                                    <button className="nav-button" onClick={() => toggleFormState('activeIntervenantIndex', index)}>
-                                        <FaBuilding className="btnnavicon" /> Add Entreprise
-                                    </button>
-                                    <button className="nav-button" onClick={() => toggleFormState('selectedIntervenantForTask', intervenant)}>
-                                        <FaFileMedical className="btnnavicon" /> Add Tâches
-                                    </button>
+                                    <div className="nav-button" onClick={() => toggleFormState('activeIntervenantIndex', index)}>
+                                        <FaBuilding className="btnnavicon" /> <p className='btnent' > Add Entreprise</p>
+                                    </div>
+                                    <div className="nav-button" onClick={() => toggleFormState('selectedIntervenantForTask', intervenant)}>
+                                        <FaFileMedical className="btnnavicon" /> <p className='btnent' > Add Tâches </p>
+                                    </div>
                                 </div>
                             )}
 
