@@ -112,38 +112,9 @@ function AdminPage() {
       </div>
       <div className="AdminPagemain">
         <header className="admin-header">
-          <h1 className="welcome-title">
-            Bienvenue {adminData.name} dans votre tableau de bord
-          </h1>
+        <h2 className='adtexthead'>Admin Dashboard</h2>
           <p className="company-name">{adminData.company_name}</p>
         </header>
-
-        {/* <div className="btnshow">
-          <button
-            id="toggle-buttonrecent"
-            className="nav-button"
-            onClick={toggleRecentActivities}
-            aria-expanded={showRecentActivities}
-          >
-            {showRecentActivities ? (
-              <>
-                <FaEyeSlash className="btnnavicon" />
-                <span className="nav-link">Masquer l'historique</span>
-              </>
-            ) : (
-              <>
-                <FaEye className="btnnavicon" />
-                <span className="nav-link">Afficher l'historique</span>
-              </>
-            )}
-          </button>
-        </div> */}
-
-        {showRecentActivities && (
-          <div className="company">
-            <RecentActivities adminId={auth.currentUser?.uid} />
-          </div>
-        )}
 
         <AdminDashboard adminEmail={adminData.email} />
       </div>

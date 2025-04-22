@@ -17,10 +17,8 @@
   
   .client-item {
     padding: 10px;
-    border: 1px solid #ddd;
     margin-bottom: 10px;
     position: relative;
-    background: linear-gradient(131deg, rgb(255 255 255 / 98%), #000);
     border-radius: 5px;
 }
   
@@ -151,7 +149,6 @@
 .client-view.list .client-item {
   display: block;
   margin-bottom: 15px;
-  border: 1px solid #ddd;
   padding: 10px;
 }
 
@@ -195,8 +192,8 @@
   align-items: center;
 }
 .btnnavicon{
-  height: 1.5em;
-  width: 1.5em;
+  height: 1em;
+  width: 1em;
 }
 
 .nav-button .nav-link {
