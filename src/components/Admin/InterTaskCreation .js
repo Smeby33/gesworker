@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react';
 import '../css/TaskCreation.css';
 import { toast, ToastContainer } from 'react-toastify';
 import { signOut, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-
+import {
+  FaTimes
+} from 'react-icons/fa';
 import 'react-toastify/dist/ReactToastify.css';
 
-function InterTaskCreation() {
+function InterTaskCreation({ onIntervenantAdded, onClose ,preselectedIntervenant}) {
   const [tasks, setTasks] = useState([]);
+  const [selectedIntervenants, setSelectedIntervenants] = useState(preselectedIntervenant ? [preselectedIntervenant] : []);
   const [categories, setCategories] = useState([]);
   const [intervenants, setIntervenants] = useState([]);  
   const [companies, setCompanies] = useState([]);
@@ -17,7 +20,6 @@ function InterTaskCreation() {
   // États pour les champs du formulaire
   const [titre, setTitre] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedIntervenants, setSelectedIntervenants] = useState([]);
   const [selectedCompany, setSelectedCompany] = useState('');
   const [selectedPriorités, setSelectedPriorités] = useState('');
   const [dateDebut, setDateDebut] = useState(new Date().toISOString().slice(0, 16));
@@ -69,6 +71,10 @@ function InterTaskCreation() {
   
 
   const handleIntervenantChange = (intervenant) => {
+    if (intervenant === preselectedIntervenant) {
+      return; // Empêche la modification du pré-sélectionné
+    }
+  
     if (selectedIntervenants.includes(intervenant)) {
       setSelectedIntervenants(selectedIntervenants.filter((int) => int !== intervenant));
     } else {
@@ -126,8 +132,17 @@ function InterTaskCreation() {
 
   return (
     <div className="task-creation-container">
+      <button className="close-button" onClick={onClose}>
+      <FaTimes />
+      </button>
       <ToastContainer />
       <h3>Création de Tâche</h3>
+
+      {preselectedIntervenant && (
+        <p>
+          Intervenant pré-sélectionné : <strong>{preselectedIntervenant}</strong>
+        </p>
+      )}
 
       <form onSubmit={handleTaskCreation}>
         <div>
@@ -172,6 +187,7 @@ function InterTaskCreation() {
                   value={intervenant.name}
                   checked={selectedIntervenants.includes(intervenant.name)}
                   onChange={() => handleIntervenantChange(intervenant.name)}
+                  disabled={intervenant.name === preselectedIntervenant} // Désactivez si c'est le pré-sélectionné
                 />
                 <label htmlFor={`intervenant-${index}`}>
                   <img src={intervenant.icon} alt="" className="icon" /> {intervenant.name}

@@ -12,7 +12,7 @@ import {
   FaTh
 } from 'react-icons/fa';
 
-function CreateIntervenant({ onIntervenantAdded,closeForm }) {
+function CreateIntervenant({ onIntervenantAdded, setShowAjoutinter }) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [profilePicture, setProfilePicture] = useState('');
@@ -156,19 +156,15 @@ function CreateIntervenant({ onIntervenantAdded,closeForm }) {
     }
   };
 
+  const handleClose = () => {
+    setShowAjoutinter(false); // Ferme le formulaire
+  };
+
   return (
     <div className="max-w-md mx-auto p-6 mt-10" id="form-intervenant">
-      <button
-          className="close-buttoncompanytask"
-          onClick={(e) => {
-            e.stopPropagation(); // Empêche la propagation
-            e.preventDefault(); // Empêche tout comportement par défaut
-            closeForm(); // Appelle la fonction de fermeture
-          }}
-          aria-label="Fermer le formulaire"
-        >
-          <FaTimes />
-        </button>
+      <button className="close-button" onClick={handleClose}>
+        <FaTimes />
+      </button>
       <ToastContainer />
       <h3 className="text-xl font-semibold mb-4">Créer un Intervenant</h3>
       <form onSubmit={handleSubmit} className="space-y-4">

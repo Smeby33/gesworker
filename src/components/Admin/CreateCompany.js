@@ -13,7 +13,7 @@ import {
   FaTh
 } from 'react-icons/fa';
 
-function CreateCompany({ onCompanyCreated , closeForm}) {
+function CreateCompany({ onCompanyCreated, closeForm }) {
   const [companyName, setCompanyName] = useState('');
   const [contact, setContact] = useState('');
   const [email, setEmail] = useState('');
@@ -71,16 +71,8 @@ function CreateCompany({ onCompanyCreated , closeForm}) {
   return (
     <div className="max-w-md mx-auto p-6 mt-10" id='form'>
 
-      <button
-                className="close-buttoncompanytask"
-                onClick={(e) => {
-                  e.stopPropagation(); // Empêche la propagation
-                  e.preventDefault(); // Empêche tout comportement par défaut
-                  closeForm(); // Appelle la fonction de fermeture
-                }}
-                aria-label="Fermer le formulaire"
-              >
-                <FaTimes />
+              <button className="close-button" onClick={closeForm}>
+                <FaTimes onClick={closeForm}/>
               </button>
       
       <h3 className="text-xl font-semibold mb-4" id='Form-company'>Créer une Entreprise</h3>

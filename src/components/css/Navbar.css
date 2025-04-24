@@ -1,77 +1,18 @@
-nav {
-    padding: 2em;
-    background: linear-gradient(135deg, #2c3e50 0%, #4ca1af 100%);
-    height: 100vh;
-    position: fixed;
-    display: flex;
-    flex-direction: column;
-}
-
-.navbar-list {
-  list-style-type: none; /* Enlève les puces des listes */
-  padding: 0; /* Enlève le padding par défaut */
-}
-
-.navbar-list li {
-  display: inline-block; /* Affiche les éléments de la liste horizontalement */
-  margin-right: 20px; /* Espacement entre les éléments */
-}
-
-.nav-link, .nav-button {
-  color: #fff; /* Couleur du texte */
-  text-decoration: none; /* Enlève le soulignement */
-  padding: 10px; /* Espacement interne */
-  border: none; /* Enlève la bordure des boutons */
-  background: transparent; /* Fond transparent pour les boutons */
-  cursor: pointer; /* Curseur de pointeur */
-}
-
-.nav-button  {
-  border-radius: 5px; 
-  display: flex;/* Coins arrondis */
-}
-
-.nav-button:hover ,.nav-link:hover {
-    color: #1c1c1c; /* Couleur au survol */
-}
-
-.modal-content {
-  padding: 20px; /* Espacement interne du modal */
-  background-color: #fff; /* Fond blanc pour le contenu du modal */
-  border-radius: 10px; /* Coins arrondis du modal */
-}
-
-.modal-overlay {
-  background-color: rgba(0, 0, 0, 0.7); /* Fond semi-transparent pour l'overlay */
-}
-
-.close-button {
-  background: transparent; /* Fond transparent pour le bouton de fermeture */
-  border: none; /* Pas de bordure */
-  font-size: 1.5em; /* Taille du texte */
-  color: #000; /* Couleur du texte */
-  cursor: pointer; /* Curseur de pointeur */
-  float: right; /* Place le bouton de fermeture à droite */
-}
-
-
-/* Navbar.css */
-
+/* Variables globales */
 :root {
-  :root {
-    --primary: #1b803ea3;
-    --primary-dark: #1dca5a;
-    --secondary: ##03de4e;
-    --accent: #f5a623;
-    --light: #f8f9fa;
-    --dark: #2c3e50;
-    --gray: #e0e0e0;
-    --moi: #1b803ea3;
-    --error: #ff3860;
-  }
+  --primary: #1b803ea3;
+  --primary-dark: #1dca5a;
+  --secondary: #03de4e;
+  --accent: #f5a623;
+  --light: #f8f9fa;
+  --dark: #2c3e50;
+  --gray: #e0e0e0;
+  --error: #ff3860;
 }
 
+/* Styles pour la navbar */
 nav {
+  padding: 2em;
   background: linear-gradient(135deg, var(--primary), var(--secondary));
   color: white;
   height: 100vh;
@@ -83,10 +24,12 @@ nav {
   flex-direction: column;
   box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
   z-index: 1000;
-  padding: 20px 0;
 }
 
+/* Liste de navigation */
 .navbar-list {
+  list-style-type: none;
+  padding: 0;
   display: flex;
   flex-direction: column;
   flex-grow: 1;
@@ -94,32 +37,30 @@ nav {
   justify-content: space-between;
 }
 
-.btnnav {
+.navbar-list li {
   margin-bottom: 20px;
 }
 
-.navb-button {
-  background: transparent;
+/* Boutons et liens */
+.nav-link, .navb-button {
+  color: #fff;
+  text-decoration: none;
+  padding: 10px;
   border: none;
-  color: white;
-  width: 100%;
-  padding: 12px 20px;
-  text-align: left;
+  background: transparent;
   cursor: pointer;
-  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   font-size: 15px;
   font-weight: 500;
+  border-radius: 5px;
+  transition: all 0.3s ease;
+}
+
+.navb-button {
+  width: 100%;
+  text-align: left;
   border-left: 3px solid transparent;
-  border-radius: 5px; 
-  display: flex;/* Coins arrondis */
-  color: #fff; /* Couleur du texte */
-  text-decoration: none; /* Enlève le soulignement */
-  padding: 10px; /* Espacement interne */
-  border: none; /* Enlève la bordure des boutons */
-  background: transparent; /* Fond transparent pour les boutons */
-  cursor: pointer; /* Curseur de pointeur */
 }
 
 .navb-button:hover {
@@ -127,12 +68,8 @@ nav {
   border-left: 3px solid #3498db;
 }
 
-.nav-link {
-  color: white;
-  text-decoration: none;
-  display: flex;
-  align-items: center;
-  width: 100%;
+.nav-link:hover {
+  color: #1c1c1c;
 }
 
 .nav-link svg {
@@ -141,7 +78,7 @@ nav {
   color: #ecf0f1;
 }
 
-/* Style pour le bouton de déconnexion en bas */
+/* Bouton de déconnexion */
 .logout-section {
   margin-top: auto;
   padding-top: 20px;
@@ -168,7 +105,7 @@ nav {
   background: rgba(231, 76, 60, 0.8);
 }
 
-/* Styles pour les modals */
+/* Modals */
 .modal-overlay {
   position: fixed;
   top: 0;
@@ -205,7 +142,7 @@ nav {
   color: #7f8c8d;
 }
 
-/* Animation pour les boutons */
+/* Animations */
 @keyframes fadeIn {
   from { opacity: 0; transform: translateX(-10px); }
   to { opacity: 1; transform: translateX(0); }

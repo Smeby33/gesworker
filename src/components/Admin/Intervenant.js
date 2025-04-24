@@ -57,6 +57,13 @@ function Intervenant() {
         }
     };
 
+    const closeForms = () => {
+        console.log("Fermeture des formulaires");
+        setActiveIntervenantIndex(null);
+        setSelectedIntervenantForTask(null);
+        setShowAjoutinter(false);
+    };
+
     const getTasksForIntervenant = (intervenantName) => {
         if (!Array.isArray(tasks)) return []; // sécurité en cas de problème
     
@@ -101,9 +108,6 @@ function Intervenant() {
 
                             {showCompanyBtn === index && (
                                 <div className="navclient">
-                                    <div className="nav-button" onClick={() => toggleFormState('activeIntervenantIndex', index)}>
-                                        <FaBuilding className="btnnavicon" /> <p className='btnent' > Add Entreprise</p>
-                                    </div>
                                     <div className="nav-button" onClick={() => toggleFormState('selectedIntervenantForTask', intervenant)}>
                                         <FaFileMedical className="btnnavicon" /> <p className='btnent' > Add Tâches </p>
                                     </div>
@@ -139,8 +143,16 @@ function Intervenant() {
                                   </div>
                                 </div>
 
-                                {activeIntervenantIndex === index && <CreateCompany onCompanyCreated={setCompanies} />}
-                                {selectedIntervenantForTask === intervenant && <InterTaskCreation onIntervenantAdded={setIntervenants} />}
+                                {activeIntervenantIndex === index && (
+                                    <CreateCompany onCompanyCreated={setCompanies} onClose={closeForms} />
+                                )}
+                                {selectedIntervenantForTask === intervenant && (
+                                    <InterTaskCreation 
+                                        onIntervenantAdded={setIntervenants} 
+                                        onClose={closeForms} 
+                                        preselectedIntervenant={intervenant.name} // Passez le nom de l'intervenant
+                                    />
+                                )}
 
                                 {hoveredIntervenant && hoveredIntervenant.name === intervenant.name && (
                                     <div className="intervenant-details">
@@ -165,7 +177,12 @@ function Intervenant() {
                     <p>Aucun intervenant trouvé.</p>
                 )}
             </div>
-            {showAjoutinter && <CreateIntervenant onIntervenantAdded={setIntervenants} />}
+            {showAjoutinter && (
+                <CreateIntervenant 
+                    onIntervenantAdded={setIntervenants} 
+                    setShowAjoutinter={setShowAjoutinter} 
+                />
+            )}
             <ToastContainer />
         </div>
     );

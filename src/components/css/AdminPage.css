@@ -1,50 +1,29 @@
 /* AdminPage.css */
-
-.company {
-  background: #F8F8EE; /* Fond clair pour la section des entreprises */
-  padding: 20px; /* Espace autour du contenu */
-  border-radius: 8px; /* Coins arrondis */
-  display: flex;
-  color: white;
-  flex-direction: column;
-  width: 80%;
-  box-shadow: 0px 2px 3px 5px #06060a;
+/* Bouton de fermeture */
+.close-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: none;
+  border: none;
+  color: #d32f2f;
+  font-size: 20px;
+  cursor: pointer;
+  transition: color 0.3s ease;
 }
 
-.list-unstyled {
-  display: flex;
-  justify-content: space-evenly;
-  align-items: center;
-  margin-top: 1em;
+.close-button:hover {
+  color: #b71c1c;
 }
 
-.divnav {
-  margin-right: 1em;
-  position: relative;
-  width: 100%;
-  z-index: 1000;
-}
-
-.admin-header {
-  width: 100%;
+/* Conteneur principal */
+.AdminPage {
   display: flex;
   justify-content: space-between;
-  text-align: center;
-}
-
-.adtexthead {
-  text-align: center;
-  font-weight: bolder;
-  color: #03de4e;
-  text-shadow: 2px 2px 2px #151111, 1px 1px 2px rgba(0, 0, 0, 0.5);
-}
-
-.company-item {
-  border: 1px solid #0a74da; /* Bord bleu roi */
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 10px; /* Espacement entre les entreprises */
-  background: linear-gradient(15deg, #808080, #000000); /* Fond blanc pour les éléments d'entreprise */
+  width: 100%;
+  min-height: 100vh;
+  background-color: rgb(255, 255, 255);
+  position: relative;
 }
 
 .AdminPagemain {
@@ -55,15 +34,6 @@
   align-items: center;
   flex: 1;
   padding: 2rem;
-  margin-left: 250px; /* Ajustez selon la largeur de votre navbar */
-}
-
-.AdminPage {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  background-color: rgba(133, 146, 157, 0.584);
-  position: relative;
 }
 
 .adminpagepart1 {
@@ -80,7 +50,61 @@
   overflow-y: auto;
 }
 
-/* Navbar styling */
+/* Section des entreprises */
+.company {
+  background-color: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  width: 80%;
+}
+
+.company-item {
+  border: 1px solid #0a74da; /* Bord bleu roi */
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 10px; /* Espacement entre les entreprises */
+  background: linear-gradient(15deg, #808080, #000000); /* Fond blanc pour les éléments d'entreprise */
+}
+
+.company-name {
+  font-size: 1.2rem;
+  color: #7f8c8d;
+  font-style: italic;
+}
+
+/* Liste non stylisée */
+.list-unstyled {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  margin-top: 1em;
+}
+
+.divnav {
+  margin-right: 1em;
+  width: 20%;
+}
+
+.admin-header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  text-align: center;
+}
+
+/* Texte et animations */
+.adtexthead {
+  text-align: center;
+  font-weight: bolder;
+  color: #03de4e;
+  text-shadow: 2px 2px 2px #151111, 1px 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+/* Navigation */
 .navbar {
   color: #fff;
 }
@@ -135,12 +159,6 @@
   animation: fadeIn 0.6s ease-out forwards;
 }
 
-.company-name {
-  font-size: 1.2rem;
-  color: #7f8c8d;
-  font-style: italic;
-}
-
 .btnshow {
   display: flex;
   justify-content: center;
@@ -156,7 +174,6 @@
   border-radius: 10px;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 2px 10px rgba(52, 152, 219, 0.3);
@@ -173,14 +190,6 @@
 
 .btnnavicon {
   font-size: 0.8rem;
-}
-
-.company {
-  background-color: white;
-  border-radius: 10px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
 }
 
 /* Animation pour le titre */

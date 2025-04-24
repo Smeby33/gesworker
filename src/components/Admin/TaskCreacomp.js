@@ -2,13 +2,20 @@ import React, { useEffect, useState } from 'react';
 import '../css/TaskCreation.css';
 import { toast, ToastContainer } from 'react-toastify';
 import { signOut, getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
-
+import {
+  FaUserPlus,
+  FaFileMedical,
+  FaList,
+  FaPlusCircle,
+  FaTimes,
+  FaTh
+} from 'react-icons/fa';
 import 'react-toastify/dist/ReactToastify.css';
 
-function TaskCreation() {
+function TaskCreation({ closeForm, preselectedCompany }) {
   const [tasks, setTasks] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [intervenants, setIntervenants] = useState([]);  
+  const [intervenants, setIntervenants] = useState([]);
   const [companies, setCompanies] = useState([]);
   const [priorités, setPriorités] = useState([]);
   const [adminEmail, setAdminEmail] = useState('');
@@ -18,7 +25,7 @@ function TaskCreation() {
   const [titre, setTitre] = useState('');
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedIntervenants, setSelectedIntervenants] = useState([]);
-  const [selectedCompany, setSelectedCompany] = useState('');
+  const [selectedCompany, setSelectedCompany] = useState(preselectedCompany || ''); // Pré-remplir avec la valeur passée
   const [selectedPriorités, setSelectedPriorités] = useState('');
   const [dateDebut, setDateDebut] = useState(new Date().toISOString().slice(0, 16));
   const [dateFin, setDateFin] = useState('');
@@ -127,6 +134,9 @@ function TaskCreation() {
   return (
     <div className="task-creation-container">
       <ToastContainer />
+      <button className="close-button" onClick={closeForm}>
+        <FaTimes onClick={closeForm} />
+      </button>
       <h3>Création de Tâche</h3>
 
       <form onSubmit={handleTaskCreation} className='formi'>
@@ -197,18 +207,11 @@ function TaskCreation() {
         </div>
         <div>
           <label>Entreprise :</label>
-          <select
+          <input
+            type="text"
             value={selectedCompany}
-            onChange={(e) => setSelectedCompany(e.target.value)}
-            required
-          >
-            <option value="">Sélectionnez une entreprise</option>
-            {companies.map((company, index) => (
-              <option key={index} value={company.company_name}>
-                {company.company_name}
-              </option>
-            ))}
-          </select>
+            readOnly // Empêche la modification
+          />
         </div>
 
         <div>

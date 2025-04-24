@@ -271,6 +271,9 @@ function Tasks() {
   return (
     <div className="tasks-container">
     <h3 id="taches">Liste des Tâches</h3>
+    {ajoutertache && (
+                  <TaskCreation closeForm={() => setAjoutertache(false)} />
+                )}
     <div className="countertask">
       <p className="ptachestyle">Tâches terminées : {taskStats['Terminé'] || 0}</p>
       <p className="ptachestyle">Tâches En cours : {taskStats['En cours'] || 0}</p>
@@ -287,7 +290,7 @@ function Tasks() {
         <FaTh /> Grille
       </button>
       <button onClick={() => setAjoutertache((prev) => !prev)}>
-        <FaUserPlus/> Tâches
+        <FaUserPlus /> Ajouter une tâche
       </button>
     </div>
 
@@ -334,7 +337,6 @@ function Tasks() {
     {filteredTasks.length === 0 && !noTasksMessage ? (
       <div>
         <p>Aucune tâche trouvée.</p>
-        <TaskCreation/>
       </div>
     ) : (
         <div className={`tasks-view ${viewMode}`}>
@@ -409,10 +411,7 @@ function Tasks() {
                   </button>
                 </div>
 
-                {ajoutertache && (
-                  <TaskCreation/>
-                  
-                )}
+               
                 
                 {selectedTaskIdbtn === task.id && (
                   <div className="task-actions">

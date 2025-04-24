@@ -212,13 +212,12 @@ function Company() {
       </div>
 
       {showCreateCompany && (
-         <CreateCompany 
-         onCompanyCreated={handleCompanyCreation}
-         closeForm={() => {
-           setShowCreateCompany(false);
-           closeForm(); // Appel à la fonction originale si nécessaire
-         }}
-       />
+        <CreateCompany 
+          onCompanyCreated={handleCompanyCreation}
+          closeForm={() => {
+            setShowCreateCompany(false); // Ferme le formulaire
+          }}
+        />
       )}
 
       <div className={`client-view ${viewMode}`}>
@@ -244,21 +243,9 @@ function Company() {
 
                 {expandedCompany === company && (
                   <div className="navclient">
-                    <div className="btnnav">
-                      <button 
-                        className="nav-button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          showForm('intervenant');
-                        }}
-                      >
-                        <FaUserPlus className="btnnavicon"/>
-                        <span className="nav-link">Add Intervenant</span>
-                      </button>
-                    </div>
 
                     <div className="btnnav">
-                      <button
+                      <div
                         className="nav-button"
                         onClick={(e) => {
                           e.stopPropagation();
@@ -266,8 +253,8 @@ function Company() {
                         }}
                       >
                         <FaFileMedical className="btnnavicon" />
-                        <span className="nav-link">Add Tâches</span>
-                      </button>
+                        <p className='btnent' >Add Tâches </p>
+                      </div>
                     </div>
                   </div>
                 )}
@@ -278,16 +265,26 @@ function Company() {
                       setIntervenants(updatedIntervenants);
                       closeForm();
                     }}
-                    closeForm={closeForm}
-                  />
+                    closeForm={closeForm} // Passez la fonction closeForm comme prop
+                  >
+                    <button className="close-button" onClick={closeForm}>
+                      <FaTimes /> Fermer
+                    </button>
+                  </CreateIntervenant>
                 )}
 
                 {expandedCompany === company && formToShow === 'task' && (
-                    <TaskCreation
+                  <TaskCreation
+                    preselectedCompany={company.company_name} // Passez le nom de l'entreprise ici
                     closeForm={() => {
                       setShowCreateCompany(false);
                       closeForm(); // Appel à la fonction originale si nécessaire
-                    }}/>
+                    }}
+                  >
+                    <button className="close-button" onClick={closeForm}>
+                      <FaTimes /> Fermer
+                    </button>
+                  </TaskCreation>
                 )}
 
                 {hoveredCompany === company && (
