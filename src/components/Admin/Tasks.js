@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import TaskCreation from './TaskCreation';
 import { getAuth, } from "firebase/auth";
 import TaskComments from '../Intervenant/TaskComments';
- import { FaCheckCircle,FaUserPlus, FaHourglassHalf, FaTh, FaTimesCircle, FaFilter, FaList,FaMailBulk, FaExclamationTriangle } from 'react-icons/fa';
+ import { FaCheckCircle,FaUserPlus, FaHourglassHalf, FaTh, FaTimesCircle,FaFileMedical, FaFilter, FaList,FaMailBulk, FaExclamationTriangle } from 'react-icons/fa';
 import '../css/Tasks.css';
 
 
@@ -290,7 +290,7 @@ function Tasks() {
         <FaTh /> Grille
       </button>
       <button onClick={() => setAjoutertache((prev) => !prev)}>
-        <FaUserPlus /> Ajouter une tâche
+        <FaFileMedical/> Tâches
       </button>
     </div>
 
