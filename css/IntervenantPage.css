@@ -32,20 +32,8 @@
   margin-bottom: 10px; /* Espacement entre les entreprises */
   background: linear-gradient(15deg, #808080, #000000); /* Fond blanc pour les éléments d'entreprise */
 }
-.AdminPagemain{
-  margin-top: 2em;
-  width: 80%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items:center;
-}
-.AdminPage {
-    min-height: 100vh;
-    position: relative;
-    display: flex;
-    background:#F3F7F8;
-  }
+
+
   
   .adminpagepart1 {
     background-color: #001f3f;
@@ -87,7 +75,7 @@
     color: #5592ebe0;
     margin-bottom: 2em;
     overflow: hidden;
-    text-align: start;
+    text-align: center;
     border-right: 2px solid #5b8c85;
     white-space: nowrap;
     width: 32px;
@@ -106,8 +94,6 @@
     font-weight: bolder;
     color: white;
     text-shadow: 2px 2px 2px #151111, 1px 1px 2px rgba(0, 0, 0, 0.5);
-    margin-top: 2em;
-    margin-bottom: 2em;
 }
 
   

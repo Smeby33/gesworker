@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import axios from "axios";
 import {
   FaFileInvoice,
   FaCashRegister,
@@ -18,27 +19,6 @@ function TaskCategories() {
   const [editedCategoryName, setEditedCategoryName] = useState("");
   const [editedCategoryIcon, setEditedCategoryIcon] = useState("");
 
-
-  const defaultCategories = [
-    { name: "Saisie prestataires contractuels", icon: "FaFileInvoice" },
-    { name: "Saisie caisse", icon: "FaCashRegister" },
-    { name: "Saisie autre dépense", icon: "FaCalculator" },
-    { name: "Rapprochement bancaire", icon: "FaBalanceScale" },
-    { name: "Plan de trésorerie", icon: "FaChartLine" },
-    { name: "Arrêté", icon: "FaFileInvoice" },
-    { name: "Reporting", icon: "FaChartLine" },
-    { name: "ID10", icon: "FaFileInvoice" },
-    { name: "ID28", icon: "FaFileInvoice" },
-    { name: "TPS", icon: "FaFileInvoice" },
-    { name: "TVA", icon: "FaCalculator" },
-    { name: "CSS", icon: "FaFileInvoice" },
-    { name: "TSIL", icon: "FaFileInvoice" },
-    { name: "CNSS", icon: "FaFileInvoice" },
-    { name: "CNAMGS", icon: "FaFileInvoice" },
-    { name: "DSF", icon: "FaFileInvoice" },
-    { name: "DAS", icon: "FaFileInvoice" },
-  ];
-
   const iconMapping = {
     FaFileInvoice: <FaFileInvoice />,
     FaCashRegister: <FaCashRegister />,
@@ -47,54 +27,76 @@ function TaskCategories() {
     FaCalculator: <FaCalculator />,
   };
 
+  // 📌 Récupérer les catégories depuis l'API
   useEffect(() => {
-    const storedCategories = JSON.parse(localStorage.getItem("taskCategories"));
-    if (storedCategories && storedCategories.length > 0) {
-      setCategories(storedCategories);
-    } else {
-      localStorage.setItem("taskCategories", JSON.stringify(defaultCategories));
-      setCategories(defaultCategories);
-    }
+    axios
+      .get("https://gesworkerback.onrender.com/categories/toutescategories")
+      .then((response) => {
+        setCategories(response.data);
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la récupération des catégories :", error);
+      });
   }, []);
 
+  // 📌 Ajouter une nouvelle catégorie
   const addCategory = () => {
     if (newCategoryName.trim()) {
-      const newCategory = {
-        name: newCategoryName,
-        icon: newCategoryIcon,
-      };
-      const updatedCategories = [...categories, newCategory];
-      setCategories(updatedCategories);
-      localStorage.setItem("taskCategories", JSON.stringify(updatedCategories));
-      setNewCategoryName("");
+      axios
+        .post("https://gesworkerback.onrender.com/categories/ajouterunecategorie", {
+          name: newCategoryName,
+          icon: newCategoryIcon,
+        })
+        .then((response) => {
+          setCategories([...categories, response.data]);
+          setNewCategoryName("");
+        })
+        .catch((error) => {
+          console.error("Erreur lors de l'ajout :", error);
+        });
     }
   };
 
-  const deleteCategory = (categoryToDelete) => {
-    const updatedCategories = categories.filter(
-      (category) => category.name !== categoryToDelete.name
-    );
-    setCategories(updatedCategories);
-    localStorage.setItem("taskCategories", JSON.stringify(updatedCategories));
+  // 📌 Supprimer une catégorie
+  const deleteCategory = (categoryId) => {
+    axios
+      .delete(`https://gesworkerback.onrender.com/categories/suprimerunecategorie/${categoryId}`)
+      .then(() => {
+        setCategories(categories.filter((category) => category.id !== categoryId));
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la suppression :", error);
+      });
   };
 
+  // 📌 Démarrer l'édition
   const startEditing = (category) => {
     setEditingCategory(category);
     setEditedCategoryName(category.name);
     setEditedCategoryIcon(category.icon);
   };
-  
+
+  // 📌 Sauvegarder la modification
   const saveCategory = () => {
-    const updatedCategories = categories.map((category) =>
-      category.name === editingCategory.name
-        ? { ...category, name: editedCategoryName, icon: editedCategoryIcon }
-        : category
-    );
-    setCategories(updatedCategories);
-    localStorage.setItem("taskCategories", JSON.stringify(updatedCategories));
-    setEditingCategory(null); // Quitte le mode d'édition
+    axios
+      .put(`https://gesworkerback.onrender.com/categories/modifierunegategorie/${editingCategory.id}`, {
+        name: editedCategoryName,
+        icon: editedCategoryIcon,
+      })
+      .then(() => {
+        setCategories(
+          categories.map((category) =>
+            category.id === editingCategory.id
+              ? { ...category, name: editedCategoryName, icon: editedCategoryIcon }
+              : category
+          )
+        );
+        setEditingCategory(null);
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la mise à jour :", error);
+      });
   };
-  
 
   return (
     <div className="task-categories-container" id="Action">
@@ -108,6 +110,17 @@ function TaskCategories() {
           onChange={(e) => setNewCategoryName(e.target.value)}
           className="add-input"
         />
+        <select
+          value={newCategoryIcon}
+          onChange={(e) => setNewCategoryIcon(e.target.value)}
+          className="add-select"
+        >
+          {Object.keys(iconMapping).map((icon) => (
+            <option key={icon} value={icon}>
+              {icon}
+            </option>
+          ))}
+        </select>
         <button onClick={addCategory} className="add-btn">
           <FaPlusCircle /> Ajouter
         </button>
@@ -117,64 +130,54 @@ function TaskCategories() {
         {[0, 1].map((column) => (
           <div key={column} className="task-column">
             {categories
-  .filter((_, index) => index % 2 === column)
-  .map((category, index) => (
-    <div key={index} className="task-item">
-      {editingCategory?.name === category.name ? (
-        // Formulaire d'édition
-        <div className="edit-form">
-          <input
-            type="text"
-            value={editedCategoryName}
-            onChange={(e) => setEditedCategoryName(e.target.value)}
-            className="edit-input"
-          />
-          <select
-            value={editedCategoryIcon}
-            onChange={(e) => setEditedCategoryIcon(e.target.value)}
-            className="edit-select"
-          >
-            {Object.keys(iconMapping).map((icon) => (
-              <option key={icon} value={icon}>
-                {icon}
-              </option>
-            ))}
-          </select>
-          <button onClick={saveCategory} className="save-btn">
-            Sauvegarder
-          </button>
-          <button onClick={() => setEditingCategory(null)} className="cancel-btn">
-            Annuler
-          </button>
-        </div>
-      ) : (
-        // Affichage normal
-        <>
-          <span className="task-icon">{iconMapping[category.icon]}</span>
-          <span className="task-name">{category.name}</span>
-            <div className="catebtn">
-              <button
-                className="edit-btn"
-                onClick={() => startEditing(category)}
-              >
-                Modifier
-              </button>
-              <button
-                className="delete-btn"
-                onClick={() => deleteCategory(category)}
-              >
-                <FaTrashAlt />
-              </button>
-            </div>
-        </>
-      )}
-    </div>
-  ))}
+              .filter((_, index) => index % 2 === column)
+              .map((category, index) => (
+                <div key={index} className="task-item">
+                  {editingCategory?.id === category.id ? (
+                    <div className="edit-form">
+                      <input
+                        type="text"
+                        value={editedCategoryName}
+                        onChange={(e) => setEditedCategoryName(e.target.value)}
+                        className="edit-input"
+                      />
+                      <select
+                        value={editedCategoryIcon}
+                        onChange={(e) => setEditedCategoryIcon(e.target.value)}
+                        className="edit-select"
+                      >
+                        {Object.keys(iconMapping).map((icon) => (
+                          <option key={icon} value={icon}>
+                            {icon}
+                          </option>
+                        ))}
+                      </select>
+                      <button onClick={saveCategory} className="save-btn">
+                        Sauvegarder
+                      </button>
+                      <button onClick={() => setEditingCategory(null)} className="cancel-btn">
+                        Annuler
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <span className="task-icon">{iconMapping[category.icon]}</span>
+                      <span className="task-name">{category.name}</span>
+                      <div className="catebtn">
+                        <button className="edit-btn" onClick={() => startEditing(category)}>
+                          Modifier
+                        </button>
+                        <button className="delete-btn" onClick={() => deleteCategory(category.id)}>
+                          <FaTrashAlt />
+                        </button>
+                      </div>
+                    </>
+                  )}
+                </div>
+              ))}
           </div>
         ))}
       </div>
-
-      
     </div>
   );
 }

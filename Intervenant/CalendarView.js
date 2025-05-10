@@ -10,7 +10,7 @@ function CalendarView() {
   const [events, setEvents] = useState([]);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/tasks')
+    axios.get('https://gesworkerback.onrender.com/tasks')
       .then(response => {
         const tasks = response.data.map(task => ({
           title: task.titre,
@@ -19,7 +19,6 @@ function CalendarView() {
         }));
         setEvents(tasks);
       })
-      .catch(error => console.error('Error fetching tasks:', error));
   }, []);
 
   return (

@@ -7,7 +7,7 @@
     padding: 1em;
     background: linear-gradient(15deg, #808080, #000000);
     position: absolute;
-    top: 20%;
+    top: 2%;
     left: 45%;
     margin-left: 20px; /* Décalage pour qu'il ne soit pas trop collé à l'élément */
     width: 450px; /* Réduit la largeur du détail */
