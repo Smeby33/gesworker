@@ -241,10 +241,10 @@ useEffect(() => {
               onMouseLeave={() => setShowTaskStats(false)}
             >
               <a href="#taches">
-                <FaTasks className="me-3" /> Liste des Tâches
+                <FaTasks id="me-3" /> Liste des Tâches
               </a>
               <p className='petitp' >total: {countTasks}</p>
-                            {showTaskStats && (
+                            {/* {showTaskStats && (
                               <div className="task-stats">
                                 <span className="stat-completed">
                                   {taskStats['Terminé']} <FaCheckCircle /> 
@@ -256,7 +256,7 @@ useEffect(() => {
                                   {taskStats.overdue} <FaExclamationTriangle />
                                 </span>
                               </div>
-                            )}
+                            )} */}
             </div>
 
 
@@ -267,7 +267,7 @@ useEffect(() => {
               onClick={() => setSelectedView('Calendrier')}
             >
               <a href="#Calendrier">
-                <FaCalendarAlt className="me-4" /> Calendrier
+                <FaCalendarAlt id="me-4" /> Calendrier
               </a>
             </div>
 
@@ -279,7 +279,7 @@ useEffect(() => {
               onClick={() => setSelectedView('Performance')}
             >
               <a href="#Performances">
-                <FaUserGraduate className="me-5" /> Performances
+                <FaUserGraduate id="me-5" /> Performances
               </a>
                { <p className='petitp' >total: {performances}</p>}
 

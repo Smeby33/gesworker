@@ -107,39 +107,33 @@ function Dashboardintervenant() {
   };
 
   return (
-    <Container fluid className="Dashboard" id='tableau'>
-      <Row>
-        {/* Barre de navigation à gauche */}
-        <div className="nav-buttons">
-          <div className="butondash1">
+    <Container fluid className="Dashboard" id='tableau' style={{ display: 'flex', flexDirection: 'row', height: '100vh',justifyContent: 'space-between',width:'100%' }}>
+      <div className="nav-buttons-inter" style={{ width: '30%' }}>
             <div
-              id="companyadm"
-              className="w-24% mb-2 d-flex align-items-center"
+              className="navb-button1"
               onClick={() => setSelectedView('intervenants')}
             >
-              <a href="#intervenants">
+              <a className='nav-link1' href="#intervenants">
                 <FaUserTie className="me-2" /> Mes collègues
               </a>
               <p>total : {countIntervenants}</p>
             </div>
             <div
-              id="companyadm"
-              className="w-24% mb-2 d-flex align-items-center"
+              className="navb-button1"
               onClick={() => setSelectedView('clients')}
             >
-              <a href="#clients">
+              <a className='nav-link1' href="#clients">
                 <FaUsers className="me-2" />Clients
               </a>
               <p>total: {countClients}</p>
             </div>
             <div
-              id="companyadm"
-              className="w-24% d-flex align-items-center task-menu-item"
+              className="navb-button1"
               onClick={() => setSelectedView('taches')}
               onMouseEnter={() => setShowTaskStats(true)}
               onMouseLeave={() => setShowTaskStats(false)}
             >
-              <a href="#taches">
+              <a className='nav-link1' href="#taches">
                 <FaTasks className="me-2" /> Mes Tâches
               </a>
               <p>total: {countTasks}</p>
@@ -158,13 +152,12 @@ function Dashboardintervenant() {
               )}
             </div>
             <div
-              id="companyadm"
-              className="w-24% d-flex align-items-center"
+              className="navb-button1"
               onClick={() => setSelectedView('Performance')}
               onMouseEnter={() => setShowPerformanceStats(true)}
               onMouseLeave={() => setShowPerformanceStats(false)}
             >
-              <a href="#Performances">
+              <a className='nav-link1' href="#Performances">
                 <FaUserGraduate className="me-2" />Mes performances
               </a>
               <p>total: {countTasks}</p>
@@ -182,11 +175,83 @@ function Dashboardintervenant() {
                 </div>
               )}
             </div>
-          </div>
+        
         </div>
+      <Row className="sepa" style={{ width: '80%',marginLeft: '2%',minWidth:'80%'}} >
+        {/* Barre de navigation à gauche */}
+        
+        {/* <div className="nav-buttons-inter" style={{ width: '20%' }}>
+            <div
+              className="navb-button1"
+              onClick={() => setSelectedView('intervenants')}
+            >
+              <a className='nav-link1' href="#intervenants">
+                <FaUserTie className="me-2" /> Mes collègues
+              </a>
+              <p>total : {countIntervenants}</p>
+            </div>
+            <div
+              className="navb-button1"
+              onClick={() => setSelectedView('clients')}
+            >
+              <a className='nav-link1' href="#clients">
+                <FaUsers className="me-2" />Clients
+              </a>
+              <p>total: {countClients}</p>
+            </div>
+            <div
+              className="navb-button1"
+              onClick={() => setSelectedView('taches')}
+              onMouseEnter={() => setShowTaskStats(true)}
+              onMouseLeave={() => setShowTaskStats(false)}
+            >
+              <a className='nav-link1' href="#taches">
+                <FaTasks className="me-2" /> Mes Tâches
+              </a>
+              <p>total: {countTasks}</p>
+              {showTaskStats && (
+                <div className="task-stats">
+                  <span className="stat-completed">
+                    {taskStats['Terminé']} <FaCheckCircle /> 
+                  </span>
+                  <span className="stat-in-progress">
+                    {taskStats['En cours']} <FaHourglassHalf />
+                  </span>
+                  <span className="stat-overdue">
+                    {taskStats.overdue} <FaExclamationTriangle />
+                  </span>
+                </div>
+              )}
+            </div>
+            <div
+              className="navb-button1"
+              onClick={() => setSelectedView('Performance')}
+              onMouseEnter={() => setShowPerformanceStats(true)}
+              onMouseLeave={() => setShowPerformanceStats(false)}
+            >
+              <a className='nav-link1' href="#Performances">
+                <FaUserGraduate className="me-2" />Mes performances
+              </a>
+              <p>total: {countTasks}</p>
+              {showPerformanceStats && (
+                <div className="task-stats">
+                  <span className="stat-completed">
+                    {taskStats['Terminé']} <FaCheckCircle /> 
+                  </span>
+                  <span className="stat-in-progress">
+                    {taskStats['En cours']} <FaHourglassHalf />
+                  </span>
+                  <span className="stat-overdue">
+                    {taskStats.overdue} <FaExclamationTriangle />
+                  </span>
+                </div>
+              )}
+            </div>
+        
+        </div> */}
 
         {/* Contenu dynamique en fonction de la vue sélectionnée */}
-        <div xs={12} md={9} className="p-4 contenu " id='p-4'>
+        <div xs={12} md={9} className="p-4 contenu " id='p-4'style={{ width: '100%' }}>
           {renderContent()}
         </div>
       </Row>

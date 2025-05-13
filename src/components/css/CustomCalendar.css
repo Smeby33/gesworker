@@ -643,3 +643,9 @@ button.react-calendar__navigation__arrow:hover {
     padding: 4px 6px;
   }
 }
+
+.export-buttons {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}

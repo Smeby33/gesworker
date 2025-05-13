@@ -203,8 +203,7 @@ function Tasksinter() {
 
       {filteredTasks.length === 0 && !noTasksMessage ? (
         <div>
-          <p>Aucune tâche trouvée.</p>
-          <TaskCreation/>
+          <p>Aucune tâche n’est actuellement assignée. Vous recevrez bientôt une tâche ou pouvez contacter votre supérieur pour plus d’informations.</p>
         </div>
       ) : (
         <div className={`tasks-view ${viewMode}`}>
