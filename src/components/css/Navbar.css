@@ -13,7 +13,7 @@
 /* Styles pour la navbar */
 nav {
   padding: 2em;
-  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  background: gray;
   color: white;
   height: 100vh;
   width: 250px;

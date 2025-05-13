@@ -25,7 +25,7 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  border: 3px solid #3498db;
+  border: 3px solid #666;
   transition: all 0.3s ease;
 }
 
